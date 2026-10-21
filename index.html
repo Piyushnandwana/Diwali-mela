@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Shubh Diwali 3D Mela - Fully Interactive Carnival</title>
+  <title>Shubh Diwali 3D Mela - Free Crackers & Boutique</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; background: #05020c; touch-action: none; }
@@ -20,9 +20,23 @@
     #hud p { margin: 2px 0; font-size: 13px; color: #fff; }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-weight: bold; background: #15803d; color: #bbf7d0; font-size: 11px; }
 
+    /* On-Screen Cracker Action Bar (Burn & Throw Anywhere) */
+    #cracker-action-bar {
+      position: absolute; bottom: 80px; right: 20px;
+      display: flex; flex-direction: column; gap: 8px; z-index: 25;
+    }
+    .action-btn {
+      background: linear-gradient(135deg, #b91c1c, #ea580c); color: #fff;
+      border: 2px solid #ffd700; padding: 10px 16px; border-radius: 20px;
+      font-size: 13px; font-weight: bold; cursor: pointer; transition: transform 0.1s;
+      box-shadow: 0 4px 15px rgba(234, 88, 12, 0.6); display: flex; align-items: center; gap: 6px;
+    }
+    .action-btn:hover { transform: scale(1.06); background: linear-gradient(135deg, #ea580c, #f59e0b); }
+    .action-btn.throw { background: linear-gradient(135deg, #4338ca, #6366f1); border-color: #a5b4fc; }
+
     /* Bottom Greeting Bar */
     #greeting-bar {
-      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
       display: flex; gap: 8px; background: rgba(20, 8, 30, 0.94);
       padding: 8px 16px; border-radius: 40px; border: 2px solid #ffd700;
       box-shadow: 0 4px 30px rgba(255, 120, 0, 0.5); z-index: 20; max-width: 95vw; overflow-x: auto;
@@ -34,7 +48,7 @@
     }
     .greet-btn:hover { transform: scale(1.06) translateY(-2px); background: linear-gradient(135deg, #ff7e26, #ffd000); color: #220500; }
 
-    /* Touch Joystick for Mobile Movement */
+    /* Touch Joystick for Mobile */
     #mobile-controls {
       position: absolute; bottom: 85px; left: 24px; width: 110px; height: 110px;
       background: rgba(255, 255, 255, 0.12); border: 2px dashed rgba(255, 215, 0, 0.5);
@@ -47,7 +61,7 @@
       pointer-events: none;
     }
 
-    /* Interactive Action Prompt Banner */
+    /* Interaction Prompt Banner */
     #interaction-prompt {
       position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%);
       background: linear-gradient(90deg, #b91c1c, #ea580c); color: #fff;
@@ -66,7 +80,6 @@
       font-size: 14px; font-weight: bold; cursor: pointer; display: none; z-index: 30;
       box-shadow: 0 4px 20px rgba(239, 68, 68, 0.6);
     }
-    #dismount-btn:hover { transform: scale(1.05); }
 
     /* Spawn / Entry Card */
     #spawn-screen {
@@ -88,12 +101,12 @@
       font-weight: bold; cursor: pointer; width: 95%;
     }
 
-    /* Modal */
+    /* Modals */
     .modal {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       background: #1c0e30; color: #fff; border: 2px solid #ffd700;
       padding: 22px; border-radius: 16px; display: none; z-index: 100;
-      box-shadow: 0 0 45px rgba(0,0,0,0.9); min-width: 300px; text-align: center;
+      box-shadow: 0 0 45px rgba(0,0,0,0.9); min-width: 320px; text-align: center;
     }
     .modal button {
       background: #ea580c; color: #fff; border: none; padding: 9px 16px;
@@ -120,9 +133,9 @@
   <div id="spawn-screen">
     <div class="spawn-card">
       <h2 style="color: #ffd700; margin-top: 0;">🪔 Shubh Diwali Mela</h2>
-      <p style="font-size: 13px; color: #d1d5db;">Ride the giant Jhoola, ring temple bells, sit for chai, and burst physics crackers!</p>
+      <p style="font-size: 13px; color: #d1d5db;">All crackers and traditional outfits are 100% free! Burn, place or throw anywhere.</p>
       <input type="text" id="username-input" placeholder="Enter Your Name" maxlength="14" />
-      <button onclick="joinMela()">Enter Grand Mela ✨</button>
+      <button onclick="joinMela()">Enter Free Grand Mela ✨</button>
     </div>
   </div>
 
@@ -131,20 +144,25 @@
     <h2>🪔 SHUBH DIWALI MELA</h2>
     <p>👤 Player: <b id="display-name">-</b></p>
     <p>🟢 Live In Mela: <span class="badge" id="online-count">1 Online</span></p>
-    <p>🪙 Coins: <span id="coin-count">100</span></p>
+    <p>🎁 Festive Pass: <b style="color:#86efac;">100% Free Access</b></p>
+    <p>👗 Kurta: <span id="kurta-name" style="color:#ffd700;">Royal Saffron</span></p>
     <p>🎡 Ride State: <b id="ride-state" style="color:#ffd700;">On Foot</b></p>
-    <p>🔄 <b>Swipe / Drag</b> to look around</p>
   </div>
 
-  <!-- Exit Ride Button -->
+  <!-- Throw & Place Cracker Action Bar -->
+  <div id="cracker-action-bar" style="display: none;">
+    <button class="action-btn throw" onclick="throwBomb()">💣 Throw Sutli Bomb!</button>
+    <button class="action-btn" onclick="burnHere('rocket')">🚀 Shoot Sky Rocket</button>
+    <button class="action-btn" onclick="burnHere('chakri')">🌀 Spin Chakri Here</button>
+    <button class="action-btn" onclick="burnHere('anar')">🌋 Place Anar Here</button>
+  </div>
+
   <button id="dismount-btn" onclick="dismountCurrentRide()">🚪 Dismount Ride (Exit Jhoola)</button>
 
-  <!-- Mobile Movement Joystick -->
   <div id="mobile-controls">
     <div id="joystick-knob"></div>
   </div>
 
-  <!-- Quick Greetings -->
   <div id="greeting-bar" style="display: none;">
     <button class="greet-btn" onclick="sendGreeting('🙏 Namaste!')">🙏 Namaste!</button>
     <button class="greet-btn" onclick="sendGreeting('🪔 Happy Diwali!')">🪔 Happy Diwali!</button>
@@ -201,17 +219,12 @@
        3. ORBIT CAMERA RIG
        ========================================================================= */
     const CameraOrbit = {
-      theta: 0.78,
-      phi: 0.65,
-      radius: 17,
-      isDragging: false,
-      lastX: 0,
-      lastY: 0
+      theta: 0.78, phi: 0.65, radius: 17, isDragging: false, lastX: 0, lastY: 0
     };
 
     const container = document.getElementById('canvas-container');
     container.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('#mobile-controls') || e.target.closest('#hud') || e.target.closest('#greeting-bar') || e.target.closest('#dismount-btn')) return;
+      if (e.target.closest('#mobile-controls') || e.target.closest('#hud') || e.target.closest('#greeting-bar') || e.target.closest('#dismount-btn') || e.target.closest('#cracker-action-bar')) return;
       CameraOrbit.isDragging = true;
       CameraOrbit.lastX = e.clientX;
       CameraOrbit.lastY = e.clientY;
@@ -235,7 +248,7 @@
     }, { passive: true });
 
     /* =========================================================================
-       4. FESTIVE ENVIRONMENT: GROUND, PATHS, DIYAS, RIDES
+       4. FESTIVE ENVIRONMENT: GROUND, PATHS & DIYAS
        ========================================================================= */
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(160, 160),
@@ -280,7 +293,7 @@
     rangoli.position.set(0, 0.05, 0);
     scene.add(rangoli);
 
-    // Interactive Street Diyas
+    // Street Diyas
     const interactiveDiyas = [];
     for (let i = -35; i <= 35; i += 7) {
       if (Math.abs(i) > 6) {
@@ -290,18 +303,16 @@
           const base = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.12, 0.14, 10), new THREE.MeshStandardMaterial({ color: 0x9a3412 }));
           diya.add(base);
           const flame = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffea00 }));
-          flame.position.y = 0.14;
-          diya.add(flame);
+          flame.position.y = 0.14; diya.add(flame);
           const pl = new THREE.PointLight(0xff7700, 1.2, 7);
-          pl.position.y = 0.25;
-          diya.add(pl);
+          pl.position.y = 0.25; diya.add(pl);
           scene.add(diya);
-          interactiveDiyas.push({ group: diya, flame, pl, isLit: true, offset: Math.random() * 10 });
+          interactiveDiyas.push({ group: diya, flame, pl, offset: Math.random() * 10 });
         });
       }
     }
 
-    // Overhead Fairy Lights
+    // Overhead Lights
     const fairyColors = [0xff2200, 0xffd700, 0x00ffcc, 0xff00aa, 0x00ff44];
     for (let z = -20; z <= 20; z += 10) {
       for (let x = -26; x <= 26; x += 3.5) {
@@ -315,20 +326,103 @@
     }
 
     /* =========================================================================
-       5. BOARDABLE FERRIS WHEEL (GIANT JHOOLA)
+       5. DETAILED PATAKHA SHOP WITH FULL SHELF DISPLAYS
+       ========================================================================= */
+    const patakhaShop = new THREE.Group();
+    patakhaShop.position.set(-18, 0, -5);
+
+    // Shop Canopy & Desk
+    const pCanopy = new THREE.Mesh(new THREE.ConeGeometry(4.2, 2.2, 4), new THREE.MeshStandardMaterial({ color: 0xd97706 }));
+    pCanopy.position.y = 5.2; pCanopy.rotation.y = Math.PI / 4; patakhaShop.add(pCanopy);
+
+    const pDesk = new THREE.Mesh(new THREE.BoxGeometry(5.2, 1.4, 1.8), new THREE.MeshStandardMaterial({ color: 0x78350f }));
+    pDesk.position.set(0, 0.7, 1.2); patakhaShop.add(pDesk);
+
+    // Multi-tier Shelf Behind Counter
+    const shelfBack = new THREE.Mesh(new THREE.BoxGeometry(4.8, 3.2, 0.4), new THREE.MeshStandardMaterial({ color: 0x451a03 }));
+    shelfBack.position.set(0, 2.2, -0.6); patakhaShop.add(shelfBack);
+
+    // Display Crackers: Red Sutli Bomb stacks, Green Chakri boxes, Gold Anars
+    for (let row = 0; row < 3; row++) {
+      const shelfY = 1.2 + row * 1.0;
+      const shelfPlank = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.08, 0.8), new THREE.MeshStandardMaterial({ color: 0x78350f }));
+      shelfPlank.position.set(0, shelfY, -0.2); patakhaShop.add(shelfPlank);
+
+      for (let col = -1.8; col <= 1.8; col += 0.8) {
+        if (row === 0) {
+          // Cracker Boxes (Ladi / Cartons)
+          const box = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.5), new THREE.MeshStandardMaterial({ color: 0xb91c1c }));
+          box.position.set(col, shelfY + 0.24, -0.2); patakhaShop.add(box);
+        } else if (row === 1) {
+          // Conical Anar Displays
+          const anarCone = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.5, 8), new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.6 }));
+          anarCone.position.set(col, shelfY + 0.28, -0.2); patakhaShop.add(anarCone);
+        } else {
+          // Rocket Bundles
+          const rktBundle = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.7, 8), new THREE.MeshStandardMaterial({ color: 0x0284c7 }));
+          rktBundle.position.set(col, shelfY + 0.38, -0.2); patakhaShop.add(rktBundle);
+        }
+      }
+    }
+
+    // Counter Display Props
+    const counterTray = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.1, 0.8), new THREE.MeshStandardMaterial({ color: 0xd4af37 }));
+    counterTray.position.set(-1.2, 1.45, 1.2); patakhaShop.add(counterTray);
+
+    // Glowing Neon Sign
+    function createBanner(text, bgCol = '#831843') {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 128;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = bgCol; ctx.fillRect(0,0,512,128);
+      ctx.lineWidth = 6; ctx.strokeStyle = '#ffd700'; ctx.strokeRect(4,4,504,120);
+      ctx.fillStyle = '#ffea79'; ctx.font = 'bold 36px Segoe UI'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(text, 256, 64);
+      return new THREE.CanvasTexture(c);
+    }
+    const patakhaBanner = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshBasicMaterial({ map: createBanner("🎆 Free Patakha Bhandar", '#991b1b'), transparent: true }));
+    patakhaBanner.position.set(0, 6.2, 0); patakhaShop.add(patakhaBanner);
+    scene.add(patakhaShop);
+
+    /* =========================================================================
+       6. KURTA-PYJAMA & TRADITIONAL DRESS BOUTIQUE
+       ========================================================================= */
+    const kurtaShop = new THREE.Group();
+    kurtaShop.position.set(-18, 0, 15);
+
+    const kCanopy = new THREE.Mesh(new THREE.ConeGeometry(4.2, 2.2, 4), new THREE.MeshStandardMaterial({ color: 0x7c3aed }));
+    kCanopy.position.y = 5.2; kCanopy.rotation.y = Math.PI / 4; kurtaShop.add(kCanopy);
+
+    const kDesk = new THREE.Mesh(new THREE.BoxGeometry(5.2, 1.4, 1.6), new THREE.MeshStandardMaterial({ color: 0x581c87 }));
+    kDesk.position.set(0, 0.7, 1.2); kurtaShop.add(kDesk);
+
+    // Mannequin Racks with Different Colored Kurtas
+    const rackColors = [0xd97706, 0xdc2626, 0x0284c7, 0x059669, 0x9333ea];
+    rackColors.forEach((col, idx) => {
+      const manGroup = new THREE.Group();
+      manGroup.position.set(-2 + idx * 1.0, 1.4, -0.4);
+      // Mannequin Torso
+      const mTorso = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.28, 0.8, 12), new THREE.MeshStandardMaterial({ color: col, roughness: 0.4 }));
+      manGroup.add(mTorso);
+      // Stand Pole
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.4), new THREE.MeshStandardMaterial({ color: 0xd4af37 }));
+      pole.position.y = -0.7; manGroup.add(pole);
+      kurtaShop.add(manGroup);
+    });
+
+    const kurtaBanner = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshBasicMaterial({ map: createBanner("👗 Free Kurta-Pyjama Boutique", '#6b21a8'), transparent: true }));
+    kurtaBanner.position.set(0, 6.2, 0); kurtaShop.add(kurtaBanner);
+    scene.add(kurtaShop);
+
+    /* =========================================================================
+       7. BOARDABLE JHOOLA (FERRIS WHEEL) & CAROUSEL
        ========================================================================= */
     const ferrisGroup = new THREE.Group();
     ferrisGroup.position.set(26, 0, 15);
-
     const supportMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8 });
     const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.25, 16), supportMat);
     leg1.position.set(-2, 8, -2); leg1.rotation.z = -0.15; ferrisGroup.add(leg1);
     const leg2 = leg1.clone(); leg2.position.x = 2; leg2.rotation.z = 0.15; ferrisGroup.add(leg2);
-
-    // Boarding Platform
-    const boardPlatform = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 3), new THREE.MeshStandardMaterial({ color: 0x78350f }));
-    boardPlatform.position.set(0, 0.6, 2.5);
-    ferrisGroup.add(boardPlatform);
 
     const wheelRotator = new THREE.Group();
     wheelRotator.position.set(0, 13.5, 0);
@@ -341,16 +435,10 @@
       const spoke = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 16), supportMat);
       spoke.rotation.z = rad; wheelRotator.add(spoke);
 
-      // Passenger Gondola Carriage with seat
       const podGroup = new THREE.Group();
       podGroup.position.set(Math.cos(rad) * 8, Math.sin(rad) * 8, 0);
-
-      const podMesh = new THREE.Mesh(
-        new THREE.BoxGeometry(1.6, 1.6, 1.6),
-        new THREE.MeshStandardMaterial({ color: fairyColors[i % fairyColors.length], roughness: 0.3 })
-      );
+      const podMesh = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.6), new THREE.MeshStandardMaterial({ color: fairyColors[i % fairyColors.length] }));
       podGroup.add(podMesh);
-
       wheelRotator.add(podGroup);
       ferrisGondolas.push({ group: podGroup, baseAngle: rad });
     }
@@ -358,51 +446,10 @@
     scene.add(ferrisGroup);
 
     /* =========================================================================
-       6. BOARDABLE CAROUSEL (CHAKRI JHOOLA)
-       ========================================================================= */
-    const carouselGroup = new THREE.Group();
-    carouselGroup.position.set(-26, 0, 15);
-    const centerPole = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 7), new THREE.MeshStandardMaterial({ color: 0xd97706 }));
-    centerPole.position.y = 3.5; carouselGroup.add(centerPole);
-    const cCanopy = new THREE.Mesh(new THREE.ConeGeometry(5.5, 2, 16), new THREE.MeshStandardMaterial({ color: 0xb91c1c }));
-    cCanopy.position.y = 7; carouselGroup.add(cCanopy);
-
-    const carouselSpinner = new THREE.Group();
-    carouselSpinner.position.y = 3;
-    const carouselSeats = [];
-
-    for (let i = 0; i < 6; i++) {
-      const rad = (i * Math.PI * 2) / 6;
-      const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 3.5), supportMat);
-      rod.position.set(Math.cos(rad) * 3.8, 1.75, Math.sin(rad) * 3.8);
-      carouselSpinner.add(rod);
-
-      const horse = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.6, 1.2), new THREE.MeshStandardMaterial({ color: fairyColors[i % fairyColors.length] }));
-      horse.position.set(Math.cos(rad) * 3.8, 0.8, Math.sin(rad) * 3.8);
-      carouselSpinner.add(horse);
-      carouselSeats.push(horse);
-    }
-    carouselGroup.add(carouselSpinner);
-    scene.add(carouselGroup);
-
-    /* =========================================================================
-       7. INTERACTIVE CHAI & MITHAI TAPRI (WITH SEATING STOOLS)
-       ========================================================================= */
-    const chaiGroup = new THREE.Group();
-    chaiGroup.position.set(18, 0, -5);
-
-    // Stool 1 (Morha)
-    const stool = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.6, 12), new THREE.MeshStandardMaterial({ color: 0x9a3412 }));
-    stool.position.set(0, 0.3, 3);
-    chaiGroup.add(stool);
-    scene.add(chaiGroup);
-
-    /* =========================================================================
-       8. LAKSHMI TEMPLE WITH RINGABLE BELL (GHANTI) & AARTI
+       8. LAKSHMI TEMPLE WITH RINGABLE BELL & AARTI
        ========================================================================= */
     const templeGroup = new THREE.Group();
     templeGroup.position.set(0, 0, -24);
-
     const plinth = new THREE.Mesh(new THREE.BoxGeometry(14, 1.2, 10), new THREE.MeshStandardMaterial({ color: 0xf5f3ef, roughness: 0.2 }));
     plinth.position.y = 0.6; templeGroup.add(plinth);
 
@@ -416,7 +463,6 @@
     const dome = new THREE.Mesh(new THREE.ConeGeometry(5.5, 5.5, 8), new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.3 }));
     dome.position.y = 9; templeGroup.add(dome);
 
-    // Hanging Temple Brass Bell (Ghanti)
     const bellGroup = new THREE.Group();
     bellGroup.position.set(0, 5.2, 0);
     const bellChain = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.4), pMat);
@@ -443,7 +489,7 @@
     mandirLight.position.set(0, 3.5, 0); templeGroup.add(mandirLight);
     scene.add(templeGroup);
 
-    /* --- Aarti Thali & Marigold Shower --- */
+    /* --- Aarti Thali & Petal Shower --- */
     let aartiThali = null;
     let isDoingAarti = false;
     let aartiAngle = 0;
@@ -481,7 +527,6 @@
         const p = petals[i];
         p.mesh.position.y += p.vy;
         p.mesh.rotation.x += p.rotSpeed;
-        p.mesh.rotation.y += p.rotSpeed;
         p.life--;
         if (p.mesh.position.y <= 1.2 || p.life <= 0) {
           scene.remove(p.mesh); petals.splice(i, 1);
@@ -490,7 +535,7 @@
     }
 
     /* =========================================================================
-       9. REAL PHYSICS CRACKERS (Rockets, Chakris, Anars)
+       9. ADVANCED CRACKER PHYSICS: BURN & THROW ANYWHERE
        ========================================================================= */
     const activeCrackers = [];
     const particles = [];
@@ -504,6 +549,7 @@
       }
     }
 
+    // 1. Sky Rocket
     function launchPhysicsRocket(x, z) {
       const rGroup = new THREE.Group();
       const body = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.8), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
@@ -519,21 +565,53 @@
       activeCrackers.push({ type: 'rocket', mesh: rGroup, cBody, fuel: 85, light });
     }
 
+    // 2. Chakri
     function launchChakri(x, z) {
       const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.08, 16), new THREE.MeshStandardMaterial({ color: 0x10b981 }));
       mesh.position.set(x, 0.05, z); scene.add(mesh);
       activeCrackers.push({ type: 'chakri', mesh, life: 140, angle: 0 });
     }
 
+    // 3. Anar
     function launchAnar(x, z) {
       const mesh = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.6, 12), new THREE.MeshStandardMaterial({ color: 0xb45309 }));
       mesh.position.set(x, 0.3, z); scene.add(mesh);
       activeCrackers.push({ type: 'anar', mesh, life: 120 });
     }
 
+    // 4. Thrown Physics Sutli Bomb (Projectile)
+    function launchThrownBomb(origin, forwardDirection) {
+      const bMesh = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 12), new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.8 }));
+      bMesh.position.copy(origin);
+      scene.add(bMesh);
+
+      // Cannon rigid-body with realistic bounce
+      const cBody = new CANNON.Body({
+        mass: 1.2,
+        shape: new CANNON.Sphere(0.22),
+        position: new CANNON.Vec3(origin.x, origin.y + 1.2, origin.z)
+      });
+
+      // Throw velocity forward & upward
+      cBody.velocity.set(
+        forwardDirection.x * 12 + (Math.random() - 0.5) * 2,
+        6.5,
+        forwardDirection.z * 12 + (Math.random() - 0.5) * 2
+      );
+      world.addBody(cBody);
+
+      activeCrackers.push({
+        type: 'bomb',
+        mesh: bMesh,
+        cBody: cBody,
+        fuse: 70 // Explodes after fuse timer
+      });
+    }
+
     function updateCrackerPhysics() {
       for (let i = activeCrackers.length - 1; i >= 0; i--) {
         const c = activeCrackers[i];
+
         if (c.type === 'rocket') {
           if (c.fuel > 0) {
             c.cBody.applyForce(new CANNON.Vec3((Math.random() - 0.5) * 1.5, 13, (Math.random() - 0.5) * 1.5), c.cBody.position);
@@ -566,6 +644,25 @@
             particles.push({ mesh, vel: new THREE.Vector3((Math.random() - 0.5) * 0.25, Math.random() * 0.55 + 0.25, (Math.random() - 0.5) * 0.25), life: 40, gravity: 0.016 });
           }
           if (c.life <= 0) { scene.remove(c.mesh); activeCrackers.splice(i, 1); }
+        } else if (c.type === 'bomb') {
+          c.fuse--;
+          c.mesh.position.copy(c.cBody.position);
+          c.mesh.quaternion.copy(c.cBody.quaternion);
+
+          // Sizzling spark trail while flying
+          spawnSparks(c.mesh.position, 2, 0xffea00, 0.05);
+
+          if (c.fuse <= 0) {
+            // Massive Detonation Burst
+            spawnSparks(c.cBody.position, 160, 0xff3b30, 0.9);
+            spawnSparks(c.cBody.position, 140, 0xffcc00, 0.8);
+            const blast = new THREE.PointLight(0xffea00, 9, 35);
+            blast.position.copy(c.cBody.position); scene.add(blast);
+            setTimeout(() => scene.remove(blast), 180);
+
+            world.remove(c.cBody); scene.remove(c.mesh);
+            activeCrackers.splice(i, 1);
+          }
         }
       }
 
@@ -579,20 +676,19 @@
     }
 
     /* =========================================================================
-       10. ARTICULATED SKELETAL AVATAR & RIDE SYSTEM
+       10. ARTICULATED SKELETAL AVATAR & WARDROBE
        ========================================================================= */
     const LocalPlayer = {
       id: "usr_" + Math.floor(Math.random() * 100000),
       name: "Player",
-      coins: 100,
       pos: { x: 0, y: 0, z: 8 },
       rotY: 0,
       meshGroup: null,
       limbs: {},
+      kurtaColorHex: 0xd97706,
       walkCycle: 0,
       breathCycle: 0,
-      currentRide: null, // null | 'ferris' | 'carousel' | 'tapri'
-      rideIndex: 0
+      currentRide: null
     };
 
     function createNameplate(text) {
@@ -612,12 +708,12 @@
       return sprite;
     }
 
-    function buildArticulatedAvatar(name) {
+    function buildArticulatedAvatar(name, kurtaHex = 0xd97706) {
       const group = new THREE.Group();
       const limbs = {};
 
       const skinMat = new THREE.MeshStandardMaterial({ color: 0xdfa07a, roughness: 0.6 });
-      const kurtaMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.4 });
+      const kurtaMat = new THREE.MeshStandardMaterial({ color: kurtaHex, roughness: 0.4 });
       const pyjamaMat = new THREE.MeshStandardMaterial({ color: 0xfdfcf7, roughness: 0.6 });
       const goldMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.2 });
 
@@ -625,6 +721,7 @@
       const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 1.28, 16), kurtaMat);
       torso.position.y = 1.45; torso.castShadow = true; group.add(torso);
       limbs.torso = torso;
+      limbs.kurtaMat = kurtaMat;
 
       // Angavastram Sash
       const sash = new THREE.Mesh(new THREE.TorusGeometry(0.48, 0.08, 8, 24), goldMat);
@@ -642,12 +739,15 @@
       const tilak = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.09, 0.02), new THREE.MeshBasicMaterial({ color: 0xdc2626 }));
       tilak.position.set(0, 2.36, 0.26); group.add(tilak);
 
-      const pagri = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.12, 12, 24), new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.4 }));
+      const pagriMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.4 });
+      const pagri = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.12, 12, 24), pagriMat);
       pagri.position.y = 2.45; pagri.rotation.x = Math.PI / 2; group.add(pagri);
+      limbs.pagriMat = pagriMat;
+
       const kalgi = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.25, 8), goldMat);
       kalgi.position.set(0, 2.7, 0.22); group.add(kalgi);
 
-      // Limbs
+      // Arms
       function createArm(isLeft) {
         const shoulderPivot = new THREE.Group();
         shoulderPivot.position.set(isLeft ? -0.48 : 0.48, 1.9, 0);
@@ -660,6 +760,7 @@
       limbs.armL = createArm(true);
       limbs.armR = createArm(false);
 
+      // Legs
       function createLeg(isLeft) {
         const hipPivot = new THREE.Group();
         hipPivot.position.set(isLeft ? -0.22 : 0.22, 0.88, 0);
@@ -677,22 +778,29 @@
     }
 
     /* =========================================================================
-       11. INTERACTIVE HOTSPOTS & BOARDING ENGINE
+       11. INTERACTIVE MELA HOTSPOTS & SHOPS
        ========================================================================= */
     const HOTSPOTS = [
+      {
+        id: "patakha_shop",
+        name: "🎆 Free Patakha Shop (Inspect Display)",
+        pos: [-18, 0, -4.5],
+        range: 5.5,
+        action: () => showCrackerModal()
+      },
+      {
+        id: "kurta_boutique",
+        name: "👗 Free Kurta-Pyjama Boutique (Try Dresses)",
+        pos: [-18, 0, 15],
+        range: 5.5,
+        action: () => showWardrobeModal()
+      },
       {
         id: "ferris_ride",
         name: "🎡 Board the Giant Jhoola (Ferris Wheel)",
         pos: [26, 0, 17.5],
         range: 6.0,
         action: () => boardFerrisWheel()
-      },
-      {
-        id: "carousel_ride",
-        name: "🎠 Board the Chakri Carousel Jhoola",
-        pos: [-26, 0, 15],
-        range: 6.0,
-        action: () => boardCarousel()
       },
       {
         id: "temple_bell",
@@ -707,81 +815,86 @@
         pos: [0, 0, -24],
         range: 5.5,
         action: () => showTempleModal()
-      },
-      {
-        id: "patakha",
-        name: "🎆 Royal Patakha Shop",
-        pos: [-18, 0, -5],
-        range: 5.5,
-        action: () => showCrackerModal()
-      },
-      {
-        id: "chai_tapri",
-        name: "☕ Sit at Chai Tapri & Drink Chai",
-        pos: [18, 0, -2.5],
-        range: 4.5,
-        action: () => sitAtChaiTapri()
       }
     ];
 
-    /* --- Ride Boarding Handlers --- */
+    /* --- Cracker Burn & Throw Controls --- */
+    window.burnHere = (type) => {
+      const px = LocalPlayer.meshGroup.position.x + (Math.random() - 0.5) * 1.5;
+      const pz = LocalPlayer.meshGroup.position.z + (Math.random() - 0.5) * 1.5;
+
+      if (type === 'rocket') launchPhysicsRocket(px, pz);
+      if (type === 'chakri') launchChakri(px, pz);
+      if (type === 'anar') launchAnar(px, pz);
+    };
+
+    window.throwBomb = () => {
+      // Calculate forward direction based on player rotation
+      const forward = new THREE.Vector3(
+        Math.sin(LocalPlayer.meshGroup.rotation.y),
+        0,
+        Math.cos(LocalPlayer.meshGroup.rotation.y)
+      );
+      launchThrownBomb(LocalPlayer.meshGroup.position, forward);
+    };
+
+    // Right-Click mouse to throw bomb anywhere on PC
+    window.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      throwBomb();
+    });
+
+    /* --- Wardrobe Selection (100% Free) --- */
+    function showWardrobeModal() {
+      openModal("👗 Royal Festive Boutique", `
+        <p>Pick and change into any traditional outfit for free:</p>
+        <button onclick="setOutfit(0xd97706, 0xdc2626, 'Royal Saffron')">🧡 Royal Saffron Kurta</button>
+        <button onclick="setOutfit(0xdc2626, 0xffd700, 'Ruby Crimson')">❤️ Ruby Crimson Kurta</button>
+        <button onclick="setOutfit(0x0284c7, 0x0284c7, 'Peacock Teal')">💙 Peacock Teal Kurta</button>
+        <button onclick="setOutfit(0x059669, 0xf59e0b, 'Emerald Green')">💚 Emerald Green Kurta</button>
+        <button onclick="setOutfit(0x9333ea, 0xffea00, 'Imperial Violet')">💜 Imperial Violet Kurta</button>
+      `);
+    }
+
+    window.setOutfit = (kurtaHex, pagriHex, name) => {
+      LocalPlayer.limbs.kurtaMat.color.setHex(kurtaHex);
+      LocalPlayer.limbs.pagriMat.color.setHex(pagriHex);
+      document.getElementById('kurta-name').innerText = name;
+      alert(`You changed into ${name}! Looking regal!`);
+      closeModal();
+    };
+
+    function showCrackerModal() {
+      openModal("🎆 Royal Patakha Bhandar", `
+        <p>All items on display are 100% free! You can also use the bottom-right buttons to burn/throw anywhere!</p>
+        <button onclick="burnHere('rocket'); closeModal();">🚀 Launch Rocket</button>
+        <button onclick="burnHere('chakri'); closeModal();">🌀 Spin Ground Chakri</button>
+        <button onclick="burnHere('anar'); closeModal();">🌋 Light Flowerpot Anar</button>
+        <button onclick="throwBomb(); closeModal();">💣 Throw Sutli Bomb</button>
+      `);
+    }
+
     function boardFerrisWheel() {
       LocalPlayer.currentRide = 'ferris';
-      LocalPlayer.rideIndex = 0; // attach to first gondola
       document.getElementById('ride-state').innerText = "Riding Ferris Wheel 🎡";
       document.getElementById('dismount-btn').style.display = 'block';
-
-      // Sit posture
       LocalPlayer.limbs.legL.rotation.x = Math.PI / 2.3;
       LocalPlayer.limbs.legR.rotation.x = Math.PI / 2.3;
     }
 
-    function boardCarousel() {
-      LocalPlayer.currentRide = 'carousel';
-      document.getElementById('ride-state').innerText = "Riding Chakri Carousel 🎠";
-      document.getElementById('dismount-btn').style.display = 'block';
-
-      LocalPlayer.limbs.legL.rotation.x = Math.PI / 3;
-      LocalPlayer.limbs.legR.rotation.x = Math.PI / 3;
-    }
-
-    function sitAtChaiTapri() {
-      LocalPlayer.currentRide = 'tapri';
-      document.getElementById('ride-state').innerText = "Sitting at Chai Tapri ☕";
-      document.getElementById('dismount-btn').style.display = 'block';
-
-      LocalPlayer.meshGroup.position.set(18, 0.4, -2);
-      LocalPlayer.meshGroup.rotation.y = 0;
-      LocalPlayer.limbs.legL.rotation.x = Math.PI / 2.2;
-      LocalPlayer.limbs.legR.rotation.x = Math.PI / 2.2;
-      alert("Enjoying hot festive cutting chai with cardamom!");
-    }
-
     window.dismountCurrentRide = () => {
-      if (LocalPlayer.currentRide === 'ferris') {
-        LocalPlayer.meshGroup.position.set(26, 0, 18);
-      } else if (LocalPlayer.currentRide === 'carousel') {
-        LocalPlayer.meshGroup.position.set(-26, 0, 20);
-      } else if (LocalPlayer.currentRide === 'tapri') {
-        LocalPlayer.meshGroup.position.set(18, 0, -0.5);
-      }
-
+      LocalPlayer.meshGroup.position.set(26, 0, 18);
       LocalPlayer.currentRide = null;
       document.getElementById('ride-state').innerText = "On Foot";
       document.getElementById('dismount-btn').style.display = 'none';
-
       LocalPlayer.limbs.legL.rotation.x = 0;
       LocalPlayer.limbs.legR.rotation.x = 0;
     };
 
     function ringTempleBell() {
       bellSwing = 1.0;
-      LocalPlayer.coins += 15;
-      document.getElementById('coin-count').innerText = LocalPlayer.coins;
-
-      // Sparkle burst around bell
       spawnSparks(new THREE.Vector3(0, 3.8, -24), 25, 0xffea00, 0.25);
-      alert("🔔 Tring! You rang the sacred temple bell. Received 15 Coins!");
+      alert("🔔 Tring! You rang the sacred temple bell.");
     }
 
     /* --- Modals --- */
@@ -796,8 +909,8 @@
 
     function showTempleModal() {
       openModal("🪔 Shri Lakshmi Mandir", `
-        <p>Perform the holy circular Aarti and shower marigold flowers.</p>
-        <button onclick="startAartiRitual()">🔔 Perform 360° Aarti & Petal Shower</button>
+        <p>Perform the circular Deep Aarti and shower marigold flowers.</p>
+        <button onclick="startAartiRitual()">🔔 Perform 360° Aarti & Flower Petal Shower</button>
         <button onclick="alert('You received Motichoor Ladoo Prasaad!'); closeModal();">🍬 Take Prasaad</button>
       `);
     }
@@ -807,36 +920,11 @@
       isDoingAarti = true;
       aartiAngle = 0;
       showerMarigoldPetals();
-      LocalPlayer.coins += 25;
-      document.getElementById('coin-count').innerText = LocalPlayer.coins;
-      closeModal();
-    };
-
-    function showCrackerModal() {
-      openModal("🎆 Royal Patakha Bhandar", `
-        <p>Buy & burst real physics crackers:</p>
-        <button onclick="ignite('rocket')">🚀 Launch Sky Rocket (15 Coins)</button>
-        <button onclick="ignite('chakri')">🌀 Ground Chakri (10 Coins)</button>
-        <button onclick="ignite('anar')">🌋 Golden Anar (10 Coins)</button>
-      `);
-    }
-
-    window.ignite = (type) => {
-      if (LocalPlayer.coins < 10) return alert("Not enough coins! Go ring the temple bell or do Aarti.");
-      LocalPlayer.coins -= 10;
-      document.getElementById('coin-count').innerText = LocalPlayer.coins;
-
-      const px = LocalPlayer.meshGroup.position.x + (Math.random() - 0.5) * 2;
-      const pz = LocalPlayer.meshGroup.position.z - 2;
-
-      if (type === 'rocket') launchPhysicsRocket(px, pz);
-      if (type === 'chakri') launchChakri(px, pz);
-      if (type === 'anar') launchAnar(px, pz);
       closeModal();
     };
 
     /* =========================================================================
-       12. MOBILE JOYSTICK & INPUT ENGINE
+       12. CONTROLS & JOYSTICK
        ========================================================================= */
     const keys = {};
     window.addEventListener('keydown', e => {
@@ -845,11 +933,11 @@
         if (LocalPlayer.currentRide) dismountCurrentRide();
         else if (activeNearSpot) activeNearSpot.action();
       }
+      if (e.key.toLowerCase() === 't') throwBomb(); // Press 'T' to throw bomb
     });
     window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
     let activeNearSpot = null;
-
     const joystick = { active: false, dx: 0, dy: 0, originX: 0, originY: 0 };
     const joyContainer = document.getElementById('mobile-controls');
     const joyKnob = document.getElementById('joystick-knob');
@@ -872,15 +960,13 @@
       const dy = e.clientY - joystick.originY;
       const dist = Math.min(38, Math.hypot(dx, dy));
       const angle = Math.atan2(dy, dx);
-
       joystick.dx = (Math.cos(angle) * dist) / 38;
       joystick.dy = (Math.sin(angle) * dist) / 38;
       joyKnob.style.transform = `translate(${joystick.dx * 35}px, ${joystick.dy * 35}px)`;
     });
 
     const resetJoystick = () => {
-      joystick.active = false;
-      joystick.dx = 0; joystick.dy = 0;
+      joystick.active = false; joystick.dx = 0; joystick.dy = 0;
       joyKnob.style.transform = `translate(0px, 0px)`;
     };
     joyContainer.addEventListener('pointerup', resetJoystick);
@@ -896,8 +982,9 @@
       document.getElementById('display-name').innerText = LocalPlayer.name;
       document.getElementById('spawn-screen').style.display = 'none';
       document.getElementById('greeting-bar').style.display = 'flex';
+      document.getElementById('cracker-action-bar').style.display = 'flex';
 
-      const av = buildArticulatedAvatar(LocalPlayer.name);
+      const av = buildArticulatedAvatar(LocalPlayer.name, LocalPlayer.kurtaColorHex);
       LocalPlayer.meshGroup = av.group;
       LocalPlayer.limbs = av.limbs;
       LocalPlayer.meshGroup.position.set(LocalPlayer.pos.x, 0, LocalPlayer.pos.z);
@@ -916,19 +1003,14 @@
       world.step(1 / 60, delta, 3);
       const time = clock.getElapsedTime();
 
-      // Spin Wheels
+      // Spin Ferris Wheel
       wheelRotator.rotation.z += 0.008;
-      carouselSpinner.rotation.y += 0.015;
+      ferrisGondolas.forEach(g => { g.group.rotation.z = -wheelRotator.rotation.z; });
 
-      // Keep Ferris gondolas swinging upright
-      ferrisGondolas.forEach(g => {
-        g.group.rotation.z = -wheelRotator.rotation.z;
-      });
-
-      // Bell Swinging Physics
+      // Bell Swing
       if (bellSwing > 0.01) {
         bellGroup.rotation.z = Math.sin(time * 15) * bellSwing;
-        bellSwing *= 0.96; // damping
+        bellSwing *= 0.96;
       } else {
         bellGroup.rotation.z = 0;
       }
@@ -941,26 +1023,15 @@
       });
 
       if (LocalPlayer.meshGroup) {
-        // RIDE POSITION ATTACHMENT
         if (LocalPlayer.currentRide === 'ferris') {
-          // Calculate world position of current gondola
-          const targetGondola = ferrisGondolas[LocalPlayer.rideIndex].group;
+          const targetGondola = ferrisGondolas[0].group;
           const gondolaWorldPos = new THREE.Vector3();
           targetGondola.getWorldPosition(gondolaWorldPos);
-
           LocalPlayer.meshGroup.position.copy(gondolaWorldPos);
           LocalPlayer.meshGroup.position.y -= 0.4;
           LocalPlayer.meshGroup.rotation.y = 0;
-        } else if (LocalPlayer.currentRide === 'carousel') {
-          const seat = carouselSeats[0];
-          const seatWorldPos = new THREE.Vector3();
-          seat.getWorldPosition(seatWorldPos);
-
-          LocalPlayer.meshGroup.position.copy(seatWorldPos);
-          LocalPlayer.meshGroup.position.y += 0.1;
-          LocalPlayer.meshGroup.rotation.y = carouselSpinner.rotation.y + Math.PI / 2;
-        } else if (LocalPlayer.currentRide === null) {
-          // ON-FOOT MOVEMENT
+        } else {
+          // On-Foot Movement
           const speed = 0.18;
           let inputX = 0; let inputZ = 0;
 
@@ -981,80 +1052,4 @@
             const right = new THREE.Vector3(Math.cos(CameraOrbit.theta), 0, -Math.sin(CameraOrbit.theta)).normalize();
 
             const moveVec = new THREE.Vector3().addScaledVector(forward, -inputZ).addScaledVector(right, inputX).normalize();
-            LocalPlayer.meshGroup.position.addScaledVector(moveVec, speed);
-
-            const targetRot = Math.atan2(moveVec.x, moveVec.z);
-            LocalPlayer.meshGroup.rotation.y = THREE.MathUtils.lerp(LocalPlayer.meshGroup.rotation.y, targetRot, 0.2);
-
-            LocalPlayer.walkCycle += 0.22;
-            const legSwing = Math.sin(LocalPlayer.walkCycle) * 0.65;
-            LocalPlayer.limbs.legL.rotation.x = legSwing;
-            LocalPlayer.limbs.legR.rotation.x = -legSwing;
-            LocalPlayer.limbs.armL.rotation.x = -legSwing * 0.8;
-            LocalPlayer.limbs.armR.rotation.x = legSwing * 0.8;
-
-            LocalPlayer.limbs.torso.position.y = 1.45 + Math.abs(Math.sin(LocalPlayer.walkCycle * 2)) * 0.05;
-          } else {
-            LocalPlayer.breathCycle += 0.04;
-            const breath = Math.sin(LocalPlayer.breathCycle) * 0.03;
-            LocalPlayer.limbs.legL.rotation.x = THREE.MathUtils.lerp(LocalPlayer.limbs.legL.rotation.x, 0, 0.15);
-            LocalPlayer.limbs.legR.rotation.x = THREE.MathUtils.lerp(LocalPlayer.limbs.legR.rotation.x, 0, 0.15);
-            LocalPlayer.limbs.armL.rotation.x = THREE.MathUtils.lerp(LocalPlayer.limbs.armL.rotation.x, breath, 0.1);
-            LocalPlayer.limbs.armR.rotation.x = THREE.MathUtils.lerp(LocalPlayer.limbs.armR.rotation.x, -breath, 0.1);
-            LocalPlayer.limbs.torso.position.y = 1.45 + breath * 0.5;
-          }
-
-          // Hotspot Proximity Detection
-          let near = null;
-          HOTSPOTS.forEach(h => {
-            if (LocalPlayer.meshGroup.position.distanceTo(new THREE.Vector3(...h.pos)) <= h.range) near = h;
-          });
-
-          const prompt = document.getElementById('interaction-prompt');
-          if (near) {
-            activeNearSpot = near;
-            prompt.style.display = 'block';
-            prompt.innerText = `Tap or Press [E] for ${near.name}`;
-          } else {
-            activeNearSpot = null;
-            prompt.style.display = 'none';
-          }
-        }
-
-        // Camera Follows Avatar (Even high up on the Ferris wheel)
-        const camX = LocalPlayer.meshGroup.position.x + CameraOrbit.radius * Math.sin(CameraOrbit.phi) * Math.sin(CameraOrbit.theta);
-        const camY = LocalPlayer.meshGroup.position.y + CameraOrbit.radius * Math.cos(CameraOrbit.phi);
-        const camZ = LocalPlayer.meshGroup.position.z + CameraOrbit.radius * Math.sin(CameraOrbit.phi) * Math.cos(CameraOrbit.theta);
-
-        camera.position.set(camX, camY, camZ);
-        camera.lookAt(LocalPlayer.meshGroup.position.x, LocalPlayer.meshGroup.position.y + 1.4, LocalPlayer.meshGroup.position.z);
-      }
-
-      // Aarti 360 Rotation
-      if (isDoingAarti && aartiThali) {
-        aartiAngle += 0.04;
-        aartiThali.position.x = Math.cos(aartiAngle) * 1.5;
-        aartiThali.position.y = 2.5 + Math.sin(aartiAngle) * 0.5;
-        aartiThali.rotation.z = Math.cos(aartiAngle) * 0.15;
-        if (aartiAngle >= Math.PI * 4) {
-          isDoingAarti = false;
-          scene.remove(aartiThali);
-          aartiThali = null;
-        }
-      }
-
-      updatePetals();
-      updateCrackerPhysics();
-      composer.render();
-    }
-    animate();
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      composer.setSize(window.innerWidth, window.innerHeight);
-    });
-  </script>
-</body>
-</html>
+            LocalPlayer.meshGroup.position.addScaledVector
