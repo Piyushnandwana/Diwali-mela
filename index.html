@@ -3,83 +3,110 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live Multiplayer 3D Diwali Mela</title>
+  <title>Virtual 3D Diwali Mela - Grand Bazaar</title>
   <style>
-    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; background: #050510; }
-    #canvas-container { width: 100vw; height: 100vh; }
+    * { box-sizing: border-box; }
+    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; background: #070314; }
+    #canvas-container { width: 100vw; height: 100vh; display: block; }
     
-    /* HUD Overlays */
+    /* Top-Left Festive HUD */
     #hud {
-      position: absolute; top: 15px; left: 15px; color: #ffdf79;
-      background: rgba(15, 10, 25, 0.85); padding: 14px 22px;
-      border-radius: 12px; border: 1px solid #d4af37; pointer-events: none;
-      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+      position: absolute; top: 16px; left: 16px; color: #ffdf79;
+      background: linear-gradient(135deg, rgba(25, 12, 38, 0.9), rgba(12, 5, 20, 0.95));
+      padding: 16px 22px; border-radius: 16px; border: 2px solid #ffd700;
+      box-shadow: 0 8px 30px rgba(255, 170, 0, 0.25); pointer-events: none;
     }
-    #hud h2 { margin: 0 0 5px 0; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; }
-    #hud p { margin: 3px 0; font-size: 14px; color: #fff; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-weight: bold; background: #166534; color: #86efac; }
+    #hud h2 { margin: 0 0 6px 0; font-size: 19px; color: #ffea79; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255, 200, 0, 0.6); }
+    #hud p { margin: 3px 0; font-size: 13px; color: #fff; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-weight: bold; background: #15803d; color: #bbf7d0; font-size: 12px; }
 
-    /* Greeting Bar */
+    /* Bottom Greeting Bar */
     #greeting-bar {
-      position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 10px; background: rgba(20, 10, 30, 0.9);
-      padding: 10px 18px; border-radius: 30px; border: 2px solid #d4af37;
-      box-shadow: 0 4px 25px rgba(212, 175, 55, 0.35); z-index: 10;
+      position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 10px; background: rgba(18, 8, 28, 0.92);
+      padding: 10px 20px; border-radius: 40px; border: 2px solid #ffd700;
+      box-shadow: 0 4px 30px rgba(255, 120, 0, 0.4); z-index: 10;
     }
     .greet-btn {
-      background: linear-gradient(135deg, #e65c00, #ff8533); color: #fff;
-      border: 1px solid #ffd700; padding: 8px 14px; border-radius: 20px;
-      font-size: 14px; font-weight: bold; cursor: pointer; transition: transform 0.15s, background 0.15s;
+      background: linear-gradient(135deg, #d9530f, #ff7e26); color: #fff;
+      border: 1px solid #ffe285; padding: 9px 16px; border-radius: 24px;
+      font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.15s ease-in-out;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
     }
-    .greet-btn:hover { transform: scale(1.08); background: linear-gradient(135deg, #ff8533, #ffd700); }
+    .greet-btn:hover { transform: scale(1.08) translateY(-2px); background: linear-gradient(135deg, #ff7e26, #ffd000); color: #220500; }
 
-    /* Login / Join Modal */
+    /* Interaction Prompt */
+    #interaction-prompt {
+      position: absolute; bottom: 95px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(90deg, #b91c1c, #ea580c); color: #fff;
+      padding: 10px 26px; font-size: 15px; font-weight: bold; border-radius: 30px;
+      display: none; border: 2px solid #ffea79; box-shadow: 0 0 25px rgba(234, 88, 12, 0.8);
+      animation: pulse 1.2s infinite alternate; z-index: 10;
+    }
+    @keyframes pulse { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.06); } }
+
+    /* Spawn / Entry Modal */
     #spawn-screen {
-      position: absolute; inset: 0; background: rgba(5, 5, 15, 0.95);
+      position: absolute; inset: 0; background: radial-gradient(circle, rgba(20,8,35,0.95) 0%, rgba(5,2,10,0.98) 100%);
       display: flex; justify-content: center; align-items: center; z-index: 200;
     }
     .spawn-card {
-      background: #1a0f2e; border: 2px solid #d4af37; border-radius: 16px;
-      padding: 30px; width: 340px; text-align: center; color: #fff;
-      box-shadow: 0 0 35px rgba(212, 175, 55, 0.4);
+      background: linear-gradient(145deg, #231238, #11071d); border: 2px solid #ffd700;
+      border-radius: 20px; padding: 34px 28px; width: 360px; text-align: center; color: #fff;
+      box-shadow: 0 0 45px rgba(255, 170, 0, 0.35);
     }
-    .spawn-card h2 { color: #ffd700; margin-top: 0; }
+    .spawn-card h2 { color: #ffe066; margin-top: 0; font-size: 24px; }
     .spawn-card input {
-      width: 85%; padding: 10px; margin: 12px 0; border-radius: 8px;
-      border: 1px solid #d4af37; background: #0d0617; color: #fff; font-size: 15px;
+      width: 90%; padding: 12px; margin: 14px 0 20px 0; border-radius: 10px;
+      border: 1px solid #ffd700; background: #0c0416; color: #fff; font-size: 15px; text-align: center;
     }
     .spawn-card button {
-      background: linear-gradient(45deg, #e65c00, #ff8533); color: #fff;
-      border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px;
-      font-weight: bold; cursor: pointer; width: 92%;
+      background: linear-gradient(45deg, #ea580c, #f59e0b); color: #fff;
+      border: none; padding: 12px 24px; border-radius: 10px; font-size: 16px;
+      font-weight: bold; cursor: pointer; width: 95%; box-shadow: 0 4px 15px rgba(234, 88, 12, 0.5);
     }
+    .spawn-card button:hover { transform: scale(1.03); }
+
+    /* Interactive Action Popup Modal */
+    .modal {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: #1e0f33; color: #fff; border: 2px solid #ffd700;
+      padding: 24px; border-radius: 18px; display: none; z-index: 100;
+      box-shadow: 0 0 40px rgba(0,0,0,0.9); min-width: 320px; text-align: center;
+    }
+    .modal h3 { margin-top: 0; color: #ffd700; }
+    .modal button {
+      background: #ea580c; color: #fff; border: none; padding: 9px 16px;
+      margin: 6px 4px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px;
+    }
+    .modal button:hover { background: #f59e0b; color: #000; }
+    .close-modal { background: #4b5563 !important; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
   <div id="canvas-container"></div>
 
-  <!-- Join Screen -->
+  <!-- Entry Modal -->
   <div id="spawn-screen">
     <div class="spawn-card">
-      <h2>🪔 Join Diwali Mela</h2>
-      <p style="font-size: 13px; color: #bbb;">Choose your festive name and join everyone live in the bazaar!</p>
-      <input type="text" id="username-input" placeholder="Enter your name (e.g. Rahul)" maxlength="14" />
-      <br>
-      <button onclick="joinMela()">Enter the Mela ✨</button>
+      <h2>🪔 Shubh Diwali Mela</h2>
+      <p style="font-size: 13px; color: #d1d5db;">Step into the vibrant 3D festive ground, greet players, burst crackers, and visit stalls!</p>
+      <input type="text" id="username-input" placeholder="Enter Your Name" maxlength="14" />
+      <button onclick="joinMela()">Enter Grand Mela ✨</button>
     </div>
   </div>
 
-  <!-- Live Stats HUD -->
+  <!-- HUD -->
   <div id="hud">
-    <h2>🪔 Shubh Diwali Mela</h2>
+    <h2>🪔 SHUBH DIWALI MELA</h2>
     <p>👤 Player: <b id="display-name">-</b></p>
     <p>🟢 Live In Mela: <span class="badge" id="online-count">1 Online</span></p>
     <p>🪙 Coins: <span id="coin-count">100</span></p>
     <p>🕹️ Movement: <b>W, A, S, D</b> or <b>Arrow Keys</b></p>
   </div>
 
-  <!-- Interactive Greeting Bar -->
+  <!-- Quick Greeting Bar -->
   <div id="greeting-bar" style="display: none;">
     <button class="greet-btn" onclick="sendGreeting('🙏 Namaste!')">🙏 Namaste!</button>
     <button class="greet-btn" onclick="sendGreeting('🪔 Happy Diwali!')">🪔 Happy Diwali!</button>
@@ -87,266 +114,669 @@
     <button class="greet-btn" onclick="sendGreeting('✨ Ram Ram Ji!')">✨ Ram Ram Ji!</button>
   </div>
 
+  <div id="interaction-prompt">Press [E] to Interact</div>
+
+  <!-- Interactive Action Modal -->
+  <div id="action-modal" class="modal">
+    <h3 id="modal-title">Stall</h3>
+    <div id="modal-body"></div>
+    <br>
+    <button class="close-modal" onclick="closeModal()">Close</button>
+  </div>
+
   <script>
+    /* =========================================================================
+       1. GAME & PLAYER STATE
+       ========================================================================= */
     const LocalPlayer = {
-      id: "user_" + Math.floor(Math.random() * 100000),
-      name: "Guest",
-      color: 0xd4af37,
+      id: "usr_" + Math.floor(Math.random() * 100000),
+      name: "Player",
       coins: 100,
-      pos: { x: 0, y: 0, z: 10 },
+      pos: { x: 0, y: 0, z: 8 },
       rotY: 0,
-      group: null,
+      meshGroup: null,
+      limbs: {}, // legs & arms for walk cycle
+      walkCycle: 0,
       bubbleSprite: null,
       bubbleTimeout: null
     };
 
     const RemotePlayers = {};
+    const particles = [];
+    let activeZone = null;
 
+    /* =========================================================================
+       2. SCENE, CAMERAS & RENDERER
+       ========================================================================= */
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0a0515, 0.02);
+    scene.fog = new THREE.FogExp2(0x0a0316, 0.016);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0x221133, 1.2));
-    const moon = new THREE.DirectionalLight(0x6688cc, 0.6);
-    moon.position.set(20, 50, 20);
-    scene.add(moon);
+    // Warm Atmospheric Lighting
+    const ambient = new THREE.AmbientLight(0x3a1d47, 1.3);
+    scene.add(ambient);
 
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(120, 120),
-      new THREE.MeshStandardMaterial({ color: 0x1f1424, roughness: 0.85 })
+    const moonLight = new THREE.DirectionalLight(0x6b82b8, 0.7);
+    moonLight.position.set(20, 45, 20);
+    moonLight.castShadow = true;
+    scene.add(moonLight);
+
+    const centerWarmth = new THREE.PointLight(0xff9900, 3.2, 55);
+    centerWarmth.position.set(0, 9, 0);
+    scene.add(centerWarmth);
+
+    /* =========================================================================
+       3. ENVIRONMENT: GROUND, PATHWAYS, DIYAS & STRING LIGHTS
+       ========================================================================= */
+    // Main Ground with warm festival clay color
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(160, 160),
+      new THREE.MeshStandardMaterial({ color: 0x1a0f24, roughness: 0.88 })
     );
-    floor.rotation.x = -Math.PI / 2;
-    floor.receiveShadow = true;
-    scene.add(floor);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
 
-    const centerLight = new THREE.PointLight(0xff9900, 2.5, 45);
-    centerLight.position.set(0, 7, 0);
-    scene.add(centerLight);
+    // Paved Pathway (Chowk crossing)
+    const pathMat = new THREE.MeshStandardMaterial({ color: 0x331e36, roughness: 0.7 });
+    const mainPath = new THREE.Mesh(new THREE.PlaneGeometry(10, 120), pathMat);
+    mainPath.rotation.x = -Math.PI / 2;
+    mainPath.position.y = 0.02;
+    scene.add(mainPath);
 
-    /* --- Billboard Nameplate Generator --- */
-    function createNameplate(text) {
-      const canvas = document.createElement('canvas');
-      canvas.width = 256; canvas.height = 64;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = 'rgba(10, 5, 20, 0.8)';
-      ctx.beginPath();
-      ctx.roundRect(10, 10, 236, 44, 15);
-      ctx.fill();
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = '#ffd700';
-      ctx.stroke();
+    const crossPath = new THREE.Mesh(new THREE.PlaneGeometry(120, 10), pathMat);
+    crossPath.rotation.x = -Math.PI / 2;
+    crossPath.position.y = 0.02;
+    scene.add(crossPath);
 
+    // Giant Center Rangoli on the Floor
+    function createRangoliTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ff9900';
+      ctx.beginPath(); ctx.arc(256, 256, 230, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#b91c1c';
+      ctx.beginPath(); ctx.arc(256, 256, 180, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffd700';
+      ctx.beginPath(); ctx.arc(256, 256, 110, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 22px Segoe UI, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(text, 128, 32);
+      ctx.beginPath(); ctx.arc(256, 256, 40, 0, Math.PI * 2); ctx.fill();
+      for (let i = 0; i < 12; i++) {
+        const rad = (i * Math.PI) / 6;
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath();
+        ctx.arc(256 + Math.cos(rad) * 145, 256 + Math.sin(rad) * 145, 20, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      return new THREE.CanvasTexture(c);
+    }
+    const rangoliPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(14, 14),
+      new THREE.MeshBasicMaterial({ map: createRangoliTexture(), transparent: true })
+    );
+    rangoliPlane.rotation.x = -Math.PI / 2;
+    rangoliPlane.position.set(0, 0.05, 0);
+    scene.add(rangoliPlane);
 
-      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), depthTest: false }));
-      sprite.scale.set(3, 0.75, 1);
-      sprite.position.y = 2.8;
-      return sprite;
+    // Glowing Clay Diyas along the street pathways
+    function spawnDiya(x, z) {
+      const diyaGroup = new THREE.Group();
+      diyaGroup.position.set(x, 0.05, z);
+
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.1, 0.12, 12), new THREE.MeshStandardMaterial({ color: 0x9a3412 }));
+      diyaGroup.add(base);
+
+      const flame = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffea00 }));
+      flame.position.y = 0.14;
+      diyaGroup.add(flame);
+
+      const light = new THREE.PointLight(0xff7700, 0.9, 6);
+      light.position.y = 0.25;
+      diyaGroup.add(light);
+      scene.add(diyaGroup);
     }
 
-    /* --- Speech / Greeting Bubble Generator --- */
-    function createBubbleSprite(text) {
-      const canvas = document.createElement('canvas');
-      canvas.width = 320; canvas.height = 96;
-      const ctx = canvas.getContext('2d');
-
-      // Speech bubble rounded rect with bottom pointer
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.roundRect(10, 8, 300, 60, 20);
-      ctx.fill();
-
-      // Tail
-      ctx.beginPath();
-      ctx.moveTo(150, 68);
-      ctx.lineTo(160, 86);
-      ctx.lineTo(170, 68);
-      ctx.fill();
-
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = '#ff8533';
-      ctx.stroke();
-
-      // Greeting Text
-      ctx.fillStyle = '#1a0f2e';
-      ctx.font = 'bold 26px Segoe UI, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(text, 160, 38);
-
-      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), depthTest: false }));
-      sprite.scale.set(3.8, 1.15, 1);
-      sprite.position.y = 3.8;
-      return sprite;
+    for (let i = -35; i <= 35; i += 7) {
+      if (Math.abs(i) > 6) {
+        spawnDiya(-5.3, i);
+        spawnDiya(5.3, i);
+        spawnDiya(i, -5.3);
+        spawnDiya(i, 5.3);
+      }
     }
 
-    /* --- Avatar Builder --- */
-    function buildAvatarMesh(name, colorHex) {
+    // Overhead Fairy Light Garlands (Strings)
+    const fairyGroup = new THREE.Group();
+    const colors = [0xff2200, 0xffd700, 0x00ffcc, 0xff00aa, 0x00ff44];
+    for (let i = -30; i <= 30; i += 4) {
+      const bulb = new THREE.Mesh(
+        new THREE.SphereGeometry(0.12, 8, 8),
+        new THREE.MeshBasicMaterial({ color: colors[Math.abs(i) % colors.length] })
+      );
+      bulb.position.set(i, 6 + Math.sin(i * 0.2) * 0.6, 0);
+      fairyGroup.add(bulb);
+    }
+    scene.add(fairyGroup);
+
+    /* =========================================================================
+       4. 3D FESTIVE STALLS & LAKSHMI TEMPLE
+       ========================================================================= */
+    const ZONES = [
+      {
+        id: "temple",
+        name: "🪔 Shri Lakshmi-Ganesh Mandir",
+        pos: [0, 0, -22],
+        color: 0xd97706,
+        type: "temple",
+        action: () => showTempleModal()
+      },
+      {
+        id: "patakha",
+        name: "🎆 Royal Patakha Bhandar",
+        pos: [-18, 0, -5],
+        color: 0x0284c7,
+        type: "stall",
+        action: () => showCrackerModal()
+      },
+      {
+        id: "mithai",
+        name: "🍬 Bikaner Sweets & Prasaad",
+        pos: [18, 0, -5],
+        color: 0xb91c1c,
+        type: "stall",
+        action: () => showMithaiModal()
+      },
+      {
+        id: "lanterns",
+        name: "🏮 Akash Deep (Sky Lanterns)",
+        pos: [-16, 0, 16],
+        color: 0xf59e0b,
+        type: "stall",
+        action: () => showLanternModal()
+      }
+    ];
+
+    function createBannerCanvas(text) {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 128;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#7c1010';
+      ctx.fillRect(0, 0, 512, 128);
+      ctx.lineWidth = 6; ctx.strokeStyle = '#ffd700'; ctx.strokeRect(4, 4, 504, 120);
+      ctx.fillStyle = '#ffea79'; ctx.font = 'bold 36px Segoe UI, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(text, 256, 64);
+      return new THREE.CanvasTexture(c);
+    }
+
+    function buildStall(zone) {
       const group = new THREE.Group();
+      group.position.set(...zone.pos);
 
-      const kurtaMat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.5 });
-      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 1.3, 16), kurtaMat);
-      body.position.y = 1.1;
-      group.add(body);
+      if (zone.type === "temple") {
+        // Elevated Mandir Pavilion
+        const plinth = new THREE.Mesh(new THREE.BoxGeometry(12, 1.2, 10), new THREE.MeshStandardMaterial({ color: 0xf3f4f6, roughness: 0.3 }));
+        plinth.position.y = 0.6;
+        group.add(plinth);
 
-      const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 16, 16), new THREE.MeshStandardMaterial({ color: 0xdfa07a }));
-      head.position.y = 2.0;
+        // Gold Pillars
+        const pillarMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.6, roughness: 0.3 });
+        for (let x of [-4.5, 4.5]) {
+          for (let z of [-3.5, 3.5]) {
+            const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 6), pillarMat);
+            pillar.position.set(x, 3.6, z);
+            group.add(pillar);
+          }
+        }
+
+        // Shikhara Dome Roof
+        const dome = new THREE.Mesh(new THREE.ConeGeometry(5, 5, 8), new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.4 }));
+        dome.position.y = 8.5;
+        group.add(dome);
+
+        // Lakshmi-Ganesh Golden Murti Glow
+        const idol = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.1, 2, 16), new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.2 }));
+        idol.position.set(0, 2.2, -1);
+        group.add(idol);
+
+        const idolLight = new THREE.PointLight(0xffea00, 3, 15);
+        idolLight.position.set(0, 3.5, -0.5);
+        group.add(idolLight);
+      } else {
+        // Traditional Shop Booth
+        const pillarsMat = new THREE.MeshStandardMaterial({ color: 0x451a03 });
+        for (let x of [-2.5, 2.5]) {
+          for (let z of [-2, 2]) {
+            const p = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 4.5), pillarsMat);
+            p.position.set(x, 2.25, z);
+            group.add(p);
+          }
+        }
+        // Slanted Canopy
+        const canopy = new THREE.Mesh(new THREE.ConeGeometry(3.8, 1.8, 4), new THREE.MeshStandardMaterial({ color: zone.color, roughness: 0.4 }));
+        canopy.position.y = 5.2;
+        canopy.rotation.y = Math.PI / 4;
+        group.add(canopy);
+
+        // Counter Desk
+        const counter = new THREE.Mesh(new THREE.BoxGeometry(4.8, 1.3, 1.4), new THREE.MeshStandardMaterial({ color: 0x78350f }));
+        counter.position.set(0, 0.65, 1.2);
+        group.add(counter);
+
+        // Warm Stall Light
+        const l = new THREE.PointLight(zone.color, 2.2, 14);
+        l.position.set(0, 3.8, 0);
+        group.add(l);
+      }
+
+      // 3D Billboard Banner
+      const sign = new THREE.Mesh(
+        new THREE.PlaneGeometry(6, 1.6),
+        new THREE.MeshBasicMaterial({ map: createBannerCanvas(zone.name), transparent: true })
+      );
+      sign.position.set(0, 6.2, 0);
+      group.add(sign);
+
+      scene.add(group);
+    }
+    ZONES.forEach(buildStall);
+
+    /* =========================================================================
+       5. DETAILED AVATAR BUILDER (Arms, Legs, Face & Walking Rig)
+       ========================================================================= */
+    function createNameplateSprite(name) {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 64;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = 'rgba(10, 5, 20, 0.85)';
+      ctx.beginPath(); ctx.roundRect(10, 10, 236, 44, 15); ctx.fill();
+      ctx.lineWidth = 3; ctx.strokeStyle = '#ffd700'; ctx.stroke();
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 22px Segoe UI, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(name, 128, 32);
+
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
+      sprite.scale.set(3, 0.75, 1);
+      sprite.position.y = 3.2;
+      return sprite;
+    }
+
+    function createBubbleSprite(text) {
+      const c = document.createElement('canvas');
+      c.width = 340; c.height = 100;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.roundRect(10, 10, 320, 65, 20); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(160, 75); ctx.lineTo(170, 92); ctx.lineTo(180, 75); ctx.fill();
+      ctx.lineWidth = 4; ctx.strokeStyle = '#f97316'; ctx.stroke();
+      ctx.fillStyle = '#1e1b4b'; ctx.font = 'bold 26px Segoe UI, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(text, 170, 42);
+
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
+      sprite.scale.set(3.8, 1.15, 1);
+      sprite.position.y = 4.3;
+      return sprite;
+    }
+
+    function buildArticulatedAvatar(name, kurtaHex = 0xd97706) {
+      const group = new THREE.Group();
+      const limbs = {};
+
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0xdfa07a, roughness: 0.6 });
+      const kurtaMat = new THREE.MeshStandardMaterial({ color: kurtaHex, roughness: 0.5 });
+      const pyjamaMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.6 });
+
+      // Torso / Kurta
+      const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 1.25, 16), kurtaMat);
+      torso.position.y = 1.45;
+      torso.castShadow = true;
+      group.add(torso);
+
+      // Head
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.26, 16, 16), skinMat);
+      head.position.y = 2.25;
       group.add(head);
 
-      const pagri = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.1, 10, 20), new THREE.MeshStandardMaterial({ color: 0xcc2200 }));
-      pagri.position.y = 2.15;
+      // Eyes
+      const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+      const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), eyeMat);
+      eyeL.position.set(-0.09, 2.28, 0.23);
+      group.add(eyeL);
+      const eyeR = eyeL.clone();
+      eyeR.position.x = 0.09;
+      group.add(eyeR);
+
+      // Festive Red Tilak
+      const tilak = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.09, 0.02), new THREE.MeshBasicMaterial({ color: 0xdc2626 }));
+      tilak.position.set(0, 2.36, 0.25);
+      group.add(tilak);
+
+      // Pagri / Turban
+      const pagri = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.11, 10, 20), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+      pagri.position.y = 2.45;
       pagri.rotation.x = Math.PI / 2;
       group.add(pagri);
 
-      const nameplate = createNameplate(name);
+      // Shoulders & Arms
+      const armGeo = new THREE.CylinderGeometry(0.1, 0.09, 0.75, 12);
+      const armL = new THREE.Mesh(armGeo, kurtaMat);
+      armL.position.set(-0.52, 1.35, 0);
+      group.add(armL);
+      limbs.armL = armL;
+
+      const armR = new THREE.Mesh(armGeo, kurtaMat);
+      armR.position.set(0.52, 1.35, 0);
+      group.add(armR);
+      limbs.armR = armR;
+
+      // Legs / Pyjama
+      const legGeo = new THREE.CylinderGeometry(0.12, 0.1, 0.85, 12);
+      const legL = new THREE.Mesh(legGeo, pyjamaMat);
+      legL.position.set(-0.2, 0.45, 0);
+      group.add(legL);
+      limbs.legL = legL;
+
+      const legR = new THREE.Mesh(legGeo, pyjamaMat);
+      legR.position.set(0.2, 0.45, 0);
+      group.add(legR);
+      limbs.legR = legR;
+
+      // Nameplate
+      const nameplate = createNameplateSprite(name);
       group.add(nameplate);
 
-      return group;
+      return { group, limbs };
     }
 
-    /* --- Displays greeting speech bubble on avatar --- */
-    function showPlayerGreeting(targetData, text) {
-      if (targetData.bubbleSprite) {
-        targetData.group.remove(targetData.bubbleSprite);
-        clearTimeout(targetData.bubbleTimeout);
+    /* =========================================================================
+       6. FIREWORKS & PARTICLES
+       ========================================================================= */
+    function burstFirecracker(x, z, hexColor = 0xffa500) {
+      for (let i = 0; i < 60; i++) {
+        const p = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6), new THREE.MeshBasicMaterial({ color: hexColor }));
+        p.position.set(x, 0.2, z);
+        const vel = new THREE.Vector3(
+          (Math.random() - 0.5) * 0.45,
+          Math.random() * 0.5 + 0.15,
+          (Math.random() - 0.5) * 0.45
+        );
+        particles.push({ mesh: p, vel, life: 55 });
+        scene.add(p);
       }
-      const bubble = createBubbleSprite(text);
-      targetData.group.add(bubble);
-      targetData.bubbleSprite = bubble;
-
-      // Auto-hide bubble after 4 seconds
-      targetData.bubbleTimeout = setTimeout(() => {
-        if (targetData.bubbleSprite) {
-          targetData.group.remove(targetData.bubbleSprite);
-          targetData.bubbleSprite = null;
-        }
-      }, 4000);
     }
 
-    /* --- Broadcast Channel Sync --- */
+    function updateParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.mesh.position.add(p.vel);
+        p.vel.y -= 0.016; // gravity
+        p.life--;
+        if (p.life <= 0) {
+          scene.remove(p.mesh);
+          particles.splice(i, 1);
+        }
+      }
+    }
+
+    /* =========================================================================
+       7. MULTIPLAYER BROADCAST CHANNEL & GREETINGS
+       ========================================================================= */
     const channel = new BroadcastChannel('diwali_mela_room');
 
     function joinMela() {
       const input = document.getElementById('username-input');
-      const name = input.value.trim() || ("User" + Math.floor(Math.random() * 900 + 100));
+      const name = input.value.trim() || ("Player" + Math.floor(Math.random() * 900 + 100));
       LocalPlayer.name = name;
 
       document.getElementById('display-name').innerText = name;
       document.getElementById('spawn-screen').style.display = 'none';
       document.getElementById('greeting-bar').style.display = 'flex';
 
-      LocalPlayer.group = buildAvatarMesh(LocalPlayer.name, LocalPlayer.color);
-      LocalPlayer.group.position.set(LocalPlayer.pos.x, 0, LocalPlayer.pos.z);
-      scene.add(LocalPlayer.group);
+      const avatar = buildArticulatedAvatar(LocalPlayer.name);
+      LocalPlayer.meshGroup = avatar.group;
+      LocalPlayer.limbs = avatar.limbs;
+      LocalPlayer.meshGroup.position.set(LocalPlayer.pos.x, 0, LocalPlayer.pos.z);
+      scene.add(LocalPlayer.meshGroup);
 
-      initMultiplayerSync();
+      initSync();
     }
 
-    window.sendGreeting = (greetingText) => {
-      // 1. Show above local avatar
-      showPlayerGreeting(LocalPlayer, greetingText);
+    function showBubble(targetObj, text) {
+      if (targetObj.bubbleSprite) {
+        targetObj.meshGroup.remove(targetObj.bubbleSprite);
+        clearTimeout(targetObj.bubbleTimeout);
+      }
+      const b = createBubbleSprite(text);
+      targetObj.meshGroup.add(b);
+      targetObj.bubbleSprite = b;
+      targetObj.bubbleTimeout = setTimeout(() => {
+        if (targetObj.bubbleSprite) {
+          targetObj.meshGroup.remove(targetObj.bubbleSprite);
+          targetObj.bubbleSprite = null;
+        }
+      }, 4000);
+    }
 
-      // 2. Broadcast greeting event to other players
-      channel.postMessage({
-        type: 'greet',
-        playerId: LocalPlayer.id,
-        greeting: greetingText
-      });
+    window.sendGreeting = (txt) => {
+      showBubble(LocalPlayer, txt);
+      channel.postMessage({ type: 'greet', id: LocalPlayer.id, text: txt });
     };
 
-    function initMultiplayerSync() {
-      broadcastState('join');
+    function initSync() {
+      broadcast('join');
 
-      channel.onmessage = (event) => {
-        const { type, player, playerId, greeting } = event.data;
-
-        // Remote player greeting event
-        if (type === 'greet' && RemotePlayers[playerId]) {
-          showPlayerGreeting(RemotePlayers[playerId], greeting);
+      channel.onmessage = (e) => {
+        const { type, player, id, text } = e.data;
+        if (type === 'greet' && RemotePlayers[id]) {
+          showBubble(RemotePlayers[id], text);
           return;
         }
-
         if (!player || player.id === LocalPlayer.id) return;
 
         if (type === 'join' || type === 'update') {
           if (!RemotePlayers[player.id]) {
-            const group = buildAvatarMesh(player.name, player.color);
-            scene.add(group);
-            RemotePlayers[player.id] = { ...player, group, bubbleSprite: null, bubbleTimeout: null };
-            updateOnlineCounter();
+            const av = buildArticulatedAvatar(player.name);
+            scene.add(av.group);
+            RemotePlayers[player.id] = { ...player, meshGroup: av.group, limbs: av.limbs, bubbleSprite: null };
+            document.getElementById('online-count').innerText = `${Object.keys(RemotePlayers).length + 1} Online`;
           }
-          RemotePlayers[player.id].group.position.set(player.pos.x, 0, player.pos.z);
-          RemotePlayers[player.id].group.rotation.y = player.rotY;
+          const rp = RemotePlayers[player.id];
+          rp.meshGroup.position.set(player.pos.x, 0, player.pos.z);
+          rp.meshGroup.rotation.y = player.rotY;
+
+          // Remote limb swing
+          if (player.isMoving) {
+            const swing = Math.sin(Date.now() * 0.01) * 0.5;
+            rp.limbs.legL.rotation.x = swing;
+            rp.limbs.legR.rotation.x = -swing;
+            rp.limbs.armL.rotation.x = -swing;
+            rp.limbs.armR.rotation.x = swing;
+          } else {
+            rp.limbs.legL.rotation.x = 0; rp.limbs.legR.rotation.x = 0;
+            rp.limbs.armL.rotation.x = 0; rp.limbs.armR.rotation.x = 0;
+          }
         } else if (type === 'leave') {
           if (RemotePlayers[player.id]) {
-            scene.remove(RemotePlayers[player.id].group);
+            scene.remove(RemotePlayers[player.id].meshGroup);
             delete RemotePlayers[player.id];
-            updateOnlineCounter();
+            document.getElementById('online-count').innerText = `${Object.keys(RemotePlayers).length + 1} Online`;
           }
         }
       };
 
       setInterval(() => {
-        if (LocalPlayer.group) {
-          LocalPlayer.pos.x = LocalPlayer.group.position.x;
-          LocalPlayer.pos.z = LocalPlayer.group.position.z;
-          LocalPlayer.rotY = LocalPlayer.group.rotation.y;
-          broadcastState('update');
+        if (LocalPlayer.meshGroup) {
+          LocalPlayer.pos.x = LocalPlayer.meshGroup.position.x;
+          LocalPlayer.pos.z = LocalPlayer.meshGroup.position.z;
+          LocalPlayer.rotY = LocalPlayer.meshGroup.rotation.y;
+          broadcast('update');
         }
       }, 50);
 
-      window.addEventListener('beforeunload', () => broadcastState('leave'));
+      window.addEventListener('beforeunload', () => broadcast('leave'));
     }
 
-    function broadcastState(type) {
+    function broadcast(type) {
       channel.postMessage({
         type: type,
         player: {
           id: LocalPlayer.id,
           name: LocalPlayer.name,
-          color: LocalPlayer.color,
           pos: LocalPlayer.pos,
-          rotY: LocalPlayer.rotY
+          rotY: LocalPlayer.rotY,
+          isMoving: keys['w'] || keys['s'] || keys['a'] || keys['d'] || keys['arrowup'] || keys['arrowdown']
         }
       });
     }
 
-    function updateOnlineCounter() {
-      const count = Object.keys(RemotePlayers).length + 1;
-      document.getElementById('online-count').innerText = `${count} Online`;
+    /* =========================================================================
+       8. MODAL ACTIONS (Temple, Sweets, Crackers, Lanterns)
+       ========================================================================= */
+    const modal = document.getElementById('action-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
+
+    function openModal(title, html) {
+      modalTitle.innerText = title; modalBody.innerHTML = html; modal.style.display = 'block';
+    }
+    function closeModal() { modal.style.display = 'none'; }
+
+    function showTempleModal() {
+      openModal("🪔 Shri Lakshmi-Ganesh Temple", `
+        <p>Perform Aarti and seek divine blessings.</p>
+        <button onclick="doAarti()">🔔 Perform Deep Aarti (+20 Coins)</button>
+        <button onclick="getPrasaad()">🍬 Take Ladoo Prasaad</button>
+      `);
+    }
+    window.doAarti = () => {
+      LocalPlayer.coins += 20;
+      document.getElementById('coin-count').innerText = LocalPlayer.coins;
+      burstFirecracker(LocalPlayer.meshGroup.position.x, LocalPlayer.meshGroup.position.z, 0xffd700);
+      alert("Aarti completed! Mata's blessings shower upon you (+20 Coins)!");
+      closeModal();
+    };
+    window.getPrasaad = () => { alert("You received sweet Motichoor Ladoo Prasaad!"); closeModal(); };
+
+    function showCrackerModal() {
+      openModal("🎆 Royal Patakha Bhandar", `
+        <p>Burst crackers directly onto the street!</p>
+        <button onclick="buyCracker(0xef4444)">🔴 Burst Red Anar (10 Coins)</button>
+        <button onclick="buyCracker(0x10b981)">🟢 Burst Green Chakri (15 Coins)</button>
+        <button onclick="buyCracker(0x38bdf8)">🔵 Burst Blue Sky-Shot (20 Coins)</button>
+      `);
+    }
+    window.buyCracker = (col) => {
+      if (LocalPlayer.coins >= 10) {
+        LocalPlayer.coins -= 10;
+        document.getElementById('coin-count').innerText = LocalPlayer.coins;
+        burstFirecracker(LocalPlayer.meshGroup.position.x, LocalPlayer.meshGroup.position.z, col);
+        closeModal();
+      } else {
+        alert("Not enough coins! Go to the Mandir to earn blessings.");
+      }
+    };
+
+    function showMithaiModal() {
+      openModal("🍬 Bikaner Sweets", `
+        <p>Fresh festive sweets for Diwali:</p>
+        <button onclick="alert('Mouth melting Kaju Katli!')">💎 Kaju Katli</button>
+        <button onclick="alert('Delicious warm Gulab Jamun!')">🍯 Gulab Jamun</button>
+      `);
     }
 
-    /* --- Movement & Render Loop --- */
+    function showLanternModal() {
+      openModal("🏮 Fly Sky Lantern", `
+        <p>Release a glowing lantern into the night sky:</p>
+        <button onclick="launchLantern()">✨ Release Wishing Lantern</button>
+      `);
+    }
+    window.launchLantern = () => {
+      const lantern = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.35, 0.45, 0.9, 12),
+        new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xea580c })
+      );
+      lantern.position.set(LocalPlayer.meshGroup.position.x, 2, LocalPlayer.meshGroup.position.z);
+      scene.add(lantern);
+
+      const anim = () => {
+        lantern.position.y += 0.08;
+        if (lantern.position.y < 45) requestAnimationFrame(anim);
+        else scene.remove(lantern);
+      };
+      anim();
+      closeModal();
+    };
+
+    /* =========================================================================
+       9. INPUT, WALKING ANIMATION & CAMERA LOOP
+       ========================================================================= */
     const keys = {};
-    window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
+    window.addEventListener('keydown', e => {
+      keys[e.key.toLowerCase()] = true;
+      if (e.key.toLowerCase() === 'e' && activeZone) activeZone.action();
+    });
     window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
     function animate() {
       requestAnimationFrame(animate);
 
-      if (LocalPlayer.group) {
+      if (LocalPlayer.meshGroup) {
         const speed = 0.18;
-        if (keys['w'] || keys['arrowup'])    { LocalPlayer.group.position.z -= speed; LocalPlayer.group.rotation.y = Math.PI; }
-        if (keys['s'] || keys['arrowdown'])  { LocalPlayer.group.position.z += speed; LocalPlayer.group.rotation.y = 0; }
-        if (keys['a'] || keys['arrowleft'])  { LocalPlayer.group.position.x -= speed; LocalPlayer.group.rotation.y = -Math.PI / 2; }
-        if (keys['d'] || keys['arrowright']) { LocalPlayer.group.position.x += speed; LocalPlayer.group.rotation.y = Math.PI / 2; }
+        let moved = false;
 
-        camera.position.x = THREE.MathUtils.lerp(camera.position.x, LocalPlayer.group.position.x, 0.08);
-        camera.position.y = THREE.MathUtils.lerp(camera.position.y, LocalPlayer.group.position.y + 7, 0.08);
-        camera.position.z = THREE.MathUtils.lerp(camera.position.z, LocalPlayer.group.position.z + 12, 0.08);
-        camera.lookAt(LocalPlayer.group.position.x, LocalPlayer.group.position.y + 1.2, LocalPlayer.group.position.z);
+        if (keys['w'] || keys['arrowup'])    { LocalPlayer.meshGroup.position.z -= speed; LocalPlayer.meshGroup.rotation.y = Math.PI; moved = true; }
+        if (keys['s'] || keys['arrowdown'])  { LocalPlayer.meshGroup.position.z += speed; LocalPlayer.meshGroup.rotation.y = 0; moved = true; }
+        if (keys['a'] || keys['arrowleft'])  { LocalPlayer.meshGroup.position.x -= speed; LocalPlayer.meshGroup.rotation.y = -Math.PI / 2; moved = true; }
+        if (keys['d'] || keys['arrowright']) { LocalPlayer.meshGroup.position.x += speed; LocalPlayer.meshGroup.rotation.y = Math.PI / 2; moved = true; }
+
+        // Limb swinging animation when moving
+        if (moved) {
+          LocalPlayer.walkCycle += 0.16;
+          const swing = Math.sin(LocalPlayer.walkCycle) * 0.55;
+          LocalPlayer.limbs.legL.rotation.x = swing;
+          LocalPlayer.limbs.legR.rotation.x = -swing;
+          LocalPlayer.limbs.armL.rotation.x = -swing;
+          LocalPlayer.limbs.armR.rotation.x = swing;
+        } else {
+          LocalPlayer.limbs.legL.rotation.x = 0;
+          LocalPlayer.limbs.legR.rotation.x = 0;
+          LocalPlayer.limbs.armL.rotation.x = 0;
+          LocalPlayer.limbs.armR.rotation.x = 0;
+        }
+
+        // Camera follow
+        camera.position.x = THREE.MathUtils.lerp(camera.position.x, LocalPlayer.meshGroup.position.x, 0.08);
+        camera.position.y = THREE.MathUtils.lerp(camera.position.y, LocalPlayer.meshGroup.position.y + 6.5, 0.08);
+        camera.position.z = THREE.MathUtils.lerp(camera.position.z, LocalPlayer.meshGroup.position.z + 11, 0.08);
+        camera.lookAt(LocalPlayer.meshGroup.position.x, LocalPlayer.meshGroup.position.y + 1.2, LocalPlayer.meshGroup.position.z);
+
+        // Check Proximity with Stalls
+        let currentNear = null;
+        ZONES.forEach(z => {
+          const d = LocalPlayer.meshGroup.position.distanceTo(new THREE.Vector3(...z.pos));
+          if (d <= 5.5) currentNear = z;
+        });
+
+        const prompt = document.getElementById('interaction-prompt');
+        if (currentNear) {
+          activeZone = currentNear;
+          prompt.style.display = 'block';
+          prompt.innerText = `Press [E] for ${currentNear.name}`;
+        } else {
+          activeZone = null;
+          prompt.style.display = 'none';
+        }
       }
 
+      updateParticles();
       renderer.render(scene, camera);
     }
     animate();
