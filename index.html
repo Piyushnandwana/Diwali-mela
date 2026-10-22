@@ -20,6 +20,7 @@
     #hud p { margin: 2px 0; font-size: 13px; color: #fff; }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-weight: bold; background: #15803d; color: #bbf7d0; font-size: 11px; }
 
+    /* Action Bar (Crackers) */
     #cracker-action-bar { position: absolute; bottom: 80px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 25; display: none; }
     .action-btn {
       background: linear-gradient(135deg, #b91c1c, #ea580c); color: #fff; border: 2px solid #ffd700;
@@ -29,6 +30,28 @@
     .action-btn:hover { transform: scale(1.06); background: linear-gradient(135deg, #ea580c, #f59e0b); }
     .action-btn.throw { background: linear-gradient(135deg, #4338ca, #6366f1); border-color: #a5b4fc; }
 
+    /* Mobile Joystick (Restored for Mobile Users) */
+    #mobile-controls {
+      position: absolute; bottom: 85px; left: 24px; width: 110px; height: 110px;
+      background: rgba(255, 255, 255, 0.12); border: 2px dashed rgba(255, 215, 0, 0.5);
+      border-radius: 50%; z-index: 20; display: none; touch-action: none;
+    }
+    #joystick-knob {
+      position: absolute; top: 32px; left: 32px; width: 46px; height: 46px;
+      background: radial-gradient(circle, #ff8533 0%, #b91c1c 100%);
+      border-radius: 50%; border: 2px solid #ffd700; box-shadow: 0 0 15px rgba(255, 120, 0, 0.8);
+      pointer-events: none;
+    }
+
+    /* Crosshair for Shooting Game */
+    #crosshair {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 16px; height: 16px; border: 2px solid #00ffcc; border-radius: 50%;
+      pointer-events: none; z-index: 50; display: none;
+    }
+    #crosshair::after { content: ''; position: absolute; top: 6px; left: 6px; width: 4px; height: 4px; background: #ff2244; border-radius: 50%; }
+
+    /* Prompts & Buttons */
     #interaction-prompt {
       position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%);
       background: linear-gradient(90deg, #b91c1c, #ea580c); color: #fff;
@@ -43,6 +66,7 @@
       border: 2px solid #ffd700; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: bold; cursor: pointer; display: none; z-index: 30;
     }
 
+    /* Spawn / Entry Card */
     #spawn-screen {
       position: absolute; inset: 0; background: radial-gradient(circle, rgba(22,9,38,0.98) 0%, rgba(5,2,10,1) 100%);
       display: flex; justify-content: center; align-items: center; z-index: 200;
@@ -54,6 +78,7 @@
     .spawn-card input { width: 90%; padding: 10px; margin: 12px 0 18px 0; border-radius: 8px; border: 1px solid #ffd700; background: #0c0416; color: #fff; font-size: 15px; text-align: center; }
     .spawn-card button { background: linear-gradient(45deg, #ea580c, #f59e0b); color: #fff; border: none; padding: 11px 22px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 95%; }
 
+    /* Modals */
     .modal {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       background: #1c0e30; color: #fff; border: 2px solid #ffd700; padding: 22px; border-radius: 16px; display: none; z-index: 100; min-width: 320px; text-align: center;
@@ -61,6 +86,9 @@
     .modal button { background: #ea580c; color: #fff; border: none; padding: 9px 16px; margin: 5px 4px; border-radius: 8px; cursor: pointer; font-weight: bold; }
     .modal button:hover { background: #f59e0b; color: #000; }
     .close-modal { background: #4b5563 !important; }
+
+    /* Audio Enable Notice */
+    #audio-notice { font-size: 11px; color: #86efac; margin-top: 10px; }
   </style>
 
   <!-- Three.js + Postprocessing + Physics -->
@@ -74,7 +102,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
 </head>
 <body>
-  <!-- Ambient Audios (Fallback if blocked, user click will play) -->
+  <div id="canvas-container"></div>
+  <div id="crosshair"></div>
+
+  <!-- Ambient Audio Elements -->
   <audio id="audio-mela" loop>
     <source src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d07a1634f1.mp3" type="audio/mpeg">
   </audio>
@@ -82,14 +113,18 @@
     <source src="https://cdn.pixabay.com/download/audio/2021/10/25/audio_24e07ea37a.mp3" type="audio/mpeg">
   </audio>
 
-  <div id="canvas-container"></div>
+  <!-- Mobile Movement Joystick -->
+  <div id="mobile-controls">
+    <div id="joystick-knob"></div>
+  </div>
 
   <div id="spawn-screen">
     <div class="spawn-card">
       <h2 style="color: #ffd700; margin-top: 0;">🪔 Grand Diwali Mela</h2>
-      <p style="font-size: 13px; color: #d1d5db;">Solid Physics, Realistic Avatars, Dynamic Audio, Lanterns & Stalls!</p>
+      <p style="font-size: 13px; color: #d1d5db;">Talk to shopkeepers, play games, ride jhoola, and burn physics crackers!</p>
       <input type="text" id="username-input" placeholder="Enter Your Name" maxlength="14" />
-      <button onclick="window.joinMela()">Enter the Grand Mela ✨</button>
+      <button onclick="window.joinMela()">Enter Grand Mela ✨</button>
+      <div id="audio-notice">🔊 Keep volume up for ambient sounds & voices!</div>
     </div>
   </div>
 
@@ -106,7 +141,7 @@
     <button class="action-btn" onclick="window.burnHere('anar')">🌋 Place Anar</button>
   </div>
 
-  <button id="dismount-btn" onclick="window.dismountCurrentRide()">🚪 Dismount Ride (Exit Jhoola)</button>
+  <button id="dismount-btn" onclick="window.dismountCurrentRide()">🚪 Dismount Ride</button>
   <div id="interaction-prompt">Press [E] to Interact</div>
 
   <div id="action-modal" class="modal">
@@ -129,13 +164,17 @@
     }
 
     /* =========================================================================
-       2. CANNON-ES PHYSICS WORLD & COLLISIONS
+       2. CANNON-ES PHYSICS WORLD & COLLISIONS (Zero Friction Base)
        ========================================================================= */
     const world = new CANNON.World();
-    world.gravity.set(0, -15, 0); // slightly heavier gravity for solid feel
+    world.gravity.set(0, -15, 0); 
     
-    // Ground Collider
-    const groundBody = new CANNON.Body({ mass: 0, shape: new CANNON.Plane() });
+    // Frictionless material so player glides smoothly
+    const physMat = new CANNON.Material("standard");
+    const contactMat = new CANNON.ContactMaterial(physMat, physMat, { friction: 0.0, restitution: 0.0 });
+    world.addContactMaterial(contactMat);
+
+    const groundBody = new CANNON.Body({ mass: 0, shape: new CANNON.Plane(), material: physMat });
     groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
     world.addBody(groundBody);
 
@@ -144,8 +183,7 @@
       const body = new CANNON.Body({ mass: 0, shape: shape, position: new CANNON.Vec3(x, 2.5, z) });
       world.addBody(body);
     }
-
-    // Adding invisible solid walls for shops & temple so player can't walk through them
+    // Solid Walls for Shops & Temple
     addStaticCollider(-20, -5, 6, 4); // Patakha shop
     addStaticCollider(20, -5, 6, 4); // Mithai shop
     addStaticCollider(0, -24, 14, 10); // Temple
@@ -174,25 +212,40 @@
     moon.position.set(30, 60, 30); moon.castShadow = true; scene.add(moon);
 
     /* =========================================================================
-       4. ORBIT CAMERA
+       4. ORBIT CAMERA RIG
        ========================================================================= */
     const CameraOrbit = { theta: 0.78, phi: 0.65, radius: 17, isDragging: false, lastX: 0, lastY: 0 };
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
     const container = document.getElementById('canvas-container');
     container.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('#hud') || e.target.closest('#cracker-action-bar')) return;
+      // Prevent drag if touching UI elements or Joystick
+      if (e.target.closest('#hud') || e.target.closest('#cracker-action-bar') || e.target.closest('#mobile-controls') || e.target.closest('#dismount-btn')) return;
+      
+      if (LocalPlayer.currentGame === 'balloons') {
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(targetBalloons);
+        if (intersects.length > 0) popBalloon(intersects[0].object);
+        return;
+      }
       CameraOrbit.isDragging = true; CameraOrbit.lastX = e.clientX; CameraOrbit.lastY = e.clientY;
     });
+
     window.addEventListener('pointermove', (e) => {
       if (!CameraOrbit.isDragging) return;
       CameraOrbit.theta -= (e.clientX - CameraOrbit.lastX) * 0.007;
       CameraOrbit.phi = Math.max(0.15, Math.min(Math.PI / 2.1, CameraOrbit.phi + (e.clientY - CameraOrbit.lastY) * 0.006));
       CameraOrbit.lastX = e.clientX; CameraOrbit.lastY = e.clientY;
     });
+
     window.addEventListener('pointerup', () => { CameraOrbit.isDragging = false; });
     window.addEventListener('wheel', (e) => { CameraOrbit.radius = Math.max(7, Math.min(32, CameraOrbit.radius + e.deltaY * 0.02)); }, { passive: true });
 
     /* =========================================================================
-       5. ENVIRONMENT
+       5. FESTIVE ENVIRONMENT
        ========================================================================= */
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshStandardMaterial({ color: 0x160c22, roughness: 0.9 }));
     ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
@@ -217,13 +270,13 @@
 
     const idolMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.85, roughness: 0.15 });
     
-    // LAKSHMI IDOL (Left)
+    // LAKSHMI IDOL
     const lakshmiGroup = new THREE.Group(); lakshmiGroup.position.set(-2, 2.2, -1);
     lakshmiGroup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.8, 1.6, 16), idolMat));
     const haloL = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.08, 12, 32), new THREE.MeshBasicMaterial({ color: 0xffea00 })); haloL.position.set(0, 1.0, -0.2); lakshmiGroup.add(haloL);
     templeGroup.add(lakshmiGroup);
 
-    // GANESHA IDOL (Right)
+    // GANESHA IDOL
     const ganeshaGroup = new THREE.Group(); ganeshaGroup.position.set(2, 2.2, -1);
     ganeshaGroup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.9, 1.4, 16), idolMat));
     const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, 0.8, 8), idolMat); trunk.position.set(0, 0.5, 0.4); trunk.rotation.x = Math.PI / 4; ganeshaGroup.add(trunk);
@@ -255,13 +308,11 @@
     const mBanner = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshBasicMaterial({ map: createBanner("🍬 Bikaner Mithai", '#7c2d12'), transparent: true })); mBanner.position.set(0, 6.2, 0); mithaiShop.add(mBanner);
     scene.add(mithaiShop);
 
-    // Sky Lantern Station
     const lanternStation = new THREE.Group(); lanternStation.position.set(-20, 0, 15);
     const lDesk = new THREE.Mesh(new THREE.BoxGeometry(5.5, 1.4, 1.8), new THREE.MeshStandardMaterial({ color: 0x0f766e })); lDesk.position.set(0, 0.7, 1.2); lanternStation.add(lDesk);
     const lBanner = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshBasicMaterial({ map: createBanner("🏮 Fly Sky Lantern", '#0f766e'), transparent: true })); lBanner.position.set(0, 6.2, 0); lanternStation.add(lBanner);
     scene.add(lanternStation);
 
-    // Rangoli Competition Zone
     const rangoliZone = new THREE.Group(); rangoliZone.position.set(20, 0, 15);
     const rBanner = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshBasicMaterial({ map: createBanner("🎨 Rangoli Competition", '#6b21a8'), transparent: true })); rBanner.position.set(0, 4, 0); rangoliZone.add(rBanner);
     const rFloor = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })); rFloor.rotation.x = -Math.PI/2; rFloor.position.y = 0.05; rangoliZone.add(rFloor);
@@ -290,7 +341,7 @@
     ferrisGroup.add(wheelRotator); scene.add(ferrisGroup);
 
     /* =========================================================================
-       9. PLAYER AVATAR & PHYSICS BODY
+       9. PLAYER AVATAR
        ========================================================================= */
     const LocalPlayer = {
       id: "usr_" + Math.floor(Math.random() * 100000), name: "Player", coins: 100,
@@ -379,7 +430,7 @@
     };
     window.dismountCurrentRide = () => {
       LocalPlayer.currentRide = null; document.getElementById('dismount-btn').style.display = 'none';
-      LocalPlayer.body.position.set(26, 1, 20); // Dismount safe zone
+      LocalPlayer.body.position.set(26, 1.5, 18); // Dismount safe zone
     };
     window.startAartiRitual = () => {
       speakHindi("Jai Maa Lakshmi. Jai Shri Ganesh."); LocalPlayer.coins += 25; document.getElementById('coin-count').innerText = LocalPlayer.coins; alert("Aarti Performed! Blessed with 25 Coins.");
@@ -404,6 +455,7 @@
       cBody.velocity.set(forward.x*12+(Math.random()-0.5)*2, 6.5, forward.z*12+(Math.random()-0.5)*2); world.addBody(cBody);
       activeCrackers.push({ type: 'bomb', mesh: bMesh, cBody: cBody, fuse: 70 });
     };
+
     function updateCrackerPhysics() {
       for (let i = activeCrackers.length - 1; i >= 0; i--) {
         const c = activeCrackers[i];
@@ -419,7 +471,34 @@
     }
 
     /* =========================================================================
-       11. INPUT & START
+       12. MOBILE JOYSTICK (Restored)
+       ========================================================================= */
+    const joystick = { active: false, dx: 0, dy: 0, originX: 0, originY: 0 };
+    const joyContainer = document.getElementById('mobile-controls');
+    const joyKnob = document.getElementById('joystick-knob');
+
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) { joyContainer.style.display = 'block'; }
+
+    joyContainer.addEventListener('pointerdown', (e) => {
+      joystick.active = true;
+      const rect = joyContainer.getBoundingClientRect();
+      joystick.originX = rect.left + rect.width / 2; joystick.originY = rect.top + rect.height / 2;
+      joyContainer.setPointerCapture(e.pointerId);
+    });
+
+    joyContainer.addEventListener('pointermove', (e) => {
+      if (!joystick.active) return;
+      const dx = e.clientX - joystick.originX; const dy = e.clientY - joystick.originY;
+      const dist = Math.min(38, Math.hypot(dx, dy)); const angle = Math.atan2(dy, dx);
+      joystick.dx = (Math.cos(angle) * dist) / 38; joystick.dy = (Math.sin(angle) * dist) / 38;
+      joyKnob.style.transform = `translate(${joystick.dx * 35}px, ${joystick.dy * 35}px)`;
+    });
+
+    const resetJoystick = () => { joystick.active = false; joystick.dx = 0; joystick.dy = 0; joyKnob.style.transform = `translate(0px, 0px)`; };
+    joyContainer.addEventListener('pointerup', resetJoystick); joyContainer.addEventListener('pointercancel', resetJoystick);
+
+    /* =========================================================================
+       13. INPUT & INIT
        ========================================================================= */
     const keys = {};
     window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; if(e.key.toLowerCase()==='e'){ if(activeNearSpot) activeNearSpot.action(); } });
@@ -427,29 +506,31 @@
     let activeNearSpot = null;
 
     window.joinMela = function() {
-      // 1. Hide UI and clear input focus to fix "not moving" bug
-      document.getElementById('spawn-screen').style.display = 'none'; 
-      document.getElementById('cracker-action-bar').style.display = 'flex';
-      document.getElementById('username-input').blur();
-
+      // 1. CLEAR FOCUS SO KEYBOARD WORKS!
       const input = document.getElementById('username-input');
+      input.blur(); 
       LocalPlayer.name = input.value.trim() || ("Player" + Math.floor(Math.random() * 900 + 100));
       document.getElementById('display-name').innerText = LocalPlayer.name;
+      
+      document.getElementById('spawn-screen').style.display = 'none'; 
+      document.getElementById('cracker-action-bar').style.display = 'flex';
 
-      // 2. Safely start ambient audio
-      const audioMela = document.getElementById('audio-mela'); audioMela.volume = 0.3;
-      const audioAarti = document.getElementById('audio-aarti'); audioAarti.volume = 0.0; // Dynamic volume
-      try { audioMela.play().catch(e=>console.log(e)); audioAarti.play().catch(e=>console.log(e)); } catch(e){}
+      try {
+        const audioMela = document.getElementById('audio-mela'); audioMela.volume = 0.3;
+        const audioAarti = document.getElementById('audio-aarti'); audioAarti.volume = 0.0;
+        audioMela.play().catch(e=>{}); audioAarti.play().catch(e=>{});
+      } catch(err) {}
 
-      // 3. Build Player with Cannon Physics Body for Collisions
       const av = buildArticulatedAvatar(LocalPlayer.name); 
       LocalPlayer.meshGroup = av.group; LocalPlayer.limbs = av.limbs;
       scene.add(LocalPlayer.meshGroup);
 
+      // PERFECT SPHERE PHYSICS BODY (Glides smoothly, no sticking)
       LocalPlayer.body = new CANNON.Body({
         mass: 15,
-        shape: new CANNON.Cylinder(0.4, 0.4, 1.8, 12),
+        shape: new CANNON.Sphere(0.6), // Radius 0.6
         position: new CANNON.Vec3(0, 1.5, 8),
+        material: physMat,
         fixedRotation: true
       });
       LocalPlayer.body.linearDamping = 0.9;
@@ -457,7 +538,7 @@
     };
 
     /* =========================================================================
-       12. ANIMATION LOOP
+       14. ANIMATION LOOP
        ========================================================================= */
     const clock = new THREE.Clock();
     function animate() {
@@ -467,29 +548,32 @@
 
       if (LocalPlayer.body && LocalPlayer.meshGroup) {
         if (LocalPlayer.currentRide === 'ferris') {
-          // Lock player to gondola
           const tGondola = ferrisGondolas[0].group; const wPos = new THREE.Vector3(); tGondola.getWorldPosition(wPos);
           LocalPlayer.body.position.copy(wPos); LocalPlayer.body.position.y += 0.5;
           LocalPlayer.meshGroup.position.copy(wPos); LocalPlayer.meshGroup.position.y -= 0.4; LocalPlayer.meshGroup.rotation.y = 0;
         } else {
-          // Physics-based WASD Movement
+          // Input parsing
           let inputX = 0; let inputZ = 0;
           if (keys['w'] || keys['arrowup']) inputZ -= 1; if (keys['s'] || keys['arrowdown']) inputZ += 1;
           if (keys['a'] || keys['arrowleft']) inputX -= 1; if (keys['d'] || keys['arrowright']) inputX += 1;
 
+          if (joystick.active) { inputX += joystick.dx; inputZ += joystick.dy; }
+
           if (Math.hypot(inputX, inputZ) > 0.1) {
+            LocalPlayer.body.wakeUp(); // IMPORTANT: Prevent body from sleeping
+
             const forward = new THREE.Vector3(-Math.sin(CameraOrbit.theta), 0, -Math.cos(CameraOrbit.theta)).normalize();
             const right = new THREE.Vector3(Math.cos(CameraOrbit.theta), 0, -Math.sin(CameraOrbit.theta)).normalize();
             const moveVec = new THREE.Vector3().addScaledVector(forward, -inputZ).addScaledVector(right, inputX).normalize();
             
-            // Apply physics velocity
-            LocalPlayer.body.velocity.x = moveVec.x * 6.5;
-            LocalPlayer.body.velocity.z = moveVec.z * 6.5;
+            // Set velocity manually
+            LocalPlayer.body.velocity.x = moveVec.x * 7.5;
+            LocalPlayer.body.velocity.z = moveVec.z * 7.5;
 
             const targetRot = Math.atan2(moveVec.x, moveVec.z);
             LocalPlayer.meshGroup.rotation.y = THREE.MathUtils.lerp(LocalPlayer.meshGroup.rotation.y, targetRot, 0.2);
 
-            LocalPlayer.walkCycle += 0.35;
+            LocalPlayer.walkCycle += 0.4;
             const legSwing = Math.sin(LocalPlayer.walkCycle) * 0.7;
             LocalPlayer.limbs.legL.rotation.x = legSwing; LocalPlayer.limbs.legR.rotation.x = -legSwing;
             LocalPlayer.limbs.armL.rotation.x = -legSwing * 0.8; LocalPlayer.limbs.armR.rotation.x = legSwing * 0.8;
@@ -501,9 +585,9 @@
             LocalPlayer.limbs.torsoPivot.rotation.x = THREE.MathUtils.lerp(LocalPlayer.limbs.torsoPivot.rotation.x, 0, 0.2); LocalPlayer.limbs.torsoPivot.position.y = 1.45;
           }
 
-          // Sync Mesh to Physics Body (Offset Y for legs)
+          // Fix Mesh Offset: Sphere is radius 0.6, so lower mesh by 0.6 to plant feet on ground
           LocalPlayer.meshGroup.position.copy(LocalPlayer.body.position);
-          LocalPlayer.meshGroup.position.y -= 0.9; 
+          LocalPlayer.meshGroup.position.y -= 0.6; 
 
           // Hotspots Check
           let near = null; HOTSPOTS.forEach(h => { if (LocalPlayer.meshGroup.position.distanceTo(new THREE.Vector3(...h.pos)) <= h.range) near = h; });
@@ -511,7 +595,7 @@
           if (near) { activeNearSpot = near; prompt.style.display = 'block'; prompt.innerText = `Press [E] for ${near.name}`; }
           else { activeNearSpot = null; prompt.style.display = 'none'; }
           
-          // Dynamic Aarti Audio (Proximity to Temple)
+          // Dynamic Aarti Audio
           const distToTemple = LocalPlayer.meshGroup.position.distanceTo(templeGroup.position);
           const aartiVol = Math.max(0, 1 - (distToTemple / 30));
           document.getElementById('audio-aarti').volume = aartiVol * 0.8;
