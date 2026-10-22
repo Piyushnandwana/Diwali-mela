@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🪔 Authentic Diwali Mela | Traditional Indian Village Fair</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🪔 Shubh Diwali Mela - Interactive 3D Village Fair</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { overflow: hidden; font-family: 'Segoe UI', Tahoma, sans-serif; background: #0a0518; color: #fff; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { overflow: hidden; font-family: 'Segoe UI', Tahoma, sans-serif; background: #0a0518; color: #fff; touch-action: none; }
     canvas { display: block; }
 
     #loader { position: fixed; inset: 0; background: radial-gradient(circle, #2a1040, #0a0518); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; transition: opacity 1s; }
@@ -14,40 +14,64 @@
     @keyframes flicker { from { opacity: 0.6; transform: scale(1); } to { opacity: 1; transform: scale(1.1); } }
     .loader-text { font-size: 22px; color: #ffd700; margin-top: 20px; letter-spacing: 2px; }
 
-    #hud { position: fixed; top: 16px; left: 16px; background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 14px; padding: 14px 20px; z-index: 20; box-shadow: 0 0 25px rgba(255,170,0,0.4); }
-    #hud h2 { color: #ffd700; font-size: 16px; margin-bottom: 6px; }
-    #hud p { font-size: 13px; margin: 2px 0; }
+    #hud { position: fixed; top: 12px; left: 12px; background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 14px; padding: 10px 16px; z-index: 20; font-size: 12px; }
+    #hud h2 { color: #ffd700; font-size: 14px; margin-bottom: 4px; }
     .hud-value { color: #ffea79; font-weight: bold; }
 
-    #quest-log { position: fixed; top: 16px; right: 16px; width: 240px; background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 14px; padding: 12px; z-index: 20; }
-    #quest-log h3 { color: #ffd700; font-size: 14px; margin-bottom: 8px; }
-    #quest-list { list-style: none; font-size: 12px; }
-    #quest-list li { padding: 4px 0; border-bottom: 1px dashed rgba(255,215,0,0.3); }
+    #quest-log { position: fixed; top: 12px; right: 12px; width: 210px; background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 14px; padding: 10px; z-index: 20; font-size: 11px; }
+    #quest-log h3 { color: #ffd700; font-size: 13px; margin-bottom: 6px; }
+    #quest-list { list-style: none; max-height: 180px; overflow-y: auto; }
+    #quest-list li { padding: 3px 0; border-bottom: 1px dashed rgba(255,215,0,0.2); }
     #quest-list li.done { text-decoration: line-through; color: #86efac; }
 
-    #chat { position: fixed; bottom: 16px; left: 16px; width: 300px; background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 14px; padding: 10px; z-index: 20; }
-    #messages { list-style: none; height: 120px; overflow-y: auto; font-size: 12px; margin-bottom: 8px; }
-    #messages li { padding: 3px 0; }
-    #chat form { display: flex; gap: 6px; }
-    #chat-input { flex: 1; padding: 6px 10px; border-radius: 8px; border: 1px solid #ffd700; background: #0c0416; color: #fff; font-size: 12px; }
-    #chat-submit { padding: 6px 12px; background: #ea580c; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; }
+    #chat { position: fixed; bottom: 12px; left: 12px; width: 260px; background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 14px; padding: 8px; z-index: 20; }
+    #messages { list-style: none; height: 90px; overflow-y: auto; font-size: 11px; margin-bottom: 6px; }
+    #chat form { display: flex; gap: 4px; }
+    #chat-input { flex: 1; padding: 5px 8px; border-radius: 6px; border: 1px solid #ffd700; background: #0c0416; color: #fff; font-size: 11px; }
+    #chat-submit { padding: 5px 10px; background: #ea580c; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; }
 
-    #controls-info { position: fixed; bottom: 16px; right: 16px; background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 14px; padding: 10px 16px; font-size: 12px; z-index: 20; }
+    /* Sponsored Ad Banner */
+    #sponsor-banner { position: fixed; top: 50%; right: 10px; transform: translateY(-50%); width: 150px; background: linear-gradient(135deg, #ea580c, #f59e0b); border: 2px solid #ffd700; border-radius: 10px; padding: 12px; z-index: 15; text-align: center; cursor: pointer; }
+    #sponsor-banner small { display: block; font-size: 9px; color: #fff; opacity: 0.7; margin-bottom: 4px; }
+    #sponsor-banner h4 { font-size: 13px; color: #fff; margin-bottom: 4px; }
+    #sponsor-banner p { font-size: 10px; color: #fff; }
 
-    #interaction-prompt { position: fixed; bottom: 160px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, #b91c1c, #ea580c); color: #fff; padding: 10px 24px; border-radius: 30px; border: 2px solid #ffea79; font-weight: bold; display: none; z-index: 25; animation: pulse 1.2s infinite alternate; }
+    #day-indicator { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 20px; padding: 6px 16px; font-size: 12px; z-index: 20; }
+
+    #controls-info { position: fixed; bottom: 12px; right: 12px; background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 10px; padding: 8px 12px; font-size: 11px; z-index: 20; max-width: 220px; }
+
+    #interaction-prompt { position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, #b91c1c, #ea580c); color: #fff; padding: 8px 20px; border-radius: 30px; border: 2px solid #ffea79; font-weight: bold; display: none; z-index: 25; font-size: 13px; animation: pulse 1.2s infinite alternate; }
     @keyframes pulse { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.08); } }
 
     #spawn-screen { position: fixed; inset: 0; background: radial-gradient(circle, rgba(22,9,38,0.98), rgba(5,2,10,1)); display: flex; justify-content: center; align-items: center; z-index: 500; }
-    .spawn-card { background: linear-gradient(145deg, #2a1440, #140722); border: 2px solid #ffd700; border-radius: 20px; padding: 32px; width: 360px; text-align: center; }
-    .spawn-card h1 { color: #ffd700; margin-bottom: 10px; font-size: 26px; }
-    .spawn-card p { font-size: 13px; color: #d1d5db; margin-bottom: 20px; }
-    .spawn-card input { width: 100%; padding: 12px; margin-bottom: 16px; border-radius: 10px; border: 1px solid #ffd700; background: #0c0416; color: #fff; font-size: 15px; text-align: center; }
-    .spawn-card button { width: 100%; padding: 12px; background: linear-gradient(45deg, #ea580c, #f59e0b); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    .spawn-card { background: linear-gradient(145deg, #2a1440, #140722); border: 2px solid #ffd700; border-radius: 20px; padding: 24px; width: 340px; text-align: center; }
+    .spawn-card h1 { color: #ffd700; margin-bottom: 8px; font-size: 22px; }
+    .spawn-card p { font-size: 12px; color: #d1d5db; margin-bottom: 16px; }
+    .spawn-card input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ffd700; background: #0c0416; color: #fff; font-size: 14px; text-align: center; }
+    .spawn-card button { width: 100%; padding: 10px; background: linear-gradient(45deg, #ea580c, #f59e0b); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; }
 
-    .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #1c0e30; border: 2px solid #ffd700; border-radius: 16px; padding: 24px; min-width: 320px; text-align: center; display: none; z-index: 100; }
-    .modal h3 { color: #ffd700; margin-bottom: 14px; }
-    .modal button { background: #ea580c; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; margin: 4px; cursor: pointer; font-weight: bold; }
+    .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #1c0e30; border: 2px solid #ffd700; border-radius: 16px; padding: 20px; min-width: 300px; max-width: 90vw; text-align: center; display: none; z-index: 100; }
+    .modal h3 { color: #ffd700; margin-bottom: 12px; font-size: 16px; }
+    .modal button { background: #ea580c; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; margin: 3px; cursor: pointer; font-weight: bold; font-size: 12px; }
     .modal button:hover { background: #f59e0b; color: #000; }
+
+    /* Mobile joystick */
+    #joystick { position: fixed; bottom: 110px; left: 20px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,215,0,0.4); border-radius: 50%; z-index: 30; display: none; }
+    #joystick-knob { position: absolute; top: 30px; left: 30px; width: 40px; height: 40px; background: radial-gradient(circle, #ff8533, #b91c1c); border-radius: 50%; border: 2px solid #ffd700; }
+
+    /* Action buttons for mobile */
+    #action-btns { position: fixed; bottom: 110px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 30; display: none; }
+    .action-btn { background: linear-gradient(135deg, #b91c1c, #ea580c); color: #fff; border: 2px solid #ffd700; padding: 10px; border-radius: 50%; font-size: 20px; width: 55px; height: 55px; cursor: pointer; }
+
+    /* Mini-game canvas */
+    #minigame-canvas { background: #2a1440; border: 2px solid #ffd700; border-radius: 10px; cursor: crosshair; }
+
+    /* Rangoli drawing */
+    #rangoli-canvas { background: #ffffff; border: 2px solid #ffd700; border-radius: 10px; cursor: crosshair; }
+    .color-swatch { display: inline-block; width: 24px; height: 24px; border-radius: 50%; margin: 2px; cursor: pointer; border: 2px solid #fff; }
+
+    #energy-bar { position: fixed; top: 55px; left: 12px; width: 150px; height: 12px; background: rgba(0,0,0,0.6); border: 1px solid #ffd700; border-radius: 6px; overflow: hidden; z-index: 20; }
+    #energy-fill { height: 100%; background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981); transition: width 0.3s; }
   </style>
 </head>
 <body>
@@ -58,45 +82,63 @@
 
   <div id="spawn-screen" style="display:none;">
     <div class="spawn-card">
-      <h1>🪔 Traditional Diwali Mela</h1>
-      <p>Step into an authentic Indian village fair - wooden rides, lantern-lit stalls, bustling crowd, and the sacred temple of Lakshmi & Ganesha.</p>
+      <h1>🪔 Shubh Diwali Mela</h1>
+      <p>Step into an authentic Indian village fair - rides, stalls, games, crackers, aarti, rangoli, and a bustling crowd!</p>
       <input type="text" id="username-input" placeholder="Enter Your Name" maxlength="14" />
       <button onclick="joinMela()">Enter Mela ✨</button>
     </div>
   </div>
 
   <div id="hud" style="display:none;">
-    <h2>🪔 SHUBH DIWALI MELA</h2>
-    <p>👤 <span id="display-name" class="hud-value">-</span></p>
-    <p>🪙 Coins: <span id="coin-count" class="hud-value">100</span></p>
-    <p>⭐ Blessings: <span id="blessing-count" class="hud-value">0</span></p>
+    <h2>🪔 <span id="display-name" class="hud-value">-</span></h2>
+    <div>🪙 <span id="coin-count" class="hud-value">100</span> | ⭐ <span id="blessing-count" class="hud-value">0</span></div>
+    <div>⚡ Energy</div>
   </div>
+  <div id="energy-bar" style="display:none;"><div id="energy-fill" style="width:100%"></div></div>
+
+  <div id="day-indicator" style="display:none;">🌙 Diwali Night - <span id="time-text">8:00 PM</span></div>
 
   <div id="quest-log" style="display:none;">
     <h3>✨ Diwali Quests</h3>
     <ul id="quest-list">
-      <li id="q1">🪔 Pray at the Lakshmi-Ganesha temple</li>
+      <li id="q1">🪔 Pray at Lakshmi-Ganesha temple</li>
       <li id="q2">🎆 Light a cracker</li>
-      <li id="q3">🍬 Buy some mithai</li>
-      <li id="q4">🎡 Ride the wooden Ferris wheel</li>
-      <li id="q5">🏮 Release a sky lantern</li>
-      <li id="q6">🎠 Ride the carousel</li>
+      <li id="q3">🍬 Buy mithai</li>
+      <li id="q4">🎡 Ride Giant Wheel</li>
+      <li id="q5">🏮 Release sky lantern</li>
+      <li id="q6">🎠 Ride Carousel</li>
+      <li id="q7">🎨 Create a rangoli</li>
+      <li id="q8">🎯 Win balloon shoot</li>
+      <li id="q9">🍵 Try chai & jalebi</li>
+      <li id="q10">💍 Buy bangles</li>
     </ul>
   </div>
 
   <div id="chat" style="display:none;">
     <ul id="messages"></ul>
     <form onsubmit="sendChat(event)">
-      <input id="chat-input" autocomplete="off" placeholder="Say Happy Diwali..." />
+      <input id="chat-input" autocomplete="off" placeholder="Happy Diwali!" />
       <button id="chat-submit" type="submit">Send</button>
     </form>
   </div>
 
+  <!-- Sponsored Banner (easy to swap out) -->
+  <div id="sponsor-banner" onclick="window.open('https://your-sponsor-link.com', '_blank')" style="display:none;">
+    <small>SPONSORED</small>
+    <h4>🪔 Your Brand</h4>
+    <p>Happy Diwali Offer!</p>
+  </div>
+
   <div id="controls-info" style="display:none;">
-    <b>🎮 Controls:</b> WASD / Arrows • E to interact • Drag to rotate camera
+    <b>🎮 Controls:</b><br>WASD/Arrows • E to interact<br>Drag to rotate • Scroll to zoom
   </div>
 
   <div id="interaction-prompt">Press [E] to Interact</div>
+
+  <div id="joystick"><div id="joystick-knob"></div></div>
+  <div id="action-btns">
+    <button class="action-btn" onclick="if(activeNearSpot)activeNearSpot.action()">✨</button>
+  </div>
 
   <div id="action-modal" class="modal">
     <h3 id="modal-title">Action</h3>
@@ -106,13 +148,21 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
-    const Player = { name: "Player", coins: 100, blessings: 0, mesh: null, position: new THREE.Vector3(0, 0, 15), velocity: new THREE.Vector3(), walkCycle: 0, limbs: {} };
-    const quests = { q1: false, q2: false, q3: false, q4: false, q5: false, q6: false };
+    // ================================================
+    // SPONSORED STALLS CONFIG (easy to edit/add)
+    // ================================================
+    const SPONSORED_STALLS = [
+      // Add entries like: { name: "Tata Diwali Mart", pos: [15, 0, 25], color: 0xff0000, bgColor: '#003366', url: 'https://tata.com', message: 'Buy at Tata!' }
+    ];
+
+    const Player = { name: "Player", coins: 100, blessings: 0, energy: 100, mesh: null, position: new THREE.Vector3(0, 0, 15), velocity: new THREE.Vector3(), walkCycle: 0, limbs: {} };
+    const quests = {}; for (let i = 1; i <= 10; i++) quests['q'+i] = false;
     let activeNearSpot = null;
     const keys = {};
+    let gameTime = 20 * 60; // 8:00 PM in minutes
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0a1420, 0.012);
+    scene.fog = new THREE.FogExp2(0x0a1420, 0.010);
     scene.background = new THREE.Color(0x0a1830);
 
     const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 500);
@@ -122,720 +172,408 @@
     renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
-    // Night sky with moonlight
     scene.add(new THREE.AmbientLight(0x3a4a7a, 1.0));
-    const moon = new THREE.DirectionalLight(0xaac0ff, 0.5);
-    moon.position.set(40, 80, 20);
-    scene.add(moon);
+    const moonLight = new THREE.DirectionalLight(0xaac0ff, 0.5);
+    moonLight.position.set(40, 80, 20);
+    scene.add(moonLight);
 
-    // Moon sphere in sky
-    const moonSphere = new THREE.Mesh(
-      new THREE.SphereGeometry(4, 24, 24),
-      new THREE.MeshBasicMaterial({ color: 0xfff8dc })
-    );
+    // Moon
+    const moonSphere = new THREE.Mesh(new THREE.SphereGeometry(4, 24, 24), new THREE.MeshBasicMaterial({ color: 0xfff8dc }));
     moonSphere.position.set(40, 70, -80);
     scene.add(moonSphere);
-    const moonHalo = new THREE.Mesh(
-      new THREE.SphereGeometry(5.5, 24, 24),
-      new THREE.MeshBasicMaterial({ color: 0xffffcc, transparent: true, opacity: 0.2 })
-    );
-    moonHalo.position.copy(moonSphere.position);
-    scene.add(moonHalo);
 
     // Stars
     const starGeo = new THREE.BufferGeometry();
     const starPos = [];
-    for (let i = 0; i < 400; i++) {
-      starPos.push((Math.random()-0.5)*400, Math.random()*100+30, (Math.random()-0.5)*400);
-    }
+    for (let i = 0; i < 600; i++) starPos.push((Math.random()-0.5)*400, Math.random()*100+30, (Math.random()-0.5)*400);
     starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
-    const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.3 }));
-    scene.add(stars);
+    scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.3 })));
 
-    // Ground - dirt/earth texture color (like village ground)
-    const groundMat = new THREE.MeshStandardMaterial({ color: 0x4a3020, roughness: 0.95 });
+    // Procedural ground texture
+    function makeDirtTexture() {
+      const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#4a3020'; ctx.fillRect(0, 0, 512, 512);
+      for (let i = 0; i < 3000; i++) {
+        ctx.fillStyle = `rgba(${80+Math.random()*60}, ${50+Math.random()*40}, ${30+Math.random()*30}, ${Math.random()*0.6})`;
+        ctx.fillRect(Math.random()*512, Math.random()*512, 2+Math.random()*4, 2+Math.random()*4);
+      }
+      const t = new THREE.CanvasTexture(c);
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(10, 10);
+      return t;
+    }
+    const groundMat = new THREE.MeshStandardMaterial({ map: makeDirtTexture(), roughness: 0.95 });
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), groundMat);
     ground.rotation.x = -Math.PI/2;
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // Trampled central mela area (lighter dirt)
-    const melaFloor = new THREE.Mesh(
-      new THREE.CircleGeometry(50, 32),
-      new THREE.MeshStandardMaterial({ color: 0x6b4a2e, roughness: 0.9 })
+    // Rangoli pattern on ground near temple
+    function makeRangoliTexture() {
+      const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+      const ctx = c.getContext('2d');
+      ctx.translate(128, 128);
+      const colors = ['#ff0000', '#ffd700', '#00aa00', '#0066ff', '#ff00ff', '#ff8800'];
+      for (let ring = 0; ring < 5; ring++) {
+        ctx.fillStyle = colors[ring % colors.length];
+        for (let i = 0; i < 12; i++) {
+          ctx.save();
+          ctx.rotate((i / 12) * Math.PI * 2);
+          ctx.beginPath();
+          ctx.ellipse(ring * 20 + 15, 0, 10, 5, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+      return new THREE.CanvasTexture(c);
+    }
+    const rangoli = new THREE.Mesh(
+      new THREE.PlaneGeometry(6, 6),
+      new THREE.MeshBasicMaterial({ map: makeRangoliTexture(), transparent: true })
     );
-    melaFloor.rotation.x = -Math.PI/2; melaFloor.position.y = 0.02;
-    scene.add(melaFloor);
+    rangoli.rotation.x = -Math.PI/2; rangoli.position.set(0, 0.05, -20); scene.add(rangoli);
 
     // ================================================
-    // STRING LIGHTS crisscrossing the mela
+    // STRING LIGHTS
     // ================================================
-    const stringLightPoints = [
-      [-30, 8, -20, 30, 8, -20],
-      [-30, 8, 0, 30, 8, 0],
-      [-30, 8, 20, 30, 8, 20],
-      [-25, 8, -25, -25, 8, 25],
-      [25, 8, -25, 25, 8, 25],
-      [0, 8, -30, 0, 8, 30]
-    ];
-    stringLightPoints.forEach(seg => {
+    const stringLightBulbs = [];
+    [
+      [-35, 8, -20, 35, 8, -20], [-35, 8, 0, 35, 8, 0], [-35, 8, 20, 35, 8, 20],
+      [-30, 8, -30, -30, 8, 30], [30, 8, -30, 30, 8, 30], [0, 8, -40, 0, 8, 30]
+    ].forEach(seg => {
       const start = new THREE.Vector3(seg[0], seg[1], seg[2]);
       const end = new THREE.Vector3(seg[3], seg[4], seg[5]);
       const dist = start.distanceTo(end);
-      const steps = Math.floor(dist / 2);
+      const steps = Math.floor(dist / 1.5);
       for (let i = 0; i <= steps; i++) {
         const t = i / steps;
         const pos = new THREE.Vector3().lerpVectors(start, end, t);
-        pos.y -= Math.sin(t * Math.PI) * 0.5; // sag
+        pos.y -= Math.sin(t * Math.PI) * 0.5;
         const colors = [0xff2200, 0xffd700, 0x00ff44, 0x0088ff, 0xff00aa];
         const bulb = new THREE.Mesh(
-          new THREE.SphereGeometry(0.15, 8, 8),
+          new THREE.SphereGeometry(0.14, 8, 8),
           new THREE.MeshStandardMaterial({ color: colors[i%5], emissive: colors[i%5], emissiveIntensity: 1.2 })
         );
-        bulb.position.copy(pos);
-        scene.add(bulb);
+        bulb.position.copy(pos); scene.add(bulb);
+        stringLightBulbs.push({ mesh: bulb, baseIntensity: 1.2, phase: Math.random() * Math.PI * 2 });
       }
-      // Wire
       const wireGeo = new THREE.BufferGeometry().setFromPoints([start, end]);
       scene.add(new THREE.Line(wireGeo, new THREE.LineBasicMaterial({ color: 0x333333 })));
     });
 
     // ================================================
-    // LAKSHMI-GANESHA TEMPLE (Based on your reference image)
+    // TEMPLE
     // ================================================
     const temple = new THREE.Group();
     temple.position.set(0, 0, -35);
 
-    // Temple base
-    const base = new THREE.Mesh(
-      new THREE.BoxGeometry(20, 1.5, 14),
-      new THREE.MeshStandardMaterial({ color: 0xeeeae0, roughness: 0.3 })
-    );
+    const base = new THREE.Mesh(new THREE.BoxGeometry(20, 1.5, 14), new THREE.MeshStandardMaterial({ color: 0xeeeae0, roughness: 0.3 }));
     base.position.y = 0.75; temple.add(base);
-
-    // Steps
     for (let i = 0; i < 3; i++) {
-      const step = new THREE.Mesh(
-        new THREE.BoxGeometry(14 + i*2, 0.3, 2),
-        new THREE.MeshStandardMaterial({ color: 0xd0ccbe, roughness: 0.4 })
-      );
+      const step = new THREE.Mesh(new THREE.BoxGeometry(14 + i*2, 0.3, 2), new THREE.MeshStandardMaterial({ color: 0xd0ccbe }));
       step.position.set(0, i*0.3 + 0.15, 7 + i*0.8); temple.add(step);
     }
-
-    // Pillars - 4 ornate gold pillars
     const pillarMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.85, roughness: 0.2 });
     [[-7.5,-5.5],[7.5,-5.5],[-7.5,5.5],[7.5,5.5]].forEach(([x,z]) => {
       const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.55, 8), pillarMat);
       pillar.position.set(x, 5, z); temple.add(pillar);
-      // Pillar top ornament
       const cap = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 1.2), pillarMat);
       cap.position.set(x, 9.2, z); temple.add(cap);
     });
-
-    // Temple roof base
-    const roofBase = new THREE.Mesh(
-      new THREE.BoxGeometry(18, 0.8, 13),
-      new THREE.MeshStandardMaterial({ color: 0xb45309 })
-    );
+    const roofBase = new THREE.Mesh(new THREE.BoxGeometry(18, 0.8, 13), new THREE.MeshStandardMaterial({ color: 0xb45309 }));
     roofBase.position.y = 9.5; temple.add(roofBase);
-
-    // Main dome (shikhara style)
-    const shikhara = new THREE.Mesh(
-      new THREE.ConeGeometry(6, 7, 8),
-      new THREE.MeshStandardMaterial({ color: 0xc07020, roughness: 0.4 })
-    );
+    const shikhara = new THREE.Mesh(new THREE.ConeGeometry(6, 7, 8), new THREE.MeshStandardMaterial({ color: 0xc07020 }));
     shikhara.position.y = 13.4; temple.add(shikhara);
-
-    // Kalash on top
-    const kalash = new THREE.Mesh(
-      new THREE.SphereGeometry(0.5, 12, 12),
-      new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9 })
-    );
+    const kalash = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 12), new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9 }));
     kalash.position.y = 17.5; temple.add(kalash);
-    const spike = new THREE.Mesh(
-      new THREE.ConeGeometry(0.2, 1.2, 8),
-      new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9 })
-    );
-    spike.position.y = 18.6; temple.add(spike);
-
-    // Side mini-domes
-    [[-7, 0, -4], [7, 0, -4], [-7, 0, 4], [7, 0, 4]].forEach(([x,,z]) => {
-      const miniDome = new THREE.Mesh(
-        new THREE.ConeGeometry(1.5, 2.5, 8),
-        new THREE.MeshStandardMaterial({ color: 0xc07020 })
-      );
+    [[-7,-4], [7,-4], [-7,4], [7,4]].forEach(([x,z]) => {
+      const miniDome = new THREE.Mesh(new THREE.ConeGeometry(1.5, 2.5, 8), new THREE.MeshStandardMaterial({ color: 0xc07020 }));
       miniDome.position.set(x, 11, z); temple.add(miniDome);
     });
 
-    // Back wall (behind idols)
-    const backWall = new THREE.Mesh(
-      new THREE.BoxGeometry(14, 7, 0.4),
-      new THREE.MeshStandardMaterial({ color: 0xeeeae0 })
-    );
-    backWall.position.set(0, 4.5, -6); temple.add(backWall);
+    // Idols (same as before)
+    const idolMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.2, emissive: 0x443300, emissiveIntensity: 0.4 });
+    const skinIdolMat = new THREE.MeshStandardMaterial({ color: 0xd4a76a, emissive: 0x221100, emissiveIntensity: 0.3 });
 
-    // ================================================
-    // LAKSHMI IDOL (3D sculpted based on reference)
-    // ================================================
-    const lakshmi = new THREE.Group();
-    lakshmi.position.set(-3.5, 1.8, -4);
-
-    // Lotus throne
-    const lotusMat = new THREE.MeshStandardMaterial({ color: 0xff9966, emissive: 0x441100, emissiveIntensity: 0.3 });
-    const lotus1 = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, 0.3, 8), lotusMat);
+    // Lakshmi
+    const lakshmi = new THREE.Group(); lakshmi.position.set(-3.5, 1.8, -4);
+    const lotus1 = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, 0.3, 8), new THREE.MeshStandardMaterial({ color: 0xff9966 }));
     lotus1.position.y = -0.1; lakshmi.add(lotus1);
-    // Lotus petals
     for (let i = 0; i < 8; i++) {
-      const petal = new THREE.Mesh(
-        new THREE.ConeGeometry(0.4, 0.8, 6),
-        new THREE.MeshStandardMaterial({ color: 0xff7744 })
-      );
-      const angle = (i/8) * Math.PI * 2;
-      petal.position.set(Math.cos(angle)*1.3, 0.1, Math.sin(angle)*1.3);
-      petal.rotation.z = Math.PI/2;
-      petal.rotation.y = -angle;
+      const petal = new THREE.Mesh(new THREE.ConeGeometry(0.4, 0.8, 6), new THREE.MeshStandardMaterial({ color: 0xff7744 }));
+      const a = (i/8)*Math.PI*2;
+      petal.position.set(Math.cos(a)*1.3, 0.1, Math.sin(a)*1.3); petal.rotation.z = Math.PI/2; petal.rotation.y = -a;
       lakshmi.add(petal);
     }
-
-    // Lakshmi body - seated posture (red saree)
-    const sareeMat = new THREE.MeshStandardMaterial({ color: 0xaa3322, emissive: 0x331100, emissiveIntensity: 0.3, roughness: 0.5 });
-    const lakshmiLegs = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.9, 1.2, 0.8, 12),
-      sareeMat
-    );
-    lakshmiLegs.position.y = 0.5; lakshmi.add(lakshmiLegs);
-
-    // Lakshmi torso (ornate top)
-    const lakshmiTorsoMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.3, emissive: 0x443300, emissiveIntensity: 0.4 });
-    const lakshmiTorso = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.6, 0.75, 1.0, 12),
-      lakshmiTorsoMat
-    );
-    lakshmiTorso.position.y = 1.45; lakshmi.add(lakshmiTorso);
-
-    // Lakshmi head
-    const skinMat = new THREE.MeshStandardMaterial({ color: 0xd4a76a, roughness: 0.5, emissive: 0x221100, emissiveIntensity: 0.2 });
-    const lakshmiHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), skinMat);
-    lakshmiHead.position.y = 2.15; lakshmi.add(lakshmiHead);
-
-    // Lakshmi crown (mukut)
-    const crownMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.95, emissive: 0x553300, emissiveIntensity: 0.5 });
-    const lakshmiCrown = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.6, 8), crownMat);
-    lakshmiCrown.position.y = 2.6; lakshmi.add(lakshmiCrown);
-
-    // Lakshmi halo (prabhavali)
-    const haloRays = new THREE.Mesh(
-      new THREE.CircleGeometry(1.0, 16),
-      new THREE.MeshBasicMaterial({ color: 0xffcc33, transparent: true, opacity: 0.4 })
-    );
-    haloRays.position.set(0, 2.2, -0.4);
-    lakshmi.add(haloRays);
-    const haloRing = new THREE.Mesh(
-      new THREE.TorusGeometry(0.9, 0.07, 12, 32),
-      crownMat
-    );
-    haloRing.position.set(0, 2.2, -0.35);
-    lakshmi.add(haloRing);
-
-    // Lakshmi 4 arms (seated hands pose - 2 holding pots, 2 showing blessing)
-    [[-0.8, 1.5, 0.1, -0.6], [0.8, 1.5, 0.1, 0.6], [-0.9, 1.3, 0.3, -0.9], [0.9, 1.3, 0.3, 0.9]].forEach(([x,y,z,rz]) => {
-      const arm = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.08, 0.09, 0.6, 8),
-        skinMat
-      );
-      arm.position.set(x, y, z); arm.rotation.z = rz; lakshmi.add(arm);
-    });
-
-    // Lakshmi holding gold pot (kalash)
-    const lakshmiPot = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.2, 0.25, 0.4, 12),
-      crownMat
-    );
-    lakshmiPot.position.set(0, 1.1, 0.5);
-    lakshmi.add(lakshmiPot);
+    const lLegs = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.2, 0.8, 12), new THREE.MeshStandardMaterial({ color: 0xaa3322, emissive: 0x331100, emissiveIntensity: 0.3 }));
+    lLegs.position.y = 0.5; lakshmi.add(lLegs);
+    const lTorso = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.75, 1.0, 12), idolMat);
+    lTorso.position.y = 1.45; lakshmi.add(lTorso);
+    const lHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), skinIdolMat);
+    lHead.position.y = 2.15; lakshmi.add(lHead);
+    const lCrown = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.6, 8), idolMat);
+    lCrown.position.y = 2.6; lakshmi.add(lCrown);
+    const lHaloRing = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.07, 12, 32), idolMat);
+    lHaloRing.position.set(0, 2.2, -0.35); lakshmi.add(lHaloRing);
     temple.add(lakshmi);
 
-    // ================================================
-    // GANESHA IDOL (3D sculpted based on reference)
-    // ================================================
-    const ganesha = new THREE.Group();
-    ganesha.position.set(3.5, 1.8, -4);
-
-    // Lotus throne for Ganesha
-    const gLotus = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, 0.3, 8), lotusMat);
+    // Ganesha
+    const ganesha = new THREE.Group(); ganesha.position.set(3.5, 1.8, -4);
+    const gLotus = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, 0.3, 8), new THREE.MeshStandardMaterial({ color: 0xff9966 }));
     gLotus.position.y = -0.1; ganesha.add(gLotus);
     for (let i = 0; i < 8; i++) {
-      const petal = new THREE.Mesh(
-        new THREE.ConeGeometry(0.4, 0.8, 6),
-        new THREE.MeshStandardMaterial({ color: 0xff7744 })
-      );
-      const angle = (i/8) * Math.PI * 2;
-      petal.position.set(Math.cos(angle)*1.3, 0.1, Math.sin(angle)*1.3);
-      petal.rotation.z = Math.PI/2; petal.rotation.y = -angle;
+      const petal = new THREE.Mesh(new THREE.ConeGeometry(0.4, 0.8, 6), new THREE.MeshStandardMaterial({ color: 0xff7744 }));
+      const a = (i/8)*Math.PI*2;
+      petal.position.set(Math.cos(a)*1.3, 0.1, Math.sin(a)*1.3); petal.rotation.z = Math.PI/2; petal.rotation.y = -a;
       ganesha.add(petal);
     }
-
-    // Ganesha legs (dhoti - red/orange)
-    const dhotiMat = new THREE.MeshStandardMaterial({ color: 0xcc5522, emissive: 0x331100, emissiveIntensity: 0.3, roughness: 0.5 });
-    const ganeshaLegs = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.0, 1.3, 0.9, 12),
-      dhotiMat
-    );
-    ganeshaLegs.position.y = 0.55; ganesha.add(ganeshaLegs);
-
-    // Ganesha belly (round)
-    const ganeshaBodyMat = new THREE.MeshStandardMaterial({ color: 0xd4a76a, roughness: 0.4, emissive: 0x221100, emissiveIntensity: 0.3 });
-    const ganeshaBelly = new THREE.Mesh(
-      new THREE.SphereGeometry(0.9, 16, 16),
-      ganeshaBodyMat
-    );
-    ganeshaBelly.position.y = 1.4; ganeshaBelly.scale.y = 0.85; ganesha.add(ganeshaBelly);
-
-    // Ganesha head (elephant - large sphere)
-    const ganeshaHead = new THREE.Mesh(
-      new THREE.SphereGeometry(0.65, 16, 16),
-      ganeshaBodyMat
-    );
-    ganeshaHead.position.y = 2.5; ganesha.add(ganeshaHead);
-
-    // Ears (large flat discs)
+    const gLegs = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.3, 0.9, 12), new THREE.MeshStandardMaterial({ color: 0xcc5522, emissive: 0x331100, emissiveIntensity: 0.3 }));
+    gLegs.position.y = 0.55; ganesha.add(gLegs);
+    const gBelly = new THREE.Mesh(new THREE.SphereGeometry(0.9, 16, 16), skinIdolMat);
+    gBelly.position.y = 1.4; gBelly.scale.y = 0.85; ganesha.add(gBelly);
+    const gHead = new THREE.Mesh(new THREE.SphereGeometry(0.65, 16, 16), skinIdolMat);
+    gHead.position.y = 2.5; ganesha.add(gHead);
     [-1, 1].forEach(side => {
-      const ear = new THREE.Mesh(
-        new THREE.SphereGeometry(0.4, 12, 12),
-        ganeshaBodyMat
-      );
-      ear.position.set(side * 0.65, 2.55, -0.15);
-      ear.scale.set(0.3, 1.1, 0.8);
-      ganesha.add(ear);
+      const ear = new THREE.Mesh(new THREE.SphereGeometry(0.4, 12, 12), skinIdolMat);
+      ear.position.set(side*0.65, 2.55, -0.15); ear.scale.set(0.3, 1.1, 0.8); ganesha.add(ear);
     });
-
-    // Trunk (curved)
-    const trunkSegments = 6;
-    for (let i = 0; i < trunkSegments; i++) {
-      const t = i / (trunkSegments - 1);
-      const trunkPart = new THREE.Mesh(
-        new THREE.SphereGeometry(0.18 - t*0.08, 10, 10),
-        ganeshaBodyMat
-      );
-      trunkPart.position.set(
-        Math.sin(t * 1.5) * 0.3,
-        2.2 - t * 0.5,
-        0.5 + t * 0.1
-      );
-      ganesha.add(trunkPart);
+    for (let i = 0; i < 6; i++) {
+      const t = i/5;
+      const tp = new THREE.Mesh(new THREE.SphereGeometry(0.18 - t*0.08, 10, 10), skinIdolMat);
+      tp.position.set(Math.sin(t*1.5)*0.3, 2.2 - t*0.5, 0.5 + t*0.1); ganesha.add(tp);
     }
-
-    // Tusks
-    [-0.2, 0.2].forEach(x => {
-      const tusk = new THREE.Mesh(
-        new THREE.ConeGeometry(0.06, 0.3, 8),
-        new THREE.MeshStandardMaterial({ color: 0xfff5d6 })
-      );
-      tusk.position.set(x, 2.25, 0.45);
-      tusk.rotation.x = -0.3;
-      ganesha.add(tusk);
-    });
-
-    // Ganesha crown
-    const ganeshaCrown = new THREE.Mesh(
-      new THREE.ConeGeometry(0.45, 0.7, 8),
-      crownMat
-    );
-    ganeshaCrown.position.y = 3.1; ganesha.add(ganeshaCrown);
-
-    // Ganesha halo
-    const gHalo = new THREE.Mesh(
-      new THREE.CircleGeometry(1.1, 16),
-      new THREE.MeshBasicMaterial({ color: 0xffcc33, transparent: true, opacity: 0.4 })
-    );
-    gHalo.position.set(0, 2.6, -0.5); ganesha.add(gHalo);
-    const gHaloRing = new THREE.Mesh(
-      new THREE.TorusGeometry(1.0, 0.07, 12, 32),
-      crownMat
-    );
+    const gCrown = new THREE.Mesh(new THREE.ConeGeometry(0.45, 0.7, 8), idolMat);
+    gCrown.position.y = 3.1; ganesha.add(gCrown);
+    const gHaloRing = new THREE.Mesh(new THREE.TorusGeometry(1.0, 0.07, 12, 32), idolMat);
     gHaloRing.position.set(0, 2.6, -0.45); ganesha.add(gHaloRing);
-
-    // Ganesha 4 arms
-    [[-0.9, 1.6, 0.1, -0.6], [0.9, 1.6, 0.1, 0.6], [-1.0, 1.3, 0.3, -0.9], [1.0, 1.3, 0.3, 0.9]].forEach(([x,y,z,rz]) => {
-      const arm = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.09, 0.1, 0.6, 8),
-        ganeshaBodyMat
-      );
-      arm.position.set(x, y, z); arm.rotation.z = rz; ganesha.add(arm);
-    });
-
-    // Modak in Ganesha's hand
-    const modak = new THREE.Mesh(
-      new THREE.ConeGeometry(0.15, 0.25, 8),
-      new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.5 })
-    );
-    modak.position.set(1.2, 1.2, 0.4);
-    ganesha.add(modak);
-
     temple.add(ganesha);
 
-    // Marigold flowers scattered in front of idols
-    for (let i = 0; i < 25; i++) {
-      const flower = new THREE.Mesh(
-        new THREE.SphereGeometry(0.1, 8, 8),
-        new THREE.MeshStandardMaterial({ color: 0xff8800, emissive: 0x442200, emissiveIntensity: 0.3 })
-      );
-      flower.position.set(
-        (Math.random()-0.5) * 8,
-        1.55,
-        (Math.random()-0.5) * 3 - 2
-      );
-      temple.add(flower);
+    // Marigolds and diyas in temple
+    for (let i = 0; i < 30; i++) {
+      const flower = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), new THREE.MeshStandardMaterial({ color: 0xff8800, emissive: 0x442200 }));
+      flower.position.set((Math.random()-0.5)*10, 1.55, (Math.random()-0.5)*4 - 1); temple.add(flower);
     }
-
-    // Diyas in front of idols
-    [-2, 0, 2].forEach(x => {
-      const diya = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.15, 0.2, 0.1, 8),
-        new THREE.MeshStandardMaterial({ color: 0xb45309 })
-      );
+    const templeFlames = [];
+    [-3, -1.5, 0, 1.5, 3].forEach(x => {
+      const diya = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 0.1, 8), new THREE.MeshStandardMaterial({ color: 0xb45309 }));
       diya.position.set(x, 1.6, -2.5); temple.add(diya);
-      const flame = new THREE.Mesh(
-        new THREE.ConeGeometry(0.08, 0.2, 6),
-        new THREE.MeshBasicMaterial({ color: 0xffcc00 })
-      );
+      const flame = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.2, 6), new THREE.MeshBasicMaterial({ color: 0xffcc00 }));
       flame.position.set(x, 1.78, -2.5); temple.add(flame);
-      const flameLight = new THREE.PointLight(0xff8800, 1.5, 8);
-      flameLight.position.set(x, 1.9, -2.5); temple.add(flameLight);
+      const fL = new THREE.PointLight(0xff8800, 1.5, 8); fL.position.set(x, 1.9, -2.5); temple.add(fL);
+      templeFlames.push({ flame, light: fL, phase: Math.random()*Math.PI*2 });
     });
 
-    // Temple interior spot light
-    const templeInnerLight = new THREE.PointLight(0xffd080, 5, 30);
-    templeInnerLight.position.set(0, 7, -3); temple.add(templeInnerLight);
-    const templeFrontLight = new THREE.PointLight(0xffbb55, 3, 25);
-    templeFrontLight.position.set(0, 4, 2); temple.add(templeFrontLight);
-
+    const tInnerLight = new THREE.PointLight(0xffd080, 5, 30); tInnerLight.position.set(0, 7, -3); temple.add(tInnerLight);
     scene.add(temple);
 
     // ================================================
-    // WOODEN FERRIS WHEEL (Traditional giant wheel like reference)
+    // FERRIS WHEEL
     // ================================================
     const ferris = new THREE.Group(); ferris.position.set(-30, 0, -15);
     const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513, roughness: 0.7 });
-
-    // Wooden support frame (A-frame)
-    [[-4, 0], [4, 0]].forEach(([x,]) => {
-      const legA = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 16), woodMat);
-      legA.position.set(x, 8, -2); legA.rotation.x = 0.15; ferris.add(legA);
-      const legB = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 16), woodMat);
-      legB.position.set(x, 8, 2); legB.rotation.x = -0.15; ferris.add(legB);
+    [[-4, -2], [4, -2], [-4, 2], [4, 2]].forEach(([x, z]) => {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 16), woodMat);
+      leg.position.set(x, 8, z); leg.rotation.x = z > 0 ? -0.15 : 0.15; ferris.add(leg);
     });
-    // Cross support
-    const crossSupport = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 10), woodMat);
-    crossSupport.position.set(0, 13.5, 0); crossSupport.rotation.z = Math.PI/2;
-    ferris.add(crossSupport);
-
     const wheel = new THREE.Group(); wheel.position.set(0, 13.5, 0);
-    // Outer wooden rings
-    const ring1 = new THREE.Mesh(
-      new THREE.TorusGeometry(7, 0.25, 8, 32),
-      woodMat
-    );
-    wheel.add(ring1);
-    const ring2 = ring1.clone(); ring2.position.z = -1.5; wheel.add(ring2);
-
+    wheel.add(new THREE.Mesh(new THREE.TorusGeometry(7, 0.25, 8, 32), woodMat));
     const podColors = [0xcc2222, 0xffcc00, 0x22aa44, 0x2266cc, 0xdd4499, 0xff6600];
     const pods = [];
     for (let i = 0; i < 8; i++) {
-      const rad = (i * Math.PI * 2) / 8;
-      // Wooden spoke
-      const spoke1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 14), woodMat);
-      spoke1.rotation.z = rad; wheel.add(spoke1);
-
-      // Hanging basket seat
+      const rad = (i*Math.PI*2)/8;
+      const spoke = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 14), woodMat);
+      spoke.rotation.z = rad; wheel.add(spoke);
       const pod = new THREE.Group();
       pod.position.set(Math.cos(rad)*7, Math.sin(rad)*7, -0.75);
-      // Rope/chain
-      const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1), new THREE.MeshStandardMaterial({ color: 0x222222 }));
-      rope.position.y = -0.5; pod.add(rope);
-      // Basket seat
-      const seat = new THREE.Mesh(
-        new THREE.BoxGeometry(1.3, 1.0, 1.3),
-        new THREE.MeshStandardMaterial({ color: podColors[i % podColors.length], emissive: podColors[i%podColors.length], emissiveIntensity: 0.2 })
-      );
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.0, 1.3), new THREE.MeshStandardMaterial({ color: podColors[i%6], emissive: podColors[i%6], emissiveIntensity: 0.2 }));
       seat.position.y = -1.5; pod.add(seat);
-      // Small light on top
-      const podLight = new THREE.Mesh(
-        new THREE.SphereGeometry(0.1, 8, 8),
-        new THREE.MeshBasicMaterial({ color: 0xffee88 })
-      );
-      podLight.position.y = -0.9; pod.add(podLight);
-
       wheel.add(pod); pods.push(pod);
     }
-    // Lights all along the wheel rim
     for (let i = 0; i < 24; i++) {
-      const angle = (i / 24) * Math.PI * 2;
-      const bulb = new THREE.Mesh(
-        new THREE.SphereGeometry(0.12, 8, 8),
-        new THREE.MeshBasicMaterial({ color: i%2===0 ? 0xffee00 : 0xff2200 })
-      );
-      bulb.position.set(Math.cos(angle)*7, Math.sin(angle)*7, 0.3);
-      wheel.add(bulb);
+      const a = (i/24)*Math.PI*2;
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: i%2===0 ? 0xffee00 : 0xff2200 }));
+      bulb.position.set(Math.cos(a)*7, Math.sin(a)*7, 0.3); wheel.add(bulb);
     }
-    ferris.add(wheel);
-    scene.add(ferris);
+    ferris.add(wheel); scene.add(ferris);
 
     // ================================================
-    // CAROUSEL (Merry-go-round)
+    // CAROUSEL
     // ================================================
     const carousel = new THREE.Group(); carousel.position.set(28, 0, -10);
-    // Center pole
-    const centerPole = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.3, 0.3, 7),
-      new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.7 })
-    );
+    const centerPole = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 7), new THREE.MeshStandardMaterial({ color: 0xffd700 }));
     centerPole.position.y = 3.5; carousel.add(centerPole);
-
-    // Top canopy (striped tent)
-    const canopy = new THREE.Mesh(
-      new THREE.ConeGeometry(5, 2.5, 12),
-      new THREE.MeshStandardMaterial({ color: 0xff2222 })
-    );
+    const canopy = new THREE.Mesh(new THREE.ConeGeometry(5, 2.5, 12), new THREE.MeshStandardMaterial({ color: 0xff2222 }));
     canopy.position.y = 7.5; carousel.add(canopy);
-    // White stripes on canopy
+    const cFloor = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, 0.3, 16), new THREE.MeshStandardMaterial({ color: 0xcc8844 }));
+    cFloor.position.y = 0.4; carousel.add(cFloor);
+    const cAnimals = new THREE.Group(); cAnimals.position.y = 0.4;
     for (let i = 0; i < 6; i++) {
-      const stripe = new THREE.Mesh(
-        new THREE.ConeGeometry(5.01, 2.52, 3, 1, false, i*Math.PI/3, Math.PI/6),
-        new THREE.MeshStandardMaterial({ color: 0xffffff })
-      );
-      stripe.position.y = 7.5; carousel.add(stripe);
-    }
-
-    // Floor
-    const carouselFloor = new THREE.Mesh(
-      new THREE.CylinderGeometry(5, 5, 0.3, 16),
-      new THREE.MeshStandardMaterial({ color: 0xcc8844 })
-    );
-    carouselFloor.position.y = 0.4; carousel.add(carouselFloor);
-
-    // Horses/seats on carousel
-    const carouselAnimals = new THREE.Group();
-    carouselAnimals.position.y = 0.4;
-    for (let i = 0; i < 6; i++) {
-      const angle = (i / 6) * Math.PI * 2;
+      const a = (i/6)*Math.PI*2;
       const animal = new THREE.Group();
-      animal.position.set(Math.cos(angle)*3.5, 1.5, Math.sin(angle)*3.5);
-      // Horse body
-      const body = new THREE.Mesh(
-        new THREE.BoxGeometry(1.2, 0.5, 0.4),
-        new THREE.MeshStandardMaterial({ color: [0xffffff, 0xff6600, 0xaa44ff][i%3] })
-      );
+      animal.position.set(Math.cos(a)*3.5, 1.5, Math.sin(a)*3.5);
+      const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.5, 0.4), new THREE.MeshStandardMaterial({ color: [0xffffff, 0xff6600, 0xaa44ff][i%3] }));
       animal.add(body);
-      // Head
-      const head = new THREE.Mesh(
-        new THREE.BoxGeometry(0.3, 0.5, 0.3),
-        new THREE.MeshStandardMaterial({ color: [0xffffff, 0xff6600, 0xaa44ff][i%3] })
-      );
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.5, 0.3), new THREE.MeshStandardMaterial({ color: [0xffffff, 0xff6600, 0xaa44ff][i%3] }));
       head.position.set(0.6, 0.4, 0); animal.add(head);
-      // Pole holding horse
-      const pole = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.05, 0.05, 2.5),
-        new THREE.MeshStandardMaterial({ color: 0xffd700 })
-      );
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.5), new THREE.MeshStandardMaterial({ color: 0xffd700 }));
       pole.position.y = 0.5; animal.add(pole);
-      animal.rotation.y = -angle + Math.PI/2;
-      carouselAnimals.add(animal);
+      animal.rotation.y = -a + Math.PI/2; cAnimals.add(animal);
     }
-    carousel.add(carouselAnimals);
-
-    // Lights around carousel edge
+    carousel.add(cAnimals);
     for (let i = 0; i < 16; i++) {
-      const angle = (i / 16) * Math.PI * 2;
-      const bulb = new THREE.Mesh(
-        new THREE.SphereGeometry(0.1, 8, 8),
-        new THREE.MeshBasicMaterial({ color: i%2===0 ? 0xffff00 : 0xff00ff })
-      );
-      bulb.position.set(Math.cos(angle)*5, 5.8, Math.sin(angle)*5);
-      carousel.add(bulb);
+      const a = (i/16)*Math.PI*2;
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), new THREE.MeshBasicMaterial({ color: i%2===0 ? 0xffff00 : 0xff00ff }));
+      bulb.position.set(Math.cos(a)*5, 5.8, Math.sin(a)*5); carousel.add(bulb);
     }
-
     scene.add(carousel);
 
     // ================================================
-    // FOOD STALLS (Canopy stalls like the reference)
+    // STALLS
     // ================================================
     function makeBanner(text, bgColor) {
       const c = document.createElement('canvas'); c.width = 512; c.height = 128;
       const ctx = c.getContext('2d');
       ctx.fillStyle = bgColor; ctx.fillRect(0,0,512,128);
       ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 6; ctx.strokeRect(4,4,504,120);
-      ctx.fillStyle = '#ffea79'; ctx.font = 'bold 40px Segoe UI'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ffea79'; ctx.font = 'bold 38px Segoe UI'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(text, 256, 64);
       return new THREE.CanvasTexture(c);
     }
 
-    function createCanopyStall(name, canopyColor, bgColor, pos) {
+    function createStall(name, canopyColor, bgColor, pos, itemColors = [0xffcc00, 0xff6600, 0xffee88]) {
       const g = new THREE.Group(); g.position.set(...pos);
-      // Striped canopy roof (red & white stripes typical of mela)
-      const roof = new THREE.Mesh(
-        new THREE.ConeGeometry(4, 2, 4),
-        new THREE.MeshStandardMaterial({ color: canopyColor })
-      );
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(4, 2, 4), new THREE.MeshStandardMaterial({ color: canopyColor }));
       roof.position.y = 4.5; roof.rotation.y = Math.PI/4; g.add(roof);
-      // White stripes
-      for (let i = 0; i < 2; i++) {
-        const stripe = new THREE.Mesh(
-          new THREE.ConeGeometry(4.02, 2.02, 4, 1, false, i*Math.PI/2, Math.PI/4),
-          new THREE.MeshStandardMaterial({ color: 0xffffff })
-        );
-        stripe.position.y = 4.5; stripe.rotation.y = Math.PI/4;
-        g.add(stripe);
-      }
-
-      // Wooden posts
       [[-2, 2], [2, 2], [-2, -2], [2, -2]].forEach(([x,z]) => {
-        const post = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.1, 0.1, 3.5),
-          new THREE.MeshStandardMaterial({ color: 0x8b4513 })
-        );
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.5), new THREE.MeshStandardMaterial({ color: 0x8b4513 }));
         post.position.set(x, 1.75, z); g.add(post);
       });
-
-      // Counter table
-      const counter = new THREE.Mesh(
-        new THREE.BoxGeometry(4.5, 1, 1.6),
-        new THREE.MeshStandardMaterial({ color: 0x6b4423 })
-      );
+      const counter = new THREE.Mesh(new THREE.BoxGeometry(4.5, 1, 1.6), new THREE.MeshStandardMaterial({ color: 0x6b4423 }));
       counter.position.set(0, 0.5, 1.3); g.add(counter);
-
-      // Items on counter
       for (let i = -1; i <= 1; i++) {
-        const item = new THREE.Mesh(
-          new THREE.SphereGeometry(0.2, 8, 8),
-          new THREE.MeshStandardMaterial({ color: [0xffcc00, 0xff6600, 0xffee88][i+1] })
-        );
+        const item = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), new THREE.MeshStandardMaterial({ color: itemColors[i+1] }));
         item.position.set(i*1.2, 1.1, 1.3); g.add(item);
       }
-
-      // Banner
-      const banner = new THREE.Mesh(
-        new THREE.PlaneGeometry(5, 1.3),
-        new THREE.MeshBasicMaterial({ map: makeBanner(name, bgColor), transparent: true })
-      );
+      const banner = new THREE.Mesh(new THREE.PlaneGeometry(5, 1.3), new THREE.MeshBasicMaterial({ map: makeBanner(name, bgColor), transparent: true }));
       banner.position.set(0, 5.8, 0); g.add(banner);
-
-      // Hanging lantern
-      const lantern = new THREE.Mesh(
-        new THREE.SphereGeometry(0.3, 12, 12),
-        new THREE.MeshStandardMaterial({ color: 0xff4400, emissive: 0xff2200, emissiveIntensity: 0.9 })
-      );
+      const lantern = new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 12), new THREE.MeshStandardMaterial({ color: 0xff4400, emissive: 0xff2200, emissiveIntensity: 0.9 }));
       lantern.position.set(0, 3, 2.2); g.add(lantern);
-      const lanternLight = new THREE.PointLight(0xff6600, 2, 10);
-      lanternLight.position.copy(lantern.position); g.add(lanternLight);
-
+      const lL = new THREE.PointLight(0xff6600, 2, 10); lL.position.copy(lantern.position); g.add(lL);
       return g;
     }
 
-    scene.add(createCanopyStall("🎆 Patakha Bhandar", 0xdd2222, '#991b1b', [-25, 0, 10]));
-    scene.add(createCanopyStall("🍬 Mithai Wala", 0xdd2222, '#7c2d12', [-18, 0, 20]));
-    scene.add(createCanopyStall("🏮 Sky Lantern", 0x228844, '#0f766e', [18, 0, 20]));
-    scene.add(createCanopyStall("🥘 Chaat Corner", 0xdd2222, '#8b2635', [25, 0, 10]));
-    scene.add(createCanopyStall("🧋 Jalebi Garam", 0xffaa22, '#b45309', [-12, 0, -8]));
-    scene.add(createCanopyStall("🎨 Rangoli Kala", 0x8844cc, '#6b21a8', [12, 0, -8]));
+    scene.add(createStall("🎆 Patakha Bhandar", 0xdd2222, '#991b1b', [-25, 0, 10], [0xff0000, 0xffff00, 0x00ff00]));
+    scene.add(createStall("🍬 Mithai Wala", 0xdd2222, '#7c2d12', [-18, 0, 20], [0xff8800, 0xffcc44, 0xffaa66]));
+    scene.add(createStall("🏮 Sky Lantern", 0x228844, '#0f766e', [18, 0, 20]));
+    scene.add(createStall("🥘 Chaat Corner", 0xdd2222, '#8b2635', [25, 0, 10]));
+    scene.add(createStall("🧋 Jalebi Garam", 0xffaa22, '#b45309', [-12, 0, -8]));
+    scene.add(createStall("🎨 Rangoli Kala", 0x8844cc, '#6b21a8', [12, 0, -8]));
+    scene.add(createStall("💍 Chudi Wala", 0xff00aa, '#881337', [-25, 0, 25]));
+    scene.add(createStall("🍵 Chai Tapri", 0x228844, '#064e3b', [25, 0, 25]));
+    scene.add(createStall("🎯 Balloon Shoot", 0x4466cc, '#1e3a8a', [-18, 0, 32]));
+    scene.add(createStall("🪔 Diya Stall", 0xffaa22, '#92400e', [18, 0, 32]));
+
+    // Add sponsored stalls dynamically
+    SPONSORED_STALLS.forEach(sp => {
+      scene.add(createStall(sp.name, sp.color, sp.bgColor, sp.pos));
+    });
 
     // ================================================
-    // VILLAGE HUTS in background
+    // VILLAGE HUTS
     // ================================================
-    for (let i = 0; i < 12; i++) {
-      const angle = (i / 12) * Math.PI * 2;
-      const dist = 60 + Math.random() * 15;
+    for (let i = 0; i < 15; i++) {
+      const angle = (i/15)*Math.PI*2;
+      const dist = 60 + Math.random()*15;
       const hut = new THREE.Group();
       hut.position.set(Math.cos(angle)*dist, 0, Math.sin(angle)*dist);
-      // Wall
-      const wall = new THREE.Mesh(
-        new THREE.BoxGeometry(4, 3, 4),
-        new THREE.MeshStandardMaterial({ color: 0xd4a574 })
-      );
+      const wall = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 4), new THREE.MeshStandardMaterial({ color: 0xd4a574 }));
       wall.position.y = 1.5; hut.add(wall);
-      // Thatched roof
-      const roof = new THREE.Mesh(
-        new THREE.ConeGeometry(3.3, 2, 4),
-        new THREE.MeshStandardMaterial({ color: 0x8b5a2b })
-      );
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(3.3, 2, 4), new THREE.MeshStandardMaterial({ color: 0x8b5a2b }));
       roof.position.y = 4; roof.rotation.y = Math.PI/4; hut.add(roof);
-      // Window light
-      const windowLight = new THREE.PointLight(0xffaa55, 0.8, 8);
-      windowLight.position.set(0, 2, 2); hut.add(windowLight);
+      const wL = new THREE.PointLight(0xffaa55, 0.8, 8); wL.position.set(0, 2, 2); hut.add(wL);
       scene.add(hut);
     }
 
-    // ================================================
-    // TREES scattered around
-    // ================================================
-    for (let i = 0; i < 20; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 55 + Math.random() * 30;
+    // Trees
+    for (let i = 0; i < 25; i++) {
+      const angle = Math.random()*Math.PI*2;
+      const dist = 55 + Math.random()*30;
       const tree = new THREE.Group();
       tree.position.set(Math.cos(angle)*dist, 0, Math.sin(angle)*dist);
-      const trunk = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.4, 0.5, 4),
-        new THREE.MeshStandardMaterial({ color: 0x5a3a20 })
-      );
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 4), new THREE.MeshStandardMaterial({ color: 0x5a3a20 }));
       trunk.position.y = 2; tree.add(trunk);
-      const leaves = new THREE.Mesh(
-        new THREE.SphereGeometry(2, 10, 10),
-        new THREE.MeshStandardMaterial({ color: 0x1a4a2a })
-      );
+      const leaves = new THREE.Mesh(new THREE.SphereGeometry(2, 10, 10), new THREE.MeshStandardMaterial({ color: 0x1a4a2a }));
       leaves.position.y = 5; leaves.scale.y = 1.3; tree.add(leaves);
       scene.add(tree);
     }
 
-    // ================================================
-    // DECORATIVE DIYAS lining pathways
-    // ================================================
-    for (let i = -40; i <= 40; i += 6) {
+    // Path diyas
+    for (let i = -40; i <= 40; i += 5) {
       [-11, 11].forEach(x => {
-        const diya = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.3, 0.4, 0.3, 8),
-          new THREE.MeshStandardMaterial({ color: 0xb45309, emissive: 0xff6600, emissiveIntensity: 0.5 })
-        );
+        const diya = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 0.3, 8), new THREE.MeshStandardMaterial({ color: 0xb45309, emissive: 0xff6600, emissiveIntensity: 0.5 }));
         diya.position.set(x, 0.15, i); scene.add(diya);
-        const flame = new THREE.PointLight(0xff8800, 0.8, 5);
-        flame.position.set(x, 0.5, i); scene.add(flame);
+        const flame = new THREE.PointLight(0xff8800, 0.8, 5); flame.position.set(x, 0.5, i); scene.add(flame);
       });
     }
 
     // ================================================
-    // NPC CROWD (walking villagers)
+    // DIVERSE NPCs (adults, kids, elders)
     // ================================================
     const npcs = [];
-    const npcColors = [0xcc2222, 0x22aa44, 0x2244cc, 0xdd8800, 0xaa44dd, 0xff6688, 0x44ddcc];
-    for (let i = 0; i < 25; i++) {
+    const sareeColors = [0xcc2222, 0x22aa44, 0x2244cc, 0xdd8800, 0xaa44dd, 0xff6688, 0x44ddcc, 0xff00aa, 0x00aa88];
+
+    function createNPC(type) {
       const npc = new THREE.Group();
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 5 + Math.random() * 25;
-      npc.position.set(Math.cos(angle)*dist, 0, Math.sin(angle)*dist);
-      
-      const sareeColor = npcColors[Math.floor(Math.random()*npcColors.length)];
-      const body = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.3, 0.4, 1.2, 10),
-        new THREE.MeshStandardMaterial({ color: sareeColor })
-      );
-      body.position.y = 0.7; npc.add(body);
-      
-      const head = new THREE.Mesh(
-        new THREE.SphereGeometry(0.22, 12, 12),
-        new THREE.MeshStandardMaterial({ color: 0xd4a76a })
-      );
-      head.position.y = 1.55; npc.add(head);
-      
-      scene.add(npc);
-      npcs.push({ 
-        mesh: npc, 
-        angle: Math.random()*Math.PI*2,
-        speed: 0.01 + Math.random()*0.02,
-        changeTimer: Math.random()*100
-      });
+      const scale = type === 'kid' ? 0.6 : type === 'elder' ? 0.95 : 1;
+      const sareeColor = sareeColors[Math.floor(Math.random()*sareeColors.length)];
+
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3*scale, 0.4*scale, 1.2*scale, 10), new THREE.MeshStandardMaterial({ color: sareeColor }));
+      body.position.y = 0.7*scale; npc.add(body);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.22*scale, 12, 12), new THREE.MeshStandardMaterial({ color: 0xd4a76a }));
+      head.position.y = 1.55*scale; npc.add(head);
+
+      if (type === 'elder') {
+        const beard = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+        beard.position.set(0, 1.4*scale, 0.15); npc.add(beard);
+      }
+      if (type === 'kid') {
+        // Balloon
+        const balloon = new THREE.Mesh(new THREE.SphereGeometry(0.2, 10, 10), new THREE.MeshStandardMaterial({ color: [0xff0000, 0x00ff00, 0xffff00, 0xff00ff][Math.floor(Math.random()*4)] }));
+        balloon.position.set(0.3, 2.3, 0); npc.add(balloon);
+        const string = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 1.0), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+        string.position.set(0.3, 1.8, 0); npc.add(string);
+      }
+
+      return npc;
+    }
+
+    for (let i = 0; i < 35; i++) {
+      const types = ['adult', 'adult', 'adult', 'kid', 'elder'];
+      const type = types[Math.floor(Math.random()*types.length)];
+      const npcMesh = createNPC(type);
+      const angle = Math.random()*Math.PI*2;
+      const dist = 5 + Math.random()*25;
+      npcMesh.position.set(Math.cos(angle)*dist, 0, Math.sin(angle)*dist);
+      scene.add(npcMesh);
+      npcs.push({ mesh: npcMesh, angle: Math.random()*Math.PI*2, speed: 0.008 + Math.random()*0.015, changeTimer: Math.random()*100, type });
+    }
+
+    // Stray dogs
+    for (let i = 0; i < 4; i++) {
+      const dog = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.4, 0.35), new THREE.MeshStandardMaterial({ color: 0xaa8855 }));
+      body.position.y = 0.3; dog.add(body);
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.3, 0.25), new THREE.MeshStandardMaterial({ color: 0xaa8855 }));
+      head.position.set(0.5, 0.4, 0); dog.add(head);
+      const angle = Math.random()*Math.PI*2;
+      dog.position.set(Math.cos(angle)*20, 0, Math.sin(angle)*20);
+      scene.add(dog);
+      npcs.push({ mesh: dog, angle: Math.random()*Math.PI*2, speed: 0.02, changeTimer: Math.random()*50, type: 'dog' });
     }
 
     // ================================================
-    // PLAYER AVATAR
+    // PLAYER
     // ================================================
     function makeNameplate(text) {
       const c = document.createElement('canvas'); c.width = 256; c.height = 64;
@@ -850,19 +588,16 @@
 
     function buildAvatar(name) {
       const group = new THREE.Group(); const limbs = {};
-      const skinMat = new THREE.MeshStandardMaterial({ color: 0xdfa07a, roughness: 0.6 });
-      const kurtaMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.4 });
-      const pyjamaMat = new THREE.MeshStandardMaterial({ color: 0xfdfcf7, roughness: 0.6 });
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0xdfa07a });
+      const kurtaMat = new THREE.MeshStandardMaterial({ color: 0xd97706 });
+      const pyjamaMat = new THREE.MeshStandardMaterial({ color: 0xfdfcf7 });
 
       const torsoPivot = new THREE.Group(); torsoPivot.position.y = 1.45; group.add(torsoPivot);
       const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 1.28, 16), kurtaMat);
       torsoPivot.add(torso); limbs.torsoPivot = torsoPivot;
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.26, 16, 16), skinMat);
       head.position.y = 0.8; torsoPivot.add(head);
-      const pagri = new THREE.Mesh(
-        new THREE.TorusGeometry(0.28, 0.12, 12, 24),
-        new THREE.MeshStandardMaterial({ color: 0xdc2626 })
-      );
+      const pagri = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.12, 12, 24), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
       pagri.position.y = 1.0; pagri.rotation.x = Math.PI/2; torsoPivot.add(pagri);
 
       function arm(isLeft) {
@@ -872,7 +607,6 @@
         a.position.y = -0.36; pivot.add(a); torsoPivot.add(pivot); return pivot;
       }
       limbs.armL = arm(true); limbs.armR = arm(false);
-
       function leg(isLeft) {
         const pivot = new THREE.Group();
         pivot.position.set(isLeft ? -0.22 : 0.22, 0.88, 0);
@@ -880,7 +614,6 @@
         l.position.y = -0.44; pivot.add(l); group.add(pivot); return pivot;
       }
       limbs.legL = leg(true); limbs.legR = leg(false);
-
       group.add(makeNameplate(name));
       return { group, limbs };
     }
@@ -888,32 +621,61 @@
     // Camera
     const cam = { theta: 0.5, phi: 0.7, radius: 16, dragging: false, lastX: 0, lastY: 0 };
     renderer.domElement.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('#joystick') || e.target.closest('#action-btns')) return;
       cam.dragging = true; cam.lastX = e.clientX; cam.lastY = e.clientY;
     });
     window.addEventListener('pointermove', (e) => {
       if (!cam.dragging) return;
-      cam.theta -= (e.clientX - cam.lastX) * 0.007;
-      cam.phi = Math.max(0.2, Math.min(Math.PI/2.1, cam.phi + (e.clientY - cam.lastY) * 0.006));
+      cam.theta -= (e.clientX - cam.lastX)*0.007;
+      cam.phi = Math.max(0.2, Math.min(Math.PI/2.1, cam.phi + (e.clientY - cam.lastY)*0.006));
       cam.lastX = e.clientX; cam.lastY = e.clientY;
     });
     window.addEventListener('pointerup', () => { cam.dragging = false; });
-    window.addEventListener('wheel', (e) => {
-      cam.radius = Math.max(7, Math.min(35, cam.radius + e.deltaY * 0.02));
-    }, { passive: true });
+    window.addEventListener('wheel', (e) => { cam.radius = Math.max(7, Math.min(35, cam.radius + e.deltaY*0.02)); }, { passive: true });
+
+    // Mobile joystick
+    const joy = { active: false, dx: 0, dy: 0, originX: 0, originY: 0 };
+    const joyC = document.getElementById('joystick');
+    const joyK = document.getElementById('joystick-knob');
+    if ('ontouchstart' in window) {
+      joyC.style.display = 'block';
+      document.getElementById('action-btns').style.display = 'flex';
+    }
+    joyC.addEventListener('pointerdown', (e) => {
+      joy.active = true;
+      const r = joyC.getBoundingClientRect();
+      joy.originX = r.left + r.width/2; joy.originY = r.top + r.height/2;
+      joyC.setPointerCapture(e.pointerId);
+    });
+    joyC.addEventListener('pointermove', (e) => {
+      if (!joy.active) return;
+      const dx = e.clientX - joy.originX, dy = e.clientY - joy.originY;
+      const dist = Math.min(35, Math.hypot(dx, dy)); const ang = Math.atan2(dy, dx);
+      joy.dx = (Math.cos(ang)*dist)/35; joy.dy = (Math.sin(ang)*dist)/35;
+      joyK.style.transform = `translate(${joy.dx*30}px, ${joy.dy*30}px)`;
+    });
+    const resetJoy = () => { joy.active = false; joy.dx = 0; joy.dy = 0; joyK.style.transform = 'translate(0,0)'; };
+    joyC.addEventListener('pointerup', resetJoy);
+    joyC.addEventListener('pointercancel', resetJoy);
 
     // Hotspots
     const hotspots = [
-      { id: "temple", name: "🪔 Lakshmi-Ganesha Mandir", pos: [0, 0, -35], range: 9, action: () => doAarti() },
-      { id: "patakha", name: "🎆 Patakha Bhandar", pos: [-25, 0, 10], range: 6, action: () => showPatakhaModal() },
-      { id: "mithai", name: "🍬 Mithai Wala", pos: [-18, 0, 20], range: 6, action: () => showMithaiModal() },
-      { id: "lantern", name: "🏮 Sky Lantern", pos: [18, 0, 20], range: 6, action: () => flyLantern() },
-      { id: "chaat", name: "🥘 Chaat Corner", pos: [25, 0, 10], range: 6, action: () => eatChaat() },
-      { id: "jalebi", name: "🧋 Jalebi Garam", pos: [-12, 0, -8], range: 6, action: () => eatJalebi() },
-      { id: "rangoli", name: "🎨 Rangoli Kala", pos: [12, 0, -8], range: 6, action: () => drawRangoli() },
+      { id: "temple", name: "🪔 Mandir", pos: [0, 0, -35], range: 9, action: () => doAarti() },
+      { id: "patakha", name: "🎆 Patakha", pos: [-25, 0, 10], range: 6, action: () => showPatakhaModal() },
+      { id: "mithai", name: "🍬 Mithai", pos: [-18, 0, 20], range: 6, action: () => showMithaiModal() },
+      { id: "lantern", name: "🏮 Lantern", pos: [18, 0, 20], range: 6, action: () => flyLantern() },
+      { id: "chaat", name: "🥘 Chaat", pos: [25, 0, 10], range: 6, action: () => eatChaat() },
+      { id: "jalebi", name: "🧋 Jalebi", pos: [-12, 0, -8], range: 6, action: () => eatJalebi() },
+      { id: "rangoli", name: "🎨 Rangoli", pos: [12, 0, -8], range: 6, action: () => drawRangoliGame() },
+      { id: "bangle", name: "💍 Bangles", pos: [-25, 0, 25], range: 6, action: () => buyBangles() },
+      { id: "chai", name: "🍵 Chai", pos: [25, 0, 25], range: 6, action: () => drinkChai() },
+      { id: "balloon", name: "🎯 Balloon Shoot", pos: [-18, 0, 32], range: 6, action: () => balloonShootGame() },
+      { id: "diya", name: "🪔 Diya Stall", pos: [18, 0, 32], range: 6, action: () => buyDiya() },
       { id: "ferris", name: "🎡 Giant Wheel", pos: [-30, 0, -15], range: 8, action: () => rideFerris() },
-      { id: "carousel", name: "🎠 Merry-Go-Round", pos: [28, 0, -10], range: 7, action: () => rideCarousel() }
+      { id: "carousel", name: "🎠 Carousel", pos: [28, 0, -10], range: 7, action: () => rideCarousel() }
     ];
 
+    // Modal helpers
     const modal = document.getElementById('action-modal');
     function openModal(title, html) {
       document.getElementById('modal-title').innerText = title;
@@ -935,48 +697,44 @@
     function completeQuest(id, reward) {
       if (quests[id]) return;
       quests[id] = true;
-      document.getElementById(id).classList.add('done');
+      const el = document.getElementById(id);
+      if (el) el.classList.add('done');
       Player.coins += reward;
       Player.blessings += 1;
       updateHUD();
-      addChatMessage("System", `Quest complete! +${reward} coins ✨`);
+      addChatMessage("System", `Quest done! +${reward} coins ✨`);
     }
 
     function updateHUD() {
       document.getElementById('coin-count').innerText = Player.coins;
       document.getElementById('blessing-count').innerText = Player.blessings;
+      document.getElementById('energy-fill').style.width = Player.energy + '%';
     }
 
+    // ========== SHOP ACTIONS ==========
     window.showPatakhaModal = function() {
-      speak("Haan bhaiya, kaunsa patakha loge?");
+      speak("Haan bhaiya kaunsa patakha?");
       openModal("🎆 Patakha Bhandar", `
-        <p>Bhaiya kaunsa patakha chahiye?</p>
         <button onclick="burnCracker('rocket')">🚀 Rocket (5)</button>
         <button onclick="burnCracker('anar')">🌋 Anar (3)</button>
         <button onclick="burnCracker('chakri')">🌀 Chakri (3)</button>
       `);
     };
-
     window.showMithaiModal = function() {
-      speak("Bhaiya kaunsi mithai chahiye?");
-      openModal("🍬 Bikaner Mithai", `
-        <p>Taza taza mithai!</p>
+      speak("Taza mithai lijiye");
+      openModal("🍬 Mithai", `
         <button onclick="buyMithai('kaju katli', 10)">💎 Kaju Katli (10)</button>
         <button onclick="buyMithai('gulab jamun', 8)">🍯 Gulab Jamun (8)</button>
         <button onclick="buyMithai('laddu', 6)">🟡 Laddu (6)</button>
       `);
     };
-
     window.buyMithai = function(name, cost) {
       if (Player.coins >= cost) {
-        Player.coins -= cost; updateHUD();
-        speak("Ye lijiye garam garam " + name);
-        addChatMessage("Shopkeeper", `Here is your ${name}!`);
-        completeQuest('q3', 15);
-        closeModal();
+        Player.coins -= cost; Player.energy = Math.min(100, Player.energy + 20); updateHUD();
+        speak("Lijiye " + name);
+        completeQuest('q3', 15); closeModal();
       } else alert("Not enough coins!");
     };
-
     window.burnCracker = function(type) {
       const cost = type === 'rocket' ? 5 : 3;
       if (Player.coins < cost) { alert("Not enough coins!"); return; }
@@ -986,124 +744,196 @@
       if (type === 'rocket') launchRocket(px, pz);
       else if (type === 'anar') launchAnar(px, pz);
       else if (type === 'chakri') launchChakri(px, pz);
-      completeQuest('q2', 10);
-      closeModal();
+      completeQuest('q2', 10); closeModal();
     };
-
     window.flyLantern = function() {
-      speak("Ek lalteen aasmaan mein chodiye");
-      const lan = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.3, 0.4, 0.8, 12),
-        new THREE.MeshStandardMaterial({ color: 0xff7700, emissive: 0xff4400, emissiveIntensity: 0.9 })
-      );
-      lan.position.copy(Player.position); lan.position.y = 2;
-      scene.add(lan);
+      speak("Lalteen chod dijiye");
+      const lan = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 0.8, 12), new THREE.MeshStandardMaterial({ color: 0xff7700, emissive: 0xff4400, emissiveIntensity: 0.9 }));
+      lan.position.copy(Player.position); lan.position.y = 2; scene.add(lan);
       const light = new THREE.PointLight(0xff8800, 2, 10); lan.add(light);
       const anim = () => {
         lan.position.y += 0.08;
-        lan.position.x += Math.sin(lan.position.y * 0.3) * 0.02;
+        lan.position.x += Math.sin(lan.position.y*0.3)*0.02;
         if (lan.position.y < 60) requestAnimationFrame(anim);
         else scene.remove(lan);
       };
       anim();
       completeQuest('q5', 20);
     };
-
     window.eatChaat = function() {
-      speak("Garma garam chaat bhaiya");
-      openModal("🥘 Chaat Corner", `
-        <p>Pani puri, bhel, dahi puri!</p>
-        <button onclick="Player.coins -= 5; updateHUD(); addChatMessage('You', 'Enjoyed Pani Puri!'); closeModal();">💧 Pani Puri (5)</button>
-        <button onclick="Player.coins -= 7; updateHUD(); addChatMessage('You', 'Enjoyed Bhel!'); closeModal();">🥗 Bhel (7)</button>
+      speak("Garam chaat bhaiya");
+      openModal("🥘 Chaat", `
+        <button onclick="eat('Pani Puri', 5)">💧 Pani Puri (5)</button>
+        <button onclick="eat('Bhel', 7)">🥗 Bhel (7)</button>
+        <button onclick="eat('Dahi Puri', 6)">🍶 Dahi Puri (6)</button>
       `);
     };
-
+    window.eat = function(item, cost) {
+      if (Player.coins >= cost) {
+        Player.coins -= cost; Player.energy = Math.min(100, Player.energy + 15); updateHUD();
+        addChatMessage("You", `Enjoyed ${item}!`); closeModal();
+      } else alert("Not enough coins!");
+    };
     window.eatJalebi = function() {
-      speak("Garam garam jalebi");
-      Player.coins -= 5; updateHUD();
-      addChatMessage("Shopkeeper", "Yahan hai aapki jalebi!");
-      closeModal();
+      speak("Garam jalebi");
+      if (Player.coins >= 5) {
+        Player.coins -= 5; Player.energy = Math.min(100, Player.energy + 15); updateHUD();
+        completeQuest('q9', 10);
+        addChatMessage("Shopkeeper", "Yahan hai jalebi!");
+      } else alert("Not enough coins!");
+    };
+    window.drinkChai = function() {
+      speak("Garam chai lijiye");
+      if (Player.coins >= 3) {
+        Player.coins -= 3; Player.energy = Math.min(100, Player.energy + 25); updateHUD();
+        completeQuest('q9', 10);
+        addChatMessage("Chaiwala", "Masala chai ready!");
+      } else alert("Not enough coins!");
+    };
+    window.buyBangles = function() {
+      speak("Chudi le lo bhaiya");
+      if (Player.coins >= 15) {
+        Player.coins -= 15; updateHUD();
+        completeQuest('q10', 10);
+        addChatMessage("Shopkeeper", "Rangeen chudi!");
+      } else alert("Not enough coins!");
+    };
+    window.buyDiya = function() {
+      speak("Deepawali ke diye");
+      if (Player.coins >= 5) {
+        Player.coins -= 5; Player.blessings += 1; updateHUD();
+        addChatMessage("Shopkeeper", "Ghar roshan karo!");
+      } else alert("Not enough coins!");
     };
 
-    window.drawRangoli = function() {
-      speak("Rangoli banayenge aap?");
-      openModal("🎨 Rangoli Design", `
-        <p>Make a beautiful rangoli pattern!</p>
-        <button onclick="Player.coins += 15; Player.blessings += 1; updateHUD(); addChatMessage('System', 'Beautiful Rangoli! +15 coins'); closeModal();">✨ Make Rangoli</button>
+    // ========== MINI-GAMES ==========
+    window.balloonShootGame = function() {
+      speak("Gubbara phodo");
+      openModal("🎯 Balloon Shoot", `
+        <p>Click balloons! 10 sec. +2 coins each.</p>
+        <canvas id="minigame-canvas" width="300" height="200"></canvas>
+        <div style="margin-top:8px">Score: <span id="bs-score">0</span> | Time: <span id="bs-time">10</span>s</div>
+        <button onclick="startBalloonShoot()">▶️ Start</button>
       `);
+    };
+    window.startBalloonShoot = function() {
+      const canvas = document.getElementById('minigame-canvas');
+      const ctx = canvas.getContext('2d');
+      let score = 0, timeLeft = 10;
+      const balloons = [];
+      for (let i = 0; i < 8; i++) balloons.push({ x: 20+Math.random()*260, y: 20+Math.random()*160, r: 15, color: `hsl(${Math.random()*360}, 80%, 60%)`, alive: true });
+      
+      canvas.onclick = (e) => {
+        const r = canvas.getBoundingClientRect();
+        const mx = (e.clientX - r.left) * (canvas.width/r.width);
+        const my = (e.clientY - r.top) * (canvas.height/r.height);
+        balloons.forEach(b => {
+          if (b.alive && Math.hypot(mx-b.x, my-b.y) < b.r) {
+            b.alive = false; score++;
+            document.getElementById('bs-score').innerText = score;
+            setTimeout(() => { b.x = 20+Math.random()*260; b.y = 20+Math.random()*160; b.color = `hsl(${Math.random()*360}, 80%, 60%)`; b.alive = true; }, 500);
+          }
+        });
+      };
+
+      const timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById('bs-time').innerText = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timer); clearInterval(draw);
+          Player.coins += score * 2; updateHUD();
+          if (score >= 3) completeQuest('q8', 25);
+          addChatMessage("System", `Shot ${score} balloons! +${score*2} coins`);
+          setTimeout(closeModal, 1500);
+        }
+      }, 1000);
+
+      const draw = setInterval(() => {
+        ctx.fillStyle = '#1a0a2a'; ctx.fillRect(0, 0, 300, 200);
+        balloons.forEach(b => {
+          if (!b.alive) return;
+          ctx.fillStyle = b.color;
+          ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill();
+          ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.moveTo(b.x, b.y+b.r); ctx.lineTo(b.x, b.y+b.r+10); ctx.stroke();
+        });
+      }, 50);
+    };
+
+    window.drawRangoliGame = function() {
+      speak("Rangoli banayenge?");
+      const colors = ['#ff0000', '#ffd700', '#00aa00', '#0066ff', '#ff00ff', '#ff8800'];
+      let currentColor = colors[0];
+      openModal("🎨 Draw Rangoli", `
+        <canvas id="rangoli-canvas" width="300" height="300"></canvas>
+        <div style="margin-top:8px">
+          ${colors.map(c => `<span class="color-swatch" style="background:${c}" onclick="window._currentColor='${c}'"></span>`).join('')}
+        </div>
+        <button onclick="submitRangoli()">✨ Submit</button>
+      `);
+      window._currentColor = colors[0];
+      const canvas = document.getElementById('rangoli-canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 300, 300);
+      let drawing = false;
+      canvas.onpointerdown = (e) => { drawing = true; };
+      canvas.onpointerup = () => { drawing = false; };
+      canvas.onpointermove = (e) => {
+        if (!drawing) return;
+        const r = canvas.getBoundingClientRect();
+        const x = (e.clientX - r.left) * (canvas.width/r.width);
+        const y = (e.clientY - r.top) * (canvas.height/r.height);
+        ctx.fillStyle = window._currentColor;
+        ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI*2); ctx.fill();
+      };
+    };
+    window.submitRangoli = function() {
+      Player.coins += 20; Player.blessings += 1; updateHUD();
+      completeQuest('q7', 25);
+      addChatMessage("System", "Beautiful rangoli! +20 coins");
+      closeModal();
     };
 
     window.rideFerris = function() {
-      speak("Jhoole ka maza lijiye");
-      openModal("🎡 Giant Wheel", `
-        <p>Enjoy the view from the top!</p>
-        <button onclick="payFerris()">🎫 Pay 10 Coins</button>
-      `);
+      speak("Jhoole ka maza");
+      openModal("🎡 Giant Wheel", `<button onclick="payFerris()">🎫 Pay 10 Coins</button>`);
     };
-
     window.payFerris = function() {
       if (Player.coins >= 10) {
-        Player.coins -= 10; updateHUD();
-        completeQuest('q4', 25);
-        addChatMessage("System", "You rode the Giant Wheel! 🎡");
-        closeModal();
+        Player.coins -= 10; updateHUD(); completeQuest('q4', 25); closeModal();
       } else alert("Not enough coins!");
     };
-
     window.rideCarousel = function() {
-      speak("Ghoda ghoda ride lijiye");
-      openModal("🎠 Carousel", `
-        <p>Hop on the merry-go-round!</p>
-        <button onclick="payCarousel()">🎫 Pay 8 Coins</button>
-      `);
+      speak("Ghoda ride");
+      openModal("🎠 Carousel", `<button onclick="payCarousel()">🎫 Pay 8 Coins</button>`);
     };
-
     window.payCarousel = function() {
       if (Player.coins >= 8) {
-        Player.coins -= 8; updateHUD();
-        completeQuest('q6', 20);
-        addChatMessage("System", "You rode the Carousel! 🎠");
-        closeModal();
+        Player.coins -= 8; updateHUD(); completeQuest('q6', 20); closeModal();
       } else alert("Not enough coins!");
     };
-
     window.doAarti = function() {
-      speak("Jai Maa Lakshmi. Jai Shri Ganesh.");
-      openModal("🪔 Temple Aarti", `
-        <p>Om Jai Lakshmi Mata...<br>Jai Ganesh Deva...</p>
-        <p>Offer your prayers to Lakshmi & Ganesha</p>
+      speak("Jai Lakshmi Mata. Jai Ganesh Deva.");
+      openModal("🪔 Aarti", `
+        <p>Om Jai Lakshmi Mata<br>Jai Ganesh Deva</p>
         <button onclick="finishAarti()">🙏 Perform Aarti</button>
       `);
     };
-
     window.finishAarti = function() {
-      Player.coins += 25; Player.blessings += 2;
-      updateHUD();
-      completeQuest('q1', 25);
-      closeModal();
+      Player.coins += 25; Player.blessings += 2; updateHUD();
+      completeQuest('q1', 25); closeModal();
     };
 
     // Cracker effects
     const activeFx = [];
     function sparks(pos, count, color, speed) {
       for (let i = 0; i < count; i++) {
-        const s = new THREE.Mesh(
-          new THREE.SphereGeometry(0.08, 6, 6),
-          new THREE.MeshBasicMaterial({ color })
-        );
+        const s = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6), new THREE.MeshBasicMaterial({ color }));
         s.position.copy(pos); scene.add(s);
-        activeFx.push({
-          type: 'spark', mesh: s,
-          vel: new THREE.Vector3((Math.random()-0.5)*speed, Math.random()*speed+0.1, (Math.random()-0.5)*speed),
-          life: 50
-        });
+        activeFx.push({ type: 'spark', mesh: s, vel: new THREE.Vector3((Math.random()-0.5)*speed, Math.random()*speed+0.1, (Math.random()-0.5)*speed), life: 50 });
       }
     }
     function launchRocket(x, z) {
-      const r = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.1, 0.1, 0.8, 8),
-        new THREE.MeshStandardMaterial({ color: 0xdc2626 })
-      );
+      const r = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.8, 8), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
       r.position.set(x, 0.5, z); scene.add(r);
       const light = new THREE.PointLight(0xff7700, 2, 10); scene.add(light);
       activeFx.push({ type: 'rocket', mesh: r, light, vy: 0.6, life: 60 });
@@ -1118,6 +948,16 @@
       c.position.set(x, 0.05, z); scene.add(c);
       activeFx.push({ type: 'chakri', mesh: c, angle: 0, life: 140 });
     }
+
+    // Background fireworks
+    function spawnBackgroundFirework() {
+      const x = (Math.random()-0.5)*80, z = -30 - Math.random()*40, y = 20 + Math.random()*20;
+      const pos = new THREE.Vector3(x, y, z);
+      const colors = [0xff2244, 0x00ffcc, 0xffd700, 0xff00ff, 0x44ff44];
+      sparks(pos, 60, colors[Math.floor(Math.random()*colors.length)], 0.8);
+    }
+    setInterval(spawnBackgroundFirework, 3000);
+
     function updateFx() {
       for (let i = activeFx.length - 1; i >= 0; i--) {
         const f = activeFx[i];
@@ -1133,13 +973,11 @@
           }
         } else if (f.type === 'anar') {
           sparks(new THREE.Vector3(f.mesh.position.x, f.mesh.position.y+0.3, f.mesh.position.z), 5, 0xffd700, 0.3);
-          f.life--;
-          if (f.life <= 0) { scene.remove(f.mesh); activeFx.splice(i, 1); }
+          f.life--; if (f.life <= 0) { scene.remove(f.mesh); activeFx.splice(i, 1); }
         } else if (f.type === 'chakri') {
           f.angle += 0.4; f.mesh.rotation.y = f.angle;
           sparks(new THREE.Vector3(f.mesh.position.x + Math.cos(f.angle)*0.35, 0.1, f.mesh.position.z + Math.sin(f.angle)*0.35), 5, 0x10b981, 0.3);
-          f.life--;
-          if (f.life <= 0) { scene.remove(f.mesh); activeFx.splice(i, 1); }
+          f.life--; if (f.life <= 0) { scene.remove(f.mesh); activeFx.splice(i, 1); }
         }
       }
     }
@@ -1155,11 +993,10 @@
       e.preventDefault();
       const input = document.getElementById('chat-input');
       const msg = input.value.trim(); if (!msg) return;
-      addChatMessage(Player.name, msg);
-      input.value = '';
+      addChatMessage(Player.name, msg); input.value = '';
       setTimeout(() => {
-        const replies = ["Happy Diwali! 🪔", "Shubh Deepavali!", "Jai Lakshmi Mata! ✨", "Light more diyas! 🪔"];
-        addChatMessage("Mela NPC", replies[Math.floor(Math.random()*replies.length)]);
+        const replies = ["Happy Diwali! 🪔", "Shubh Deepavali!", "Jai Lakshmi Mata!", "Mithai khao!"];
+        addChatMessage("NPC", replies[Math.floor(Math.random()*replies.length)]);
       }, 800);
     };
 
@@ -1172,16 +1009,16 @@
     window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
     window.joinMela = function() {
+      document.getElementById('username-input').blur();
       Player.name = document.getElementById('username-input').value.trim() || "Player";
       document.getElementById('display-name').innerText = Player.name;
       document.getElementById('spawn-screen').style.display = 'none';
-      ['hud','quest-log','chat','controls-info'].forEach(id => document.getElementById(id).style.display = 'block');
+      ['hud','quest-log','chat','controls-info','energy-bar','day-indicator','sponsor-banner'].forEach(id => document.getElementById(id).style.display = 'block');
       const av = buildAvatar(Player.name);
       Player.mesh = av.group; Player.limbs = av.limbs;
-      Player.mesh.position.copy(Player.position);
-      scene.add(Player.mesh);
+      Player.mesh.position.copy(Player.position); scene.add(Player.mesh);
       updateHUD();
-      addChatMessage("System", `Welcome to the Mela, ${Player.name}! 🪔`);
+      addChatMessage("System", `Welcome ${Player.name}! 🪔`);
     };
 
     window.addEventListener('load', () => {
@@ -1194,27 +1031,54 @@
       }, 1500);
     });
 
+    // Energy drain
+    setInterval(() => {
+      if (Player.mesh) {
+        Player.energy = Math.max(0, Player.energy - 1);
+        updateHUD();
+      }
+    }, 5000);
+
+    // Time progression
+    setInterval(() => {
+      gameTime = (gameTime + 10) % (24*60);
+      const h = Math.floor(gameTime/60), m = gameTime%60;
+      const h12 = h%12 || 12;
+      const ampm = h < 12 ? 'AM' : 'PM';
+      const t = document.getElementById('time-text');
+      if (t) t.innerText = `${h12}:${m.toString().padStart(2,'0')} ${ampm}`;
+    }, 2000);
+
     function animate() {
       requestAnimationFrame(animate);
       wheel.rotation.z += 0.005;
       pods.forEach(p => { p.rotation.z = -wheel.rotation.z; });
-      carouselAnimals.rotation.y += 0.008;
+      cAnimals.rotation.y += 0.008;
 
-      // NPC movement
+      // Flicker string lights
+      const time = performance.now()*0.001;
+      stringLightBulbs.forEach(b => {
+        b.mesh.material.emissiveIntensity = b.baseIntensity + Math.sin(time*3 + b.phase)*0.3;
+      });
+
+      // Flicker temple diyas
+      templeFlames.forEach(f => {
+        f.light.intensity = 1.5 + Math.sin(time*8 + f.phase)*0.5;
+        f.flame.scale.y = 1 + Math.sin(time*10 + f.phase)*0.3;
+      });
+
+      // NPCs
       npcs.forEach(npc => {
         npc.changeTimer--;
         if (npc.changeTimer <= 0) {
-          npc.angle = Math.random() * Math.PI * 2;
+          npc.angle = Math.random()*Math.PI*2;
           npc.changeTimer = 100 + Math.random()*200;
         }
-        npc.mesh.position.x += Math.cos(npc.angle) * npc.speed;
-        npc.mesh.position.z += Math.sin(npc.angle) * npc.speed;
+        npc.mesh.position.x += Math.cos(npc.angle)*npc.speed;
+        npc.mesh.position.z += Math.sin(npc.angle)*npc.speed;
         npc.mesh.rotation.y = -npc.angle + Math.PI/2;
-        // Keep NPCs in bounds
         const d = Math.hypot(npc.mesh.position.x, npc.mesh.position.z);
-        if (d > 35) {
-          npc.angle = Math.atan2(-npc.mesh.position.z, -npc.mesh.position.x);
-        }
+        if (d > 35) npc.angle = Math.atan2(-npc.mesh.position.z, -npc.mesh.position.x);
       });
 
       if (Player.mesh) {
@@ -1223,20 +1087,20 @@
         if (keys['s'] || keys['arrowdown']) iz += 1;
         if (keys['a'] || keys['arrowleft']) ix -= 1;
         if (keys['d'] || keys['arrowright']) ix += 1;
+        if (joy.active) { ix += joy.dx; iz += joy.dy; }
 
         if (Math.hypot(ix, iz) > 0.1) {
           const forward = new THREE.Vector3(-Math.sin(cam.theta), 0, -Math.cos(cam.theta));
           const right = new THREE.Vector3(Math.cos(cam.theta), 0, -Math.sin(cam.theta));
           const move = new THREE.Vector3().addScaledVector(forward, -iz).addScaledVector(right, ix).normalize();
-          Player.position.addScaledVector(move, 0.18);
+          const speed = Player.energy > 20 ? 0.18 : 0.1;
+          Player.position.addScaledVector(move, speed);
           Player.mesh.position.copy(Player.position);
           Player.mesh.rotation.y = Math.atan2(move.x, move.z);
           Player.walkCycle += 0.35;
-          const swing = Math.sin(Player.walkCycle) * 0.7;
-          Player.limbs.legL.rotation.x = swing;
-          Player.limbs.legR.rotation.x = -swing;
-          Player.limbs.armL.rotation.x = -swing * 0.8;
-          Player.limbs.armR.rotation.x = swing * 0.8;
+          const swing = Math.sin(Player.walkCycle)*0.7;
+          Player.limbs.legL.rotation.x = swing; Player.limbs.legR.rotation.x = -swing;
+          Player.limbs.armL.rotation.x = -swing*0.8; Player.limbs.armR.rotation.x = swing*0.8;
         } else {
           ['legL','legR','armL','armR'].forEach(k => {
             Player.limbs[k].rotation.x = THREE.MathUtils.lerp(Player.limbs[k].rotation.x, 0, 0.2);
@@ -1248,14 +1112,8 @@
           if (Player.position.distanceTo(new THREE.Vector3(...h.pos)) <= h.range) near = h;
         });
         const prompt = document.getElementById('interaction-prompt');
-        if (near) {
-          activeNearSpot = near;
-          prompt.style.display = 'block';
-          prompt.innerText = `Press [E] for ${near.name}`;
-        } else {
-          activeNearSpot = null;
-          prompt.style.display = 'none';
-        }
+        if (near) { activeNearSpot = near; prompt.style.display = 'block'; prompt.innerText = `[E] ${near.name}`; }
+        else { activeNearSpot = null; prompt.style.display = 'none'; }
 
         const cx = Player.position.x + cam.radius * Math.sin(cam.phi) * Math.sin(cam.theta);
         const cy = Player.position.y + cam.radius * Math.cos(cam.phi);
@@ -1268,9 +1126,8 @@
       renderer.render(scene, camera);
     }
     animate();
-
     window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = window.innerWidth/window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
