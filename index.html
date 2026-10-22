@@ -3,77 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>90s Nostalgia Diwali Mela</title>
+  <title>Diwali Mela 3D - Premium Edition</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; background: #020617; touch-action: none; }
     #canvas-container { width: 100vw; height: 100vh; display: block; position: absolute; inset: 0; }
     
-    /* HUD */
+    /* Premium HUD */
     #hud {
       position: absolute; top: 16px; left: 16px; color: #ffdf79;
-      background: linear-gradient(135deg, rgba(30, 10, 20, 0.92), rgba(15, 5, 10, 0.95));
-      padding: 14px 20px; border-radius: 16px; border: 2px solid #d97706;
+      background: linear-gradient(135deg, rgba(20, 5, 10, 0.85), rgba(5, 2, 5, 0.95));
+      backdrop-filter: blur(8px); padding: 16px 24px; border-radius: 16px; border: 2px solid #d97706;
       box-shadow: 0 8px 30px rgba(217, 119, 6, 0.35); pointer-events: none; z-index: 20;
     }
-    #hud h2 { margin: 0 0 4px 0; font-size: 17px; color: #fde047; letter-spacing: 1px; }
-    #hud p { margin: 2px 0; font-size: 13px; color: #fff; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-weight: bold; background: #15803d; color: #bbf7d0; font-size: 11px; }
+    #hud h2 { margin: 0 0 6px 0; font-size: 18px; color: #fde047; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 2px 10px rgba(253, 224, 71, 0.5); }
+    #hud p { margin: 4px 0; font-size: 13px; color: #fff; font-weight: 500; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-weight: bold; background: #15803d; color: #bbf7d0; font-size: 11px; }
 
-    /* Action Bar */
-    #cracker-action-bar { position: absolute; bottom: 80px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 25; display: none; }
+    /* Controls Hint */
+    #controls-hint {
+      position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 12px; color: #ccc; font-size: 12px; pointer-events: none; border: 1px solid #444; z-index: 20; line-height: 1.6;
+    }
+    #controls-hint b { color: #fde047; }
+
+    /* Action Bar (Crackers) */
+    #cracker-action-bar { position: absolute; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 25; display: none; }
     .action-btn {
       background: linear-gradient(135deg, #b91c1c, #ea580c); color: #fff; border: 2px solid #fde047;
-      padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: transform 0.1s;
-      box-shadow: 0 4px 15px rgba(234, 88, 12, 0.6); display: flex; align-items: center; justify-content: center; pointer-events: auto;
+      padding: 12px 20px; border-radius: 25px; font-size: 14px; font-weight: bold; cursor: pointer; transition: transform 0.1s;
+      box-shadow: 0 4px 20px rgba(234, 88, 12, 0.6); display: flex; align-items: center; justify-content: center; pointer-events: auto;
     }
-    .action-btn:hover { transform: scale(1.06); background: linear-gradient(135deg, #ea580c, #f59e0b); }
+    .action-btn:hover { transform: scale(1.05); background: linear-gradient(135deg, #ea580c, #f59e0b); }
     .action-btn.throw { background: linear-gradient(135deg, #4338ca, #6366f1); border-color: #a5b4fc; }
 
-    /* Crosshair for Shooting Game */
-    #crosshair {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 16px; height: 16px; border: 2px solid #00ffcc; border-radius: 50%;
-      pointer-events: none; z-index: 50; display: none;
-    }
+    /* Crosshair */
+    #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 16px; height: 16px; border: 2px solid #00ffcc; border-radius: 50%; pointer-events: none; z-index: 50; display: none; }
     #crosshair::after { content: ''; position: absolute; top: 6px; left: 6px; width: 4px; height: 4px; background: #ff2244; border-radius: 50%; }
 
-    /* Prompts & Buttons */
+    /* Interaction Prompt */
     #interaction-prompt {
-      position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(90deg, #b91c1c, #ea580c); color: #fff;
-      padding: 10px 28px; font-size: 15px; font-weight: bold; border-radius: 30px;
-      display: none; border: 2px solid #fde047; box-shadow: 0 0 25px rgba(234, 88, 12, 0.8);
-      z-index: 25; pointer-events: auto; cursor: pointer; animation: pulse 1.2s infinite alternate;
+      position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
+      background: rgba(234, 88, 12, 0.95); color: #fff; padding: 12px 32px; font-size: 16px; font-weight: bold; border-radius: 30px;
+      display: none; border: 2px solid #fde047; box-shadow: 0 0 30px rgba(234, 88, 12, 0.8);
+      z-index: 25; pointer-events: auto; cursor: pointer; animation: float 1s infinite alternate; text-transform: uppercase; backdrop-filter: blur(5px);
     }
-    @keyframes pulse { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.06); } }
+    @keyframes float { from { transform: translateX(-50%) translateY(0); } to { transform: translateX(-50%) translateY(-8px); } }
 
-    #dismount-btn {
-      position: absolute; top: 85px; right: 20px; background: linear-gradient(135deg, #b91c1c, #ef4444); color: #fff;
-      border: 2px solid #fde047; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: bold; cursor: pointer; display: none; z-index: 30;
-    }
+    #dismount-btn { position: absolute; top: 85px; right: 20px; background: #ef4444; color: #fff; border: 2px solid #fde047; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: bold; cursor: pointer; display: none; z-index: 30; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.6); }
 
-    /* Spawn / Entry Card */
-    #spawn-screen {
-      position: absolute; inset: 0; background: radial-gradient(circle, rgba(20,10,15,0.98) 0%, rgba(2,6,23,1) 100%);
-      display: flex; justify-content: center; align-items: center; z-index: 200;
-    }
-    .spawn-card {
-      background: linear-gradient(145deg, #381a1a, #1a0a0a); border: 2px solid #d97706;
-      border-radius: 20px; padding: 30px 24px; width: 340px; text-align: center; color: #fff;
-    }
-    .spawn-card input { width: 90%; padding: 10px; margin: 12px 0 18px 0; border-radius: 8px; border: 1px solid #d97706; background: #000; color: #fff; font-size: 15px; text-align: center; }
-    .spawn-card button { background: linear-gradient(45deg, #ea580c, #f59e0b); color: #fff; border: none; padding: 11px 22px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 95%; }
+    /* Entry Screen */
+    #spawn-screen { position: absolute; inset: 0; background: rgba(5, 2, 8, 0.95); backdrop-filter: blur(12px); display: flex; justify-content: center; align-items: center; z-index: 200; }
+    .spawn-card { background: rgba(30, 10, 15, 0.95); border: 2px solid #d97706; border-radius: 24px; padding: 40px 30px; width: 380px; text-align: center; color: #fff; box-shadow: 0 0 60px rgba(217, 119, 6, 0.4); }
+    .spawn-card h2 { color: #fde047; margin-top: 0; font-size: 26px; text-shadow: 0 2px 10px rgba(253, 224, 71, 0.4); }
+    .spawn-card input { width: 90%; padding: 14px; margin: 20px 0; border-radius: 12px; border: 2px solid #d97706; background: #000; color: #fff; font-size: 16px; text-align: center; font-weight: 600; outline: none; }
+    .spawn-card button { background: linear-gradient(45deg, #ea580c, #f59e0b); color: #fff; border: none; padding: 14px 24px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; width: 95%; text-transform: uppercase; box-shadow: 0 4px 20px rgba(234, 88, 12, 0.5); }
+    .spawn-card button:hover { transform: scale(1.02); }
 
     /* Modals */
-    .modal {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background: #271212; color: #fff; border: 2px solid #d97706; padding: 22px; border-radius: 16px; display: none; z-index: 100; min-width: 320px; text-align: center;
-    }
-    .modal button { background: #ea580c; color: #fff; border: none; padding: 9px 16px; margin: 5px 4px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-    .modal button:hover { background: #f59e0b; color: #000; }
-    .close-modal { background: #4b5563 !important; }
-    #audio-notice { font-size: 11px; color: #86efac; margin-top: 10px; }
+    .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(30, 10, 15, 0.98); color: #fff; border: 2px solid #d97706; padding: 25px; border-radius: 20px; display: none; z-index: 100; min-width: 340px; text-align: center; backdrop-filter: blur(10px); box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+    .modal h3 { color: #fde047; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; }
+    .modal button { background: #ea580c; color: #fff; border: 1px solid #fde047; padding: 10px 18px; margin: 6px 4px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    .modal button:hover { background: #fde047; color: #000; }
+    .close-modal { background: #4b5563 !important; border-color: #6b7280 !important; }
+    #audio-notice { font-size: 12px; color: #86efac; margin-top: 15px; }
+
+    #mobile-controls { display: none; }
   </style>
 
   <!-- Three.js + Postprocessing + Physics -->
@@ -90,34 +84,36 @@
   <div id="canvas-container"></div>
   <div id="crosshair"></div>
 
-  <!-- Ambient Audio Elements -->
-  <audio id="audio-mela" loop>
-    <source src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d07a1634f1.mp3" type="audio/mpeg">
-  </audio>
-  <audio id="audio-aarti" loop>
-    <source src="https://cdn.pixabay.com/download/audio/2021/10/25/audio_24e07ea37a.mp3" type="audio/mpeg">
-  </audio>
+  <audio id="audio-mela" loop><source src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d07a1634f1.mp3" type="audio/mpeg"></audio>
+  <audio id="audio-aarti" loop><source src="https://cdn.pixabay.com/download/audio/2021/10/25/audio_24e07ea37a.mp3" type="audio/mpeg"></audio>
 
   <div id="spawn-screen">
     <div class="spawn-card">
-      <h2 style="color: #fde047; margin-top: 0;">🪔 90s Village Mela</h2>
-      <p style="font-size: 13px; color: #d1d5db;">Experience the nostalgia. Muddy grounds, wooden jhoolas, and glowing tents!</p>
+      <h2>🪔 3D Diwali Mela</h2>
+      <p style="color: #a1a1aa; font-size: 14px; margin-bottom: 20px;">Free-Look 360° Camera • Sprint • Rent Stalls • Physics Crackers</p>
       <input type="text" id="username-input" placeholder="Enter Your Name" maxlength="14" />
-      <button onclick="window.joinMela()">Enter the 90s Mela ✨</button>
-      <div id="audio-notice">🔊 Keep volume up for shopkeeper voices!</div>
+      <button onclick="window.joinMela()">Enter Grand Mela ✨</button>
+      <div id="audio-notice">🔊 Keep volume up for NPC voices!</div>
     </div>
   </div>
 
   <div id="hud">
-    <h2>🪔 90s VILLAGE MELA</h2>
-    <p>👤 Player: <b id="display-name">-</b></p>
-    <p>🪙 Coins: <span id="coin-count">100</span></p>
-    <p>🎡 Ride State: <b id="ride-state" style="color:#fde047;">On Foot</b></p>
+    <h2>🪔 MELA EXPERT</h2>
+    <p>👤 Player: <b id="display-name" style="color:#fff;">-</b></p>
+    <p>🪙 Coins: <span id="coin-count" style="color:#fde047;">100</span></p>
+    <p>🎡 State: <b id="ride-state" style="color:#fde047;">On Foot</b></p>
+  </div>
+
+  <div id="controls-hint">
+    <b>🖱️ Left Click + Drag</b>: Look Around<br>
+    <b>⌨️ W,A,S,D</b>: Move<br>
+    <b>🏃 Shift + W</b>: Sprint<br>
+    <b>🎮 E</b>: Interact
   </div>
 
   <div id="cracker-action-bar">
-    <button class="action-btn throw" onclick="window.throwBomb()">💣 Throw Sutli Bomb</button>
-    <button class="action-btn" onclick="window.burnHere('rocket')">🚀 Shoot Sky Rocket</button>
+    <button class="action-btn throw" onclick="window.throwBomb()">💣 Throw Bomb</button>
+    <button class="action-btn" onclick="window.burnHere('rocket')">🚀 Sky Rocket</button>
     <button class="action-btn" onclick="window.burnHere('anar')">🌋 Place Anar</button>
   </div>
 
@@ -125,190 +121,125 @@
   <div id="interaction-prompt">Press [E] to Interact</div>
 
   <div id="action-modal" class="modal">
-    <h3 id="modal-title" style="color:#fde047; margin-top:0;">Action</h3>
+    <h3 id="modal-title">Action</h3>
     <div id="modal-body"></div>
     <br><button class="close-modal" onclick="closeModal()">Close</button>
   </div>
 
   <script>
-    /* =========================================================================
-       1. TTS & AUDIO
-       ========================================================================= */
     function speakHindi(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'hi-IN'; u.rate = 0.9; u.pitch = 1.1;
-        window.speechSynthesis.speak(u);
+        const u = new SpeechSynthesisUtterance(text); u.lang = 'hi-IN'; u.rate = 0.95; u.pitch = 1.1; window.speechSynthesis.speak(u);
       }
     }
 
     /* =========================================================================
-       2. CANNON-ES PHYSICS WORLD & COLLISIONS
+       1. CANNON-ES PHYSICS WORLD (Frictionless Base)
        ========================================================================= */
-    const world = new CANNON.World();
-    world.gravity.set(0, -15, 0); 
-    
-    const physMat = new CANNON.Material("standard");
-    const contactMat = new CANNON.ContactMaterial(physMat, physMat, { friction: 0.0, restitution: 0.0 });
-    world.addContactMaterial(contactMat);
-
-    const groundBody = new CANNON.Body({ mass: 0, shape: new CANNON.Plane(), material: physMat });
-    groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
-    world.addBody(groundBody);
+    const world = new CANNON.World(); world.gravity.set(0, -15, 0); 
+    const physMat = new CANNON.Material(); const contactMat = new CANNON.ContactMaterial(physMat, physMat, { friction: 0.0, restitution: 0.0 }); world.addContactMaterial(contactMat);
+    const groundBody = new CANNON.Body({ mass: 0, shape: new CANNON.Plane(), material: physMat }); groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2); world.addBody(groundBody);
 
     function addStaticCollider(x, z, width, depth) {
-      const shape = new CANNON.Box(new CANNON.Vec3(width/2, 5, depth/2));
-      const body = new CANNON.Body({ mass: 0, shape: shape, position: new CANNON.Vec3(x, 2.5, z) });
-      world.addBody(body);
+      world.addBody(new CANNON.Body({ mass: 0, shape: new CANNON.Box(new CANNON.Vec3(width/2, 5, depth/2)), position: new CANNON.Vec3(x, 2.5, z) }));
     }
-    addStaticCollider(-20, -5, 6, 4); 
-    addStaticCollider(20, -5, 6, 4); 
-    addStaticCollider(0, -24, 14, 10); 
-    addStaticCollider(26, 15, 10, 10); 
+    addStaticCollider(-20, -5, 6, 4); addStaticCollider(20, -5, 6, 4); 
+    addStaticCollider(-20, 15, 6, 4); addStaticCollider(20, 15, 6, 4); 
+    addStaticCollider(0, -26, 16, 12); addStaticCollider(26, 15, 10, 10); 
 
     /* =========================================================================
-       3. THREE.JS SCENE SETUP & BLOOM (90s Warm Night Look)
+       2. THREE.JS SCENE SETUP & BLOOM
        ========================================================================= */
-    const scene = new THREE.Scene();
-    // Deep blue night fog
-    scene.fog = new THREE.FogExp2(0x0a1128, 0.015);
-
-    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x0a1128, 0.012);
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
+    renderer.setSize(window.innerWidth, window.innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.shadowMap.enabled = true;
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
     const renderScene = new THREE.RenderPass(scene, camera);
-    const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.3, 0.5, 0.8);
-    const composer = new THREE.EffectComposer(renderer);
-    composer.addPass(renderScene); composer.addPass(bloomPass);
+    const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.4, 0.5, 0.8);
+    const composer = new THREE.EffectComposer(renderer); composer.addPass(renderScene); composer.addPass(bloomPass);
 
-    // Warm ambient light for dusty look
     scene.add(new THREE.AmbientLight(0x2a1a1a, 1.2));
-    const moonLight = new THREE.DirectionalLight(0x7c93c4, 0.6);
-    moonLight.position.set(0, 80, -100); moonLight.castShadow = true; scene.add(moonLight);
+    const moonLight = new THREE.DirectionalLight(0x7c93c4, 0.6); moonLight.position.set(0, 80, -100); moonLight.castShadow = true; scene.add(moonLight);
 
-    /* --- GIANT 90s MOON --- */
-    const moonGeo = new THREE.SphereGeometry(12, 32, 32);
-    const moonMat = new THREE.MeshBasicMaterial({ color: 0xfffbea });
-    const giantMoon = new THREE.Mesh(moonGeo, moonMat);
-    giantMoon.position.set(0, 75, -120);
-    scene.add(giantMoon);
-    // Moon Glow
-    const moonGlow = new THREE.PointLight(0x7c93c4, 2, 200);
-    moonGlow.position.set(0, 70, -110);
-    scene.add(moonGlow);
+    const giantMoon = new THREE.Mesh(new THREE.SphereGeometry(14, 32, 32), new THREE.MeshBasicMaterial({ color: 0xfffbea })); giantMoon.position.set(0, 85, -130); scene.add(giantMoon);
+    const moonGlow = new THREE.PointLight(0x7c93c4, 2, 200); moonGlow.position.set(0, 80, -120); scene.add(moonGlow);
 
     /* =========================================================================
-       4. ORBIT CAMERA RIG
+       3. 3RD-PERSON DRAG-TO-LOOK CAMERA RIG
        ========================================================================= */
-    const CameraOrbit = { theta: 0.78, phi: 0.65, radius: 17, isDragging: false, lastX: 0, lastY: 0 };
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
+    const CameraOrbit = { theta: Math.PI, phi: Math.PI/3, radius: 14, isDragging: false, lastX: 0, lastY: 0 };
+    const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2();
 
     const container = document.getElementById('canvas-container');
     container.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('#hud') || e.target.closest('#cracker-action-bar') || e.target.closest('#dismount-btn')) return;
+      if (e.target.closest('#hud') || e.target.closest('#cracker-action-bar') || e.target.closest('#dismount-btn') || e.target.closest('#controls-hint')) return;
       if (LocalPlayer.currentGame === 'balloons') {
-        mouse.x = (e.clientX / window.innerWidth) * 2 - 1; mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(targetBalloons);
-        if (intersects.length > 0) popBalloon(intersects[0].object);
-        return;
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1; mouse.y = -(e.clientY / window.innerHeight) * 2 + 1; raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(targetBalloons); if (intersects.length > 0) popBalloon(intersects[0].object); return;
       }
       CameraOrbit.isDragging = true; CameraOrbit.lastX = e.clientX; CameraOrbit.lastY = e.clientY;
     });
-
     window.addEventListener('pointermove', (e) => {
       if (!CameraOrbit.isDragging) return;
-      CameraOrbit.theta -= (e.clientX - CameraOrbit.lastX) * 0.007;
-      CameraOrbit.phi = Math.max(0.15, Math.min(Math.PI / 2.1, CameraOrbit.phi + (e.clientY - CameraOrbit.lastY) * 0.006));
+      CameraOrbit.theta -= (e.clientX - CameraOrbit.lastX) * 0.006;
+      CameraOrbit.phi = Math.max(0.1, Math.min(Math.PI / 2.1, CameraOrbit.phi + (e.clientY - CameraOrbit.lastY) * 0.005));
       CameraOrbit.lastX = e.clientX; CameraOrbit.lastY = e.clientY;
     });
-
     window.addEventListener('pointerup', () => { CameraOrbit.isDragging = false; });
-    window.addEventListener('wheel', (e) => { CameraOrbit.radius = Math.max(7, Math.min(32, CameraOrbit.radius + e.deltaY * 0.02)); }, { passive: true });
+    window.addEventListener('wheel', (e) => { CameraOrbit.radius = Math.max(5, Math.min(25, CameraOrbit.radius + e.deltaY * 0.015)); }, { passive: true });
 
     /* =========================================================================
-       5. RUSTIC DUSTY GROUND & PATHS
+       4. DUSTY GROUND, FAIRY LIGHTS & PATHS
        ========================================================================= */
-    // Muddy/Dusty Ground
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshStandardMaterial({ color: 0x3d2314, roughness: 1.0 }));
-    ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
-    
-    // Sandy path
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshStandardMaterial({ color: 0x3d2314, roughness: 1.0 })); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
     const pathMat = new THREE.MeshStandardMaterial({ color: 0x543822, roughness: 1.0 });
     const mainPath = new THREE.Mesh(new THREE.PlaneGeometry(16, 120), pathMat); mainPath.rotation.x = -Math.PI / 2; mainPath.position.y = 0.02; scene.add(mainPath);
     const crossPath = new THREE.Mesh(new THREE.PlaneGeometry(120, 16), pathMat); crossPath.rotation.x = -Math.PI / 2; crossPath.position.y = 0.02; scene.add(crossPath);
 
-    /* --- OVERHEAD WARM STRING LIGHTS (90s Vibe) --- */
     function createStringLights(startX, startZ, endX, endZ) {
-      const points = [];
-      const dist = Math.hypot(endX - startX, endZ - startZ);
+      const points = []; const dist = Math.hypot(endX - startX, endZ - startZ);
       for(let i=0; i<=10; i++) {
-        const t = i/10;
-        const x = startX + (endX - startX) * t;
-        const z = startZ + (endZ - startZ) * t;
-        const y = 7 - Math.sin(t * Math.PI) * 1.5; // sagging wire
+        const t = i/10; const x = startX + (endX - startX) * t; const z = startZ + (endZ - startZ) * t; const y = 7 - Math.sin(t * Math.PI) * 1.5;
         points.push(new THREE.Vector3(x, y, z));
-        
-        if (i > 0 && i < 10) {
-          // Add glowing bulbs
-          const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffdd44 }));
-          bulb.position.set(x, y, z);
-          scene.add(bulb);
-        }
+        if (i > 0 && i < 10) { const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffdd44 })); bulb.position.set(x, y, z); scene.add(bulb); }
       }
-      const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
-      const lineMat = new THREE.LineBasicMaterial({ color: 0x111111 });
-      scene.add(new THREE.Line(lineGeo, lineMat));
+      scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), new THREE.LineBasicMaterial({ color: 0x111 })));
     }
-    createStringLights(-20, 15, 20, 15);
-    createStringLights(-20, -5, 20, -5);
-    createStringLights(-20, 15, -20, -5);
-    createStringLights(20, 15, 20, -5);
+    createStringLights(-20, 15, 20, 15); createStringLights(-20, -5, 20, -5); createStringLights(-20, 15, -20, -5); createStringLights(20, 15, 20, -5);
 
     /* =========================================================================
-       6. LAKSHMI-GANESHA TEMPLE
+       5. LAKSHMI-GANESHA TEMPLE
        ========================================================================= */
-    const templeGroup = new THREE.Group();
-    templeGroup.position.set(0, 0, -24);
-    
-    // Rustic Stone Plinth
-    const plinth = new THREE.Mesh(new THREE.BoxGeometry(16, 1.2, 10), new THREE.MeshStandardMaterial({ color: 0x8b7d6b, roughness: 0.8 }));
-    plinth.position.y = 0.6; templeGroup.add(plinth);
+    const templeGroup = new THREE.Group(); templeGroup.position.set(0, 0, -26);
+    const plinth = new THREE.Mesh(new THREE.BoxGeometry(16, 1.2, 12), new THREE.MeshStandardMaterial({ color: 0x8b7d6b })); plinth.position.y = 0.6; templeGroup.add(plinth);
+    const pMat = new THREE.MeshStandardMaterial({ color: 0x8b4513, roughness: 0.9 });
+    for (let x of [-6, 6]) { for (let z of [-4, 4]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.38, 6), pMat); p.position.set(x, 3.6, z); templeGroup.add(p); } }
+    const dome = new THREE.Mesh(new THREE.ConeGeometry(7, 5.5, 8), new THREE.MeshStandardMaterial({ color: 0xa0522d })); dome.position.y = 9; templeGroup.add(dome);
 
-    const pMat = new THREE.MeshStandardMaterial({ color: 0x8b4513, roughness: 0.9 }); // Wooden Pillars
-    for (let x of [-6, 6]) { for (let z of [-3.5, 3.5]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.38, 6), pMat); p.position.set(x, 3.6, z); templeGroup.add(p); } }
-    
-    // Terracotta Dome
-    const dome = new THREE.Mesh(new THREE.ConeGeometry(6.5, 5.5, 8), new THREE.MeshStandardMaterial({ color: 0xa0522d, roughness: 0.9 }));
-    dome.position.y = 9; templeGroup.add(dome);
-
-    const idolMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, metalness: 0.5, roughness: 0.5 }); // Aged Gold
-    
-    // LAKSHMI IDOL
+    const idolMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, metalness: 0.5 });
     const lakshmiGroup = new THREE.Group(); lakshmiGroup.position.set(-2, 2.2, -1);
     lakshmiGroup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.8, 1.6, 16), idolMat));
     const haloL = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.08, 12, 32), new THREE.MeshBasicMaterial({ color: 0xffea00 })); haloL.position.set(0, 1.0, -0.2); lakshmiGroup.add(haloL);
     templeGroup.add(lakshmiGroup);
 
-    // GANESHA IDOL
     const ganeshaGroup = new THREE.Group(); ganeshaGroup.position.set(2, 2.2, -1);
     ganeshaGroup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.9, 1.4, 16), idolMat));
     const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, 0.8, 8), idolMat); trunk.position.set(0, 0.5, 0.4); trunk.rotation.x = Math.PI / 4; ganeshaGroup.add(trunk);
     const haloG = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.08, 12, 32), new THREE.MeshBasicMaterial({ color: 0xffea00 })); haloG.position.set(0, 1.0, -0.2); ganeshaGroup.add(haloG);
     templeGroup.add(ganeshaGroup);
 
-    // Warm Temple Oil Lamp Glow
+    // Daan Patra (Donation Box)
+    const daanPatra = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.5, 1.2), new THREE.MeshStandardMaterial({ color: 0xb91c1c }));
+    daanPatra.position.set(5, 1.9, 4); templeGroup.add(daanPatra);
+
     const mandirLight = new THREE.PointLight(0xff7700, 4, 30); mandirLight.position.set(0, 4, 0); templeGroup.add(mandirLight);
     scene.add(templeGroup);
 
     /* =========================================================================
-       7. WOODEN SHOPS & STRIPED TENT AWNINGS (PANDAAL)
+       6. WOODEN SHOPS, PANDAALS & "APNA STALL"
        ========================================================================= */
     function createBanner(text, bgCol) {
       const c = document.createElement('canvas'); c.width = 512; c.height = 128; const ctx = c.getContext('2d');
@@ -316,8 +247,6 @@
       ctx.fillStyle = '#ffea79'; ctx.font = 'bold 36px Segoe UI'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 256, 64);
       return new THREE.CanvasTexture(c);
     }
-
-    // Procedural Striped Cloth Texture
     function createStripedTent(color1, color2) {
       const c = document.createElement('canvas'); c.width = 256; c.height = 256; const ctx = c.getContext('2d');
       for(let i=0; i<256; i+=32) { ctx.fillStyle = (i/32)%2===0 ? color1 : color2; ctx.fillRect(i, 0, 32, 256); }
@@ -327,41 +256,26 @@
     function buildRusticShop(x, z, name, color1, color2) {
       const shop = new THREE.Group(); shop.position.set(x, 0, z);
       const woodMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 1.0 });
-      
-      // Wooden Poles
       for (let px of [-2.5, 2.5]) { for (let pz of [-1.5, 1.5]) { const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4), woodMat); pole.position.set(px, 2, pz); shop.add(pole); } }
-      
-      // Slanted Cloth Awning
-      const tentMat = new THREE.MeshStandardMaterial({ map: createStripedTent(color1, color2), roughness: 0.9, side: THREE.DoubleSide });
-      const awning = new THREE.Mesh(new THREE.PlaneGeometry(6, 4.5), tentMat);
-      awning.position.set(0, 4.5, 0); awning.rotation.x = -Math.PI / 2.5; shop.add(awning);
-
-      // Wooden Desk
+      const tentMat = new THREE.MeshStandardMaterial({ map: createStripedTent(color1, color2), side: THREE.DoubleSide });
+      const awning = new THREE.Mesh(new THREE.PlaneGeometry(6, 4.5), tentMat); awning.position.set(0, 4.5, 0); awning.rotation.x = -Math.PI / 2.5; shop.add(awning);
       const desk = new THREE.Mesh(new THREE.BoxGeometry(5.5, 1.2, 1.8), woodMat); desk.position.set(0, 0.6, 1.0); shop.add(desk);
-      
-      // Hanging Bulb
-      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffdd44 })); bulb.position.set(0, 3.5, 0); shop.add(bulb);
       const light = new THREE.PointLight(0xff9900, 2, 15); light.position.set(0, 3.5, 0); shop.add(light);
-
-      const banner = new THREE.Mesh(new THREE.PlaneGeometry(5, 1.2), new THREE.MeshBasicMaterial({ map: createBanner(name, '#4a0000'), transparent: true }));
-      banner.position.set(0, 5.5, 1); shop.add(banner);
-
-      // Shopkeeper
+      const banner = new THREE.Mesh(new THREE.PlaneGeometry(5, 1.2), new THREE.MeshBasicMaterial({ map: createBanner(name, '#4a0000'), transparent: true })); banner.position.set(0, 5.5, 1); shop.add(banner);
+      
       const npc = new THREE.Group();
       const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 0.9, 12), new THREE.MeshStandardMaterial({ color: 0x8b0000 })); torso.position.y = 0.45; npc.add(torso);
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), new THREE.MeshStandardMaterial({ color: 0xdfa07a })); head.position.y = 1.1; npc.add(head);
       npc.position.set(0, 0.2, -0.5); shop.add(npc);
-
-      scene.add(shop);
-      return shop;
+      scene.add(shop); return shop;
     }
 
-    buildRusticShop(-20, -5, "🎆 Patakha Bhandar", '#b91c1c', '#fef08a');
-    buildRusticShop(20, -5, "🍬 Bikaner Mithai", '#047857', '#fef08a');
+    buildRusticShop(-20, -5, "🎆 Patakha Shop", '#b91c1c', '#fef08a');
+    buildRusticShop(20, -5, "🍬 Mithai Shop", '#047857', '#fef08a');
     buildRusticShop(-20, 15, "🎈 Balloon Shoot", '#1d4ed8', '#fef08a');
-    buildRusticShop(20, 15, "🏮 Sky Lanterns", '#b45309', '#fef08a');
+    buildRusticShop(20, 15, "🏬 Apna Stall (Rent)", '#6b21a8', '#fef08a');
 
-    // Add Targets for Balloon Shoot
+    // Balloon Game Targets
     const targetBalloons = [];
     function respawnBalloons() {
       targetBalloons.forEach(b => scene.remove(b)); targetBalloons.length = 0;
@@ -376,20 +290,17 @@
     respawnBalloons();
 
     function popBalloon(balloonMesh) {
-      scene.remove(balloonMesh);
-      const index = targetBalloons.indexOf(balloonMesh); if (index > -1) targetBalloons.splice(index, 1);
+      scene.remove(balloonMesh); const index = targetBalloons.indexOf(balloonMesh); if (index > -1) targetBalloons.splice(index, 1);
       spawnSparks(new THREE.Vector3().copy(balloonMesh.getWorldPosition(new THREE.Vector3())), 10, 0xffffff, 0.1);
       LocalPlayer.coins += 5; document.getElementById('coin-count').innerText = LocalPlayer.coins;
       if (targetBalloons.length === 0) { speakHindi("Wah bhaiya! Ye lo pachas extra coin!"); LocalPlayer.coins += 50; document.getElementById('coin-count').innerText = LocalPlayer.coins; setTimeout(respawnBalloons, 2000); }
     }
 
     /* =========================================================================
-       8. WOODEN RUSTIC FERRIS WHEEL (JHOOLA)
+       7. WOODEN RUSTIC FERRIS WHEEL (JHOOLA)
        ========================================================================= */
     const ferrisGroup = new THREE.Group(); ferrisGroup.position.set(26, 0, 25);
-    const woodMat = new THREE.MeshStandardMaterial({ color: 0x4a2e15, roughness: 1.0 }); // Rustic Wood
-    
-    // Wooden A-Frame Legs
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x4a2e15, roughness: 1.0 }); 
     const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 16), woodMat); leg1.position.set(-2.5, 8, -2.5); leg1.rotation.z = -0.2; ferrisGroup.add(leg1);
     const leg2 = leg1.clone(); leg2.position.x = 2.5; leg2.rotation.z = 0.2; ferrisGroup.add(leg2);
 
@@ -402,22 +313,19 @@
       const rad = (i * Math.PI * 2) / 8;
       const spoke = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 16), woodMat); spoke.rotation.z = rad; wheelRotator.add(spoke);
       const podGroup = new THREE.Group(); podGroup.position.set(Math.cos(rad) * 8, Math.sin(rad) * 8, 0);
-      const podMesh = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.6), gondolaMat); // Wooden gondolas
+      const podMesh = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.6), gondolaMat); 
       podGroup.add(podMesh); wheelRotator.add(podGroup); ferrisGondolas.push({ group: podGroup });
     }
     ferrisGroup.add(wheelRotator); scene.add(ferrisGroup);
 
     /* =========================================================================
-       9. PLAYER AVATAR
+       8. PLAYER AVATAR
        ========================================================================= */
-    const LocalPlayer = {
-      id: "usr_" + Math.floor(Math.random() * 100000), name: "Player", coins: 100,
-      meshGroup: null, body: null, limbs: {}, walkCycle: 0, currentRide: null
-    };
+    const LocalPlayer = { id: "usr_" + Math.floor(Math.random() * 100000), name: "Player", coins: 100, meshGroup: null, body: null, limbs: {}, walkCycle: 0, currentRide: null };
 
     function createNameplate(text) {
       const c = document.createElement('canvas'); c.width = 256; c.height = 64; const ctx = c.getContext('2d');
-      ctx.fillStyle = 'rgba(12, 5, 24, 0.88)'; ctx.fillRect(10, 8, 236, 48); ctx.lineWidth = 3; ctx.strokeStyle = '#ffd700'; ctx.strokeRect(10, 8, 236, 48);
+      ctx.fillStyle = 'rgba(12, 5, 24, 0.88)'; ctx.fillRect(10, 8, 236, 48); ctx.lineWidth = 3; ctx.strokeStyle = '#fde047'; ctx.strokeRect(10, 8, 236, 48);
       ctx.fillStyle = '#ffffff'; ctx.font = 'bold 22px Segoe UI'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 128, 32);
       const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
       sprite.scale.set(3, 0.75, 1); sprite.position.y = 3.3; return sprite;
@@ -426,7 +334,7 @@
     function buildArticulatedAvatar(name) {
       const group = new THREE.Group(); const limbs = {};
       const skinMat = new THREE.MeshStandardMaterial({ color: 0xdfa07a, roughness: 0.6 });
-      const kurtaMat = new THREE.MeshStandardMaterial({ color: 0xca8a04, roughness: 0.8 }); // Earthy yellow Kurta
+      const kurtaMat = new THREE.MeshStandardMaterial({ color: 0xca8a04, roughness: 0.8 }); 
       const pyjamaMat = new THREE.MeshStandardMaterial({ color: 0xfdfcf7, roughness: 0.8 });
 
       const torsoPivot = new THREE.Group(); torsoPivot.position.y = 1.45; group.add(torsoPivot);
@@ -444,68 +352,33 @@
     }
 
     /* =========================================================================
-       10. HOTSPOTS & MODALS
+       9. HOTSPOTS & MODALS
        ========================================================================= */
     const HOTSPOTS = [
-      { id: "patakha_shop", name: "🎆 Patakha Wala", pos: [-20, 0, -4.5], range: 6.0, action: () => showCrackerModal() },
-      { id: "mithai_shop", name: "🍬 Mithai Wala", pos: [20, 0, -4.5], range: 6.0, action: () => showMithaiModal() },
-      { id: "ferris_ride", name: "🎡 Ride Wooden Jhoola (10 Coins)", pos: [26, 0, 25], range: 6.0, action: () => boardFerrisWheel() },
+      { id: "patakha", name: "🎆 Patakha Wala", pos: [-20, 0, -4.5], range: 6.0, action: () => showCrackerModal() },
+      { id: "mithai", name: "🍬 Mithai Wala", pos: [20, 0, -4.5], range: 6.0, action: () => showMithaiModal() },
+      { id: "ferris", name: "🎡 Ride Jhoola (10 Coins)", pos: [26, 0, 25], range: 6.0, action: () => boardFerrisWheel() },
       { id: "balloon_game", name: "🎈 Play Balloon Shooting", pos: [-20, 0, 15], range: 6.0, action: () => window.startBalloonGame() },
-      { id: "lantern_shop", name: "🏮 Fly Sky Lantern", pos: [20, 0, 15], range: 6.0, action: () => showLanternModal() },
-      { id: "temple_aarti", name: "🪔 Mandir Aarti", pos: [0, 0, -24], range: 7.0, action: () => startAartiRitual() }
+      { id: "apna_stall", name: "🏬 Apna Stall (Rent Area)", pos: [20, 0, 15], range: 6.0, action: () => showStallModal() },
+      { id: "temple_aarti", name: "🪔 Mandir Aarti", pos: [0, 0, -24], range: 7.0, action: () => startAartiRitual() },
+      { id: "daan_patra", name: "💸 Daan Patra (Donate 5 Coins)", pos: [5, 0, -20], range: 4.0, action: () => donateCoins() }
     ];
 
-    const modal = document.getElementById('action-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalBody = document.getElementById('modal-body');
+    const modal = document.getElementById('action-modal'); const modalTitle = document.getElementById('modal-title'); const modalBody = document.getElementById('modal-body');
     function openModal(title, html) { modalTitle.innerText = title; modalBody.innerHTML = html; modal.style.display = 'block'; }
     function closeModal() { modal.style.display = 'none'; }
 
-    function showCrackerModal() {
-      speakHindi("Haan bhaiya, kaunsa patakha loge?");
-      openModal("🎆 Patakha Bhandar", `<button onclick="window.burnHere('rocket'); closeModal();">🚀 Rocket</button><button onclick="window.burnHere('chakri'); closeModal();">🌀 Chakri</button><button onclick="window.throwBomb(); closeModal();">💣 Sutli Bomb</button>`);
-    }
-    function showMithaiModal() {
-      speakHindi("Bhaiya kaunsi mithai chahiye?");
-      openModal("🍬 Bikaner Mithai", `<button onclick="speakHindi('Ye lijiye Kaju Katli'); closeModal();">💎 Kaju Katli</button><button onclick="speakHindi('Ye lijiye garam Gulab Jamun'); closeModal();">🍯 Gulab Jamun</button>`);
-    }
-    function showLanternModal() {
-      speakHindi("Ek lalteen aasmaan mein chodiye, wishes puri hongi.");
-      openModal("🏮 Fly Sky Lantern", `<button onclick="window.launchLantern(); closeModal();">✨ Release Lantern into Sky</button>`);
-    }
+    function showCrackerModal() { speakHindi("Haan bhaiya, kaunsa patakha loge?"); openModal("🎆 Patakha", `<button onclick="window.burnHere('rocket'); closeModal();">🚀 Rocket</button><button onclick="window.burnHere('chakri'); closeModal();">🌀 Chakri</button><button onclick="window.throwBomb(); closeModal();">💣 Sutli Bomb</button>`); }
+    function showMithaiModal() { speakHindi("Bhaiya kaunsi mithai chahiye?"); openModal("🍬 Mithai", `<button onclick="speakHindi('Ye lijiye Kaju Katli'); closeModal();">💎 Kaju Katli</button><button onclick="speakHindi('Ye lijiye garam Gulab Jamun'); closeModal();">🍯 Gulab Jamun</button>`); }
+    function showStallModal() { speakHindi("Apni dukaan lagana chahte ho?"); openModal("🏬 Apna Stall", `<p>Rent this stall to promote your brand!</p><button onclick="alert('Contact Admin to Rent Setup'); closeModal();">💼 Rent Stall (500 Coins)</button>`); }
 
-    window.launchLantern = () => {
-      const lan = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 0.8, 12), new THREE.MeshStandardMaterial({ color: 0xff7700, emissive: 0xff4400 }));
-      lan.position.copy(LocalPlayer.meshGroup.position); lan.position.y = 2; scene.add(lan);
-      const anim = () => { lan.position.y += 0.05; if(lan.position.y < 50) requestAnimationFrame(anim); else scene.remove(lan); }; anim();
-      LocalPlayer.coins += 10; document.getElementById('coin-count').innerText = LocalPlayer.coins;
-    };
-
-    function boardFerrisWheel() {
-      speakHindi("Haan bhaiya, ticket kahan hai? 10 coin do.");
-      openModal("🎡 Giant Jhoola", `<button onclick="window.payForJhoola()">🎫 Pay 10 Coins & Ride</button>`);
-    }
-    window.payForJhoola = () => {
-      if (LocalPlayer.coins >= 10) {
-        LocalPlayer.coins -= 10; document.getElementById('coin-count').innerText = LocalPlayer.coins;
-        speakHindi("Chalo baitho aaram se."); LocalPlayer.currentRide = 'ferris'; document.getElementById('dismount-btn').style.display = 'block'; closeModal();
-      } else { speakHindi("Arre bhaiya, paise toh poore do."); alert("Not enough coins!"); closeModal(); }
-    };
-    window.startBalloonGame = () => {
-      speakHindi("Aao bhaiya, nishana lagao!"); LocalPlayer.currentGame = 'balloons';
-      document.getElementById('crosshair').style.display = 'block'; document.getElementById('dismount-btn').innerText = "Exit Game"; document.getElementById('dismount-btn').style.display = 'block';
-    };
-    window.dismountCurrentRide = () => {
-      if (LocalPlayer.currentRide === 'ferris') {
-        LocalPlayer.meshGroup.position.set(26, 0, 18); LocalPlayer.currentRide = null; document.getElementById('ride-state').innerText = "On Foot";
-        LocalPlayer.limbs.legL.rotation.x = 0; LocalPlayer.limbs.legR.rotation.x = 0;
-      }
-      if (LocalPlayer.currentGame === 'balloons') { LocalPlayer.currentGame = null; document.getElementById('crosshair').style.display = 'none'; }
-      document.getElementById('dismount-btn').style.display = 'none'; document.getElementById('dismount-btn').innerText = "🚪 Dismount Ride (Exit Jhoola)";
-    };
-    window.startAartiRitual = () => {
-      speakHindi("Jai Maa Lakshmi. Jai Shri Ganesh."); LocalPlayer.coins += 25; document.getElementById('coin-count').innerText = LocalPlayer.coins; alert("Aarti Performed! Blessed with 25 Coins.");
-    };
+    function boardFerrisWheel() { speakHindi("Haan bhaiya, ticket kahan hai? 10 coin do."); openModal("🎡 Giant Jhoola", `<button onclick="window.payForJhoola()">🎫 Pay 10 Coins & Ride</button>`); }
+    window.payForJhoola = () => { if (LocalPlayer.coins >= 10) { LocalPlayer.coins -= 10; document.getElementById('coin-count').innerText = LocalPlayer.coins; speakHindi("Chalo baitho aaram se."); LocalPlayer.currentRide = 'ferris'; document.getElementById('dismount-btn').style.display = 'block'; closeModal(); } else { speakHindi("Arre bhaiya, paise toh poore do."); alert("Not enough coins!"); closeModal(); } };
+    window.dismountCurrentRide = () => { LocalPlayer.currentRide = null; document.getElementById('dismount-btn').style.display = 'none'; LocalPlayer.body.position.set(26, 1.5, 18); };
+    window.startAartiRitual = () => { speakHindi("Jai Maa Lakshmi. Jai Shri Ganesh."); LocalPlayer.coins += 25; document.getElementById('coin-count').innerText = LocalPlayer.coins; alert("Aarti Performed! Blessed with 25 Coins."); };
+    window.donateCoins = () => { if (LocalPlayer.coins >= 5) { LocalPlayer.coins -= 5; document.getElementById('coin-count').innerText = LocalPlayer.coins; speakHindi("Bhagwan tumhara bhala kare."); spawnSparks(new THREE.Vector3(5, 2, -20), 10, 0xffd700, 0.2); } else { alert("Not enough coins to donate."); } };
+    
+    window.startBalloonGame = () => { speakHindi("Aao bhaiya, nishana lagao!"); LocalPlayer.currentGame = 'balloons'; document.getElementById('crosshair').style.display = 'block'; document.getElementById('dismount-btn').innerText = "Exit Game"; document.getElementById('dismount-btn').style.display = 'block'; };
 
     /* --- Physics Crackers --- */
     const activeCrackers = []; const particles = [];
@@ -519,7 +392,7 @@
       else if (type === 'anar') { const mesh = new THREE.Mesh(new THREE.ConeGeometry(0.3,0.6,12), new THREE.MeshStandardMaterial({ color: 0xb45309 })); mesh.position.set(px,0.3,pz); scene.add(mesh); activeCrackers.push({ type: 'anar', mesh, life: 120 }); }
     };
     window.throwBomb = () => {
-      const forward = new THREE.Vector3(Math.sin(LocalPlayer.meshGroup.rotation.y), 0, Math.cos(LocalPlayer.meshGroup.rotation.y));
+      const forward = new THREE.Vector3(-Math.sin(CameraOrbit.theta), 0, -Math.cos(CameraOrbit.theta)).normalize();
       const origin = LocalPlayer.meshGroup.position;
       const bMesh = new THREE.Mesh(new THREE.SphereGeometry(0.22,12,12), new THREE.MeshStandardMaterial({ color:0x15803d })); bMesh.position.copy(origin); scene.add(bMesh);
       const cBody = new CANNON.Body({ mass: 1.2, shape: new CANNON.Sphere(0.22), position: new CANNON.Vec3(origin.x, origin.y+1.5, origin.z) });
@@ -542,21 +415,18 @@
     }
 
     /* =========================================================================
-       11. INPUT & INIT
+       10. INPUT & INIT
        ========================================================================= */
     const keys = {};
-    window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; if(e.key.toLowerCase()==='e'){ if(activeNearSpot) activeNearSpot.action(); } });
+    window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; if(e.key.toLowerCase()==='e' && activeNearSpot) activeNearSpot.action(); });
     window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
     let activeNearSpot = null;
 
     window.joinMela = function() {
-      const input = document.getElementById('username-input');
-      input.blur(); // Fix keyboard focus bug
-      LocalPlayer.name = input.value.trim() || ("Player" + Math.floor(Math.random() * 900 + 100));
+      document.getElementById('username-input').blur(); 
+      LocalPlayer.name = document.getElementById('username-input').value.trim() || ("Player" + Math.floor(Math.random() * 900 + 100));
       document.getElementById('display-name').innerText = LocalPlayer.name;
-      
-      document.getElementById('spawn-screen').style.display = 'none'; 
-      document.getElementById('cracker-action-bar').style.display = 'flex';
+      document.getElementById('spawn-screen').style.display = 'none'; document.getElementById('cracker-action-bar').style.display = 'flex';
 
       try {
         const audioMela = document.getElementById('audio-mela'); audioMela.volume = 0.3;
@@ -565,16 +435,14 @@
       } catch(err) {}
 
       const av = buildArticulatedAvatar(LocalPlayer.name); 
-      LocalPlayer.meshGroup = av.group; LocalPlayer.limbs = av.limbs;
-      scene.add(LocalPlayer.meshGroup);
+      LocalPlayer.meshGroup = av.group; LocalPlayer.limbs = av.limbs; scene.add(LocalPlayer.meshGroup);
 
-      LocalPlayer.body = new CANNON.Body({ mass: 15, shape: new CANNON.Sphere(0.6), position: new CANNON.Vec3(0, 1.5, 8), material: physMat, fixedRotation: true });
-      LocalPlayer.body.linearDamping = 0.9;
-      world.addBody(LocalPlayer.body);
+      LocalPlayer.body = new CANNON.Body({ mass: 15, shape: new CANNON.Sphere(0.5), position: new CANNON.Vec3(0, 1.5, 8), material: physMat, fixedRotation: true });
+      LocalPlayer.body.linearDamping = 0.9; world.addBody(LocalPlayer.body);
     };
 
     /* =========================================================================
-       12. ANIMATION LOOP
+       11. MAIN ANIMATION LOOP (3RD PERSON CAMERA & SPRINT)
        ========================================================================= */
     const clock = new THREE.Clock();
     function animate() {
@@ -585,12 +453,16 @@
       if (LocalPlayer.body && LocalPlayer.meshGroup) {
         if (LocalPlayer.currentRide === 'ferris') {
           const tGondola = ferrisGondolas[0].group; const wPos = new THREE.Vector3(); tGondola.getWorldPosition(wPos);
-          LocalPlayer.body.position.copy(wPos); LocalPlayer.body.position.y += 0.5;
-          LocalPlayer.meshGroup.position.copy(wPos); LocalPlayer.meshGroup.position.y -= 0.4; LocalPlayer.meshGroup.rotation.y = 0;
-        } else {
+          LocalPlayer.body.position.copy(wPos); LocalPlayer.body.position.y += 0.5; LocalPlayer.meshGroup.position.copy(wPos); LocalPlayer.meshGroup.position.y -= 0.4; LocalPlayer.meshGroup.rotation.y = 0;
+        } else if (LocalPlayer.currentGame !== 'balloons') {
+          
+          // 3rd Person Relative Movement
           let inputX = 0; let inputZ = 0;
           if (keys['w'] || keys['arrowup']) inputZ -= 1; if (keys['s'] || keys['arrowdown']) inputZ += 1;
           if (keys['a'] || keys['arrowleft']) inputX -= 1; if (keys['d'] || keys['arrowright']) inputX += 1;
+
+          // SPRINT LOGIC (Shift Key)
+          let speed = keys['shift'] ? 14.0 : 7.5;
 
           if (Math.hypot(inputX, inputZ) > 0.1) {
             LocalPlayer.body.wakeUp(); 
@@ -598,23 +470,23 @@
             const right = new THREE.Vector3(Math.cos(CameraOrbit.theta), 0, -Math.sin(CameraOrbit.theta)).normalize();
             const moveVec = new THREE.Vector3().addScaledVector(forward, -inputZ).addScaledVector(right, inputX).normalize();
             
-            LocalPlayer.body.velocity.x = moveVec.x * 7.5; LocalPlayer.body.velocity.z = moveVec.z * 7.5;
-            const targetRot = Math.atan2(moveVec.x, moveVec.z);
-            LocalPlayer.meshGroup.rotation.y = THREE.MathUtils.lerp(LocalPlayer.meshGroup.rotation.y, targetRot, 0.2);
+            LocalPlayer.body.velocity.x = moveVec.x * speed; LocalPlayer.body.velocity.z = moveVec.z * speed;
+            LocalPlayer.meshGroup.rotation.y = THREE.MathUtils.lerp(LocalPlayer.meshGroup.rotation.y, Math.atan2(moveVec.x, moveVec.z), 0.3);
 
-            LocalPlayer.walkCycle += 0.4;
+            // Faster animation if sprinting
+            LocalPlayer.walkCycle += keys['shift'] ? 0.6 : 0.4;
             const legSwing = Math.sin(LocalPlayer.walkCycle) * 0.7;
             LocalPlayer.limbs.legL.rotation.x = legSwing; LocalPlayer.limbs.legR.rotation.x = -legSwing;
             LocalPlayer.limbs.armL.rotation.x = -legSwing * 0.8; LocalPlayer.limbs.armR.rotation.x = legSwing * 0.8;
             LocalPlayer.limbs.torsoPivot.position.y = 1.45 + Math.abs(Math.sin(LocalPlayer.walkCycle * 2)) * 0.08;
-            LocalPlayer.limbs.torsoPivot.rotation.x = 0.15;
+            LocalPlayer.limbs.torsoPivot.rotation.x = keys['shift'] ? 0.25 : 0.15; // Lean more when running
           } else {
-            LocalPlayer.limbs.legL.rotation.x = THREE.MathUtils.lerp(LocalPlayer.limbs.legL.rotation.x, 0, 0.2); LocalPlayer.limbs.legR.rotation.x = THREE.MathUtils.lerp(LocalPlayer.limbs.legR.rotation.x, 0, 0.2);
-            LocalPlayer.limbs.armL.rotation.x = THREE.MathUtils.lerp(LocalPlayer.limbs.armL.rotation.x, 0, 0.2); LocalPlayer.limbs.armR.rotation.x = THREE.MathUtils.lerp(LocalPlayer.limbs.armR.rotation.x, 0, 0.2);
-            LocalPlayer.limbs.torsoPivot.rotation.x = THREE.MathUtils.lerp(LocalPlayer.limbs.torsoPivot.rotation.x, 0, 0.2); LocalPlayer.limbs.torsoPivot.position.y = 1.45;
+            LocalPlayer.limbs.legL.rotation.x *= 0.8; LocalPlayer.limbs.legR.rotation.x *= 0.8;
+            LocalPlayer.limbs.armL.rotation.x *= 0.8; LocalPlayer.limbs.armR.rotation.x *= 0.8;
+            LocalPlayer.limbs.torsoPivot.rotation.x *= 0.8; LocalPlayer.limbs.torsoPivot.position.y = 1.45;
           }
 
-          LocalPlayer.meshGroup.position.copy(LocalPlayer.body.position); LocalPlayer.meshGroup.position.y -= 0.6; 
+          LocalPlayer.meshGroup.position.copy(LocalPlayer.body.position); LocalPlayer.meshGroup.position.y -= 0.5; 
 
           let near = null; HOTSPOTS.forEach(h => { if (LocalPlayer.meshGroup.position.distanceTo(new THREE.Vector3(...h.pos)) <= h.range) near = h; });
           const prompt = document.getElementById('interaction-prompt');
@@ -622,14 +494,14 @@
           else { activeNearSpot = null; prompt.style.display = 'none'; }
           
           const distToTemple = LocalPlayer.meshGroup.position.distanceTo(templeGroup.position);
-          const aartiVol = Math.max(0, 1 - (distToTemple / 30));
-          document.getElementById('audio-aarti').volume = aartiVol * 0.8;
+          document.getElementById('audio-aarti').volume = Math.max(0, 1 - (distToTemple / 30)) * 0.8;
         }
 
+        // 3RD PERSON CAMERA FOLLOW (Orbit Angle)
         const camX = LocalPlayer.meshGroup.position.x + CameraOrbit.radius * Math.sin(CameraOrbit.phi) * Math.sin(CameraOrbit.theta);
         const camY = LocalPlayer.meshGroup.position.y + CameraOrbit.radius * Math.cos(CameraOrbit.phi);
         const camZ = LocalPlayer.meshGroup.position.z + CameraOrbit.radius * Math.sin(CameraOrbit.phi) * Math.cos(CameraOrbit.theta);
-        camera.position.set(camX, camY, camZ); camera.lookAt(LocalPlayer.meshGroup.position.x, LocalPlayer.meshGroup.position.y + 1.4, LocalPlayer.meshGroup.position.z);
+        camera.position.set(camX, camY, camZ); camera.lookAt(LocalPlayer.meshGroup.position.x, LocalPlayer.meshGroup.position.y + 1.0, LocalPlayer.meshGroup.position.z);
       }
       updateCrackerPhysics(); composer.render();
     }
