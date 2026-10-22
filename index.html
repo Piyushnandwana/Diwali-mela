@@ -3,45 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Shubh Diwali 3D Mela - Ultra Realistic Carnival</title>
+  <title>90s Nostalgia Diwali Mela</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; background: #05020c; touch-action: none; }
+    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; background: #020617; touch-action: none; }
     #canvas-container { width: 100vw; height: 100vh; display: block; position: absolute; inset: 0; }
     
-    /* HUD & UI Elements */
+    /* HUD */
     #hud {
       position: absolute; top: 16px; left: 16px; color: #ffdf79;
-      background: linear-gradient(135deg, rgba(30, 10, 45, 0.92), rgba(12, 4, 20, 0.95));
-      padding: 14px 20px; border-radius: 16px; border: 2px solid #ffd700;
-      box-shadow: 0 8px 30px rgba(255, 170, 0, 0.35); pointer-events: none; z-index: 20;
+      background: linear-gradient(135deg, rgba(30, 10, 20, 0.92), rgba(15, 5, 10, 0.95));
+      padding: 14px 20px; border-radius: 16px; border: 2px solid #d97706;
+      box-shadow: 0 8px 30px rgba(217, 119, 6, 0.35); pointer-events: none; z-index: 20;
     }
-    #hud h2 { margin: 0 0 4px 0; font-size: 17px; color: #ffe682; letter-spacing: 1px; }
+    #hud h2 { margin: 0 0 4px 0; font-size: 17px; color: #fde047; letter-spacing: 1px; }
     #hud p { margin: 2px 0; font-size: 13px; color: #fff; }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-weight: bold; background: #15803d; color: #bbf7d0; font-size: 11px; }
 
-    /* Action Bar (Crackers) */
+    /* Action Bar */
     #cracker-action-bar { position: absolute; bottom: 80px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 25; display: none; }
     .action-btn {
-      background: linear-gradient(135deg, #b91c1c, #ea580c); color: #fff; border: 2px solid #ffd700;
+      background: linear-gradient(135deg, #b91c1c, #ea580c); color: #fff; border: 2px solid #fde047;
       padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: transform 0.1s;
       box-shadow: 0 4px 15px rgba(234, 88, 12, 0.6); display: flex; align-items: center; justify-content: center; pointer-events: auto;
     }
     .action-btn:hover { transform: scale(1.06); background: linear-gradient(135deg, #ea580c, #f59e0b); }
     .action-btn.throw { background: linear-gradient(135deg, #4338ca, #6366f1); border-color: #a5b4fc; }
-
-    /* Mobile Joystick (Restored for Mobile Users) */
-    #mobile-controls {
-      position: absolute; bottom: 85px; left: 24px; width: 110px; height: 110px;
-      background: rgba(255, 255, 255, 0.12); border: 2px dashed rgba(255, 215, 0, 0.5);
-      border-radius: 50%; z-index: 20; display: none; touch-action: none;
-    }
-    #joystick-knob {
-      position: absolute; top: 32px; left: 32px; width: 46px; height: 46px;
-      background: radial-gradient(circle, #ff8533 0%, #b91c1c 100%);
-      border-radius: 50%; border: 2px solid #ffd700; box-shadow: 0 0 15px rgba(255, 120, 0, 0.8);
-      pointer-events: none;
-    }
 
     /* Crosshair for Shooting Game */
     #crosshair {
@@ -56,38 +43,36 @@
       position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%);
       background: linear-gradient(90deg, #b91c1c, #ea580c); color: #fff;
       padding: 10px 28px; font-size: 15px; font-weight: bold; border-radius: 30px;
-      display: none; border: 2px solid #ffea79; box-shadow: 0 0 25px rgba(234, 88, 12, 0.8);
+      display: none; border: 2px solid #fde047; box-shadow: 0 0 25px rgba(234, 88, 12, 0.8);
       z-index: 25; pointer-events: auto; cursor: pointer; animation: pulse 1.2s infinite alternate;
     }
     @keyframes pulse { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.06); } }
 
     #dismount-btn {
       position: absolute; top: 85px; right: 20px; background: linear-gradient(135deg, #b91c1c, #ef4444); color: #fff;
-      border: 2px solid #ffd700; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: bold; cursor: pointer; display: none; z-index: 30;
+      border: 2px solid #fde047; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: bold; cursor: pointer; display: none; z-index: 30;
     }
 
     /* Spawn / Entry Card */
     #spawn-screen {
-      position: absolute; inset: 0; background: radial-gradient(circle, rgba(22,9,38,0.98) 0%, rgba(5,2,10,1) 100%);
+      position: absolute; inset: 0; background: radial-gradient(circle, rgba(20,10,15,0.98) 0%, rgba(2,6,23,1) 100%);
       display: flex; justify-content: center; align-items: center; z-index: 200;
     }
     .spawn-card {
-      background: linear-gradient(145deg, #2a1440, #140722); border: 2px solid #ffd700;
+      background: linear-gradient(145deg, #381a1a, #1a0a0a); border: 2px solid #d97706;
       border-radius: 20px; padding: 30px 24px; width: 340px; text-align: center; color: #fff;
     }
-    .spawn-card input { width: 90%; padding: 10px; margin: 12px 0 18px 0; border-radius: 8px; border: 1px solid #ffd700; background: #0c0416; color: #fff; font-size: 15px; text-align: center; }
+    .spawn-card input { width: 90%; padding: 10px; margin: 12px 0 18px 0; border-radius: 8px; border: 1px solid #d97706; background: #000; color: #fff; font-size: 15px; text-align: center; }
     .spawn-card button { background: linear-gradient(45deg, #ea580c, #f59e0b); color: #fff; border: none; padding: 11px 22px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 95%; }
 
     /* Modals */
     .modal {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background: #1c0e30; color: #fff; border: 2px solid #ffd700; padding: 22px; border-radius: 16px; display: none; z-index: 100; min-width: 320px; text-align: center;
+      background: #271212; color: #fff; border: 2px solid #d97706; padding: 22px; border-radius: 16px; display: none; z-index: 100; min-width: 320px; text-align: center;
     }
     .modal button { background: #ea580c; color: #fff; border: none; padding: 9px 16px; margin: 5px 4px; border-radius: 8px; cursor: pointer; font-weight: bold; }
     .modal button:hover { background: #f59e0b; color: #000; }
     .close-modal { background: #4b5563 !important; }
-
-    /* Audio Enable Notice */
     #audio-notice { font-size: 11px; color: #86efac; margin-top: 10px; }
   </style>
 
@@ -113,26 +98,21 @@
     <source src="https://cdn.pixabay.com/download/audio/2021/10/25/audio_24e07ea37a.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Mobile Movement Joystick -->
-  <div id="mobile-controls">
-    <div id="joystick-knob"></div>
-  </div>
-
   <div id="spawn-screen">
     <div class="spawn-card">
-      <h2 style="color: #ffd700; margin-top: 0;">🪔 Grand Diwali Mela</h2>
-      <p style="font-size: 13px; color: #d1d5db;">Talk to shopkeepers, play games, ride jhoola, and burn physics crackers!</p>
+      <h2 style="color: #fde047; margin-top: 0;">🪔 90s Village Mela</h2>
+      <p style="font-size: 13px; color: #d1d5db;">Experience the nostalgia. Muddy grounds, wooden jhoolas, and glowing tents!</p>
       <input type="text" id="username-input" placeholder="Enter Your Name" maxlength="14" />
-      <button onclick="window.joinMela()">Enter Grand Mela ✨</button>
-      <div id="audio-notice">🔊 Keep volume up for ambient sounds & voices!</div>
+      <button onclick="window.joinMela()">Enter the 90s Mela ✨</button>
+      <div id="audio-notice">🔊 Keep volume up for shopkeeper voices!</div>
     </div>
   </div>
 
   <div id="hud">
-    <h2>🪔 SHUBH DIWALI MELA</h2>
+    <h2>🪔 90s VILLAGE MELA</h2>
     <p>👤 Player: <b id="display-name">-</b></p>
     <p>🪙 Coins: <span id="coin-count">100</span></p>
-    <p>🎡 Ride State: <b id="ride-state" style="color:#ffd700;">On Foot</b></p>
+    <p>🎡 Ride State: <b id="ride-state" style="color:#fde047;">On Foot</b></p>
   </div>
 
   <div id="cracker-action-bar">
@@ -145,7 +125,7 @@
   <div id="interaction-prompt">Press [E] to Interact</div>
 
   <div id="action-modal" class="modal">
-    <h3 id="modal-title" style="color:#ffd700; margin-top:0;">Action</h3>
+    <h3 id="modal-title" style="color:#fde047; margin-top:0;">Action</h3>
     <div id="modal-body"></div>
     <br><button class="close-modal" onclick="closeModal()">Close</button>
   </div>
@@ -164,12 +144,11 @@
     }
 
     /* =========================================================================
-       2. CANNON-ES PHYSICS WORLD & COLLISIONS (Zero Friction Base)
+       2. CANNON-ES PHYSICS WORLD & COLLISIONS
        ========================================================================= */
     const world = new CANNON.World();
     world.gravity.set(0, -15, 0); 
     
-    // Frictionless material so player glides smoothly
     const physMat = new CANNON.Material("standard");
     const contactMat = new CANNON.ContactMaterial(physMat, physMat, { friction: 0.0, restitution: 0.0 });
     world.addContactMaterial(contactMat);
@@ -183,17 +162,17 @@
       const body = new CANNON.Body({ mass: 0, shape: shape, position: new CANNON.Vec3(x, 2.5, z) });
       world.addBody(body);
     }
-    // Solid Walls for Shops & Temple
-    addStaticCollider(-20, -5, 6, 4); // Patakha shop
-    addStaticCollider(20, -5, 6, 4); // Mithai shop
-    addStaticCollider(0, -24, 14, 10); // Temple
-    addStaticCollider(26, 15, 10, 10); // Ferris Wheel base
+    addStaticCollider(-20, -5, 6, 4); 
+    addStaticCollider(20, -5, 6, 4); 
+    addStaticCollider(0, -24, 14, 10); 
+    addStaticCollider(26, 15, 10, 10); 
 
     /* =========================================================================
-       3. THREE.JS SCENE SETUP
+       3. THREE.JS SCENE SETUP & BLOOM (90s Warm Night Look)
        ========================================================================= */
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x060210, 0.012);
+    // Deep blue night fog
+    scene.fog = new THREE.FogExp2(0x0a1128, 0.015);
 
     const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
@@ -203,13 +182,25 @@
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
     const renderScene = new THREE.RenderPass(scene, camera);
-    const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.2, 0.4, 0.85);
+    const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.3, 0.5, 0.8);
     const composer = new THREE.EffectComposer(renderer);
     composer.addPass(renderScene); composer.addPass(bloomPass);
 
-    scene.add(new THREE.AmbientLight(0x381f4a, 1.4));
-    const moon = new THREE.DirectionalLight(0x758bb8, 0.7);
-    moon.position.set(30, 60, 30); moon.castShadow = true; scene.add(moon);
+    // Warm ambient light for dusty look
+    scene.add(new THREE.AmbientLight(0x2a1a1a, 1.2));
+    const moonLight = new THREE.DirectionalLight(0x7c93c4, 0.6);
+    moonLight.position.set(0, 80, -100); moonLight.castShadow = true; scene.add(moonLight);
+
+    /* --- GIANT 90s MOON --- */
+    const moonGeo = new THREE.SphereGeometry(12, 32, 32);
+    const moonMat = new THREE.MeshBasicMaterial({ color: 0xfffbea });
+    const giantMoon = new THREE.Mesh(moonGeo, moonMat);
+    giantMoon.position.set(0, 75, -120);
+    scene.add(giantMoon);
+    // Moon Glow
+    const moonGlow = new THREE.PointLight(0x7c93c4, 2, 200);
+    moonGlow.position.set(0, 70, -110);
+    scene.add(moonGlow);
 
     /* =========================================================================
        4. ORBIT CAMERA RIG
@@ -220,12 +211,9 @@
 
     const container = document.getElementById('canvas-container');
     container.addEventListener('pointerdown', (e) => {
-      // Prevent drag if touching UI elements or Joystick
-      if (e.target.closest('#hud') || e.target.closest('#cracker-action-bar') || e.target.closest('#mobile-controls') || e.target.closest('#dismount-btn')) return;
-      
+      if (e.target.closest('#hud') || e.target.closest('#cracker-action-bar') || e.target.closest('#dismount-btn')) return;
       if (LocalPlayer.currentGame === 'balloons') {
-        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1; mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(targetBalloons);
         if (intersects.length > 0) popBalloon(intersects[0].object);
@@ -245,14 +233,43 @@
     window.addEventListener('wheel', (e) => { CameraOrbit.radius = Math.max(7, Math.min(32, CameraOrbit.radius + e.deltaY * 0.02)); }, { passive: true });
 
     /* =========================================================================
-       5. FESTIVE ENVIRONMENT
+       5. RUSTIC DUSTY GROUND & PATHS
        ========================================================================= */
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshStandardMaterial({ color: 0x160c22, roughness: 0.9 }));
+    // Muddy/Dusty Ground
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshStandardMaterial({ color: 0x3d2314, roughness: 1.0 }));
     ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
     
-    const pathMat = new THREE.MeshStandardMaterial({ color: 0x421d28, roughness: 0.7 });
-    const mainPath = new THREE.Mesh(new THREE.PlaneGeometry(14, 120), pathMat); mainPath.rotation.x = -Math.PI / 2; mainPath.position.y = 0.02; scene.add(mainPath);
-    const crossPath = new THREE.Mesh(new THREE.PlaneGeometry(120, 14), pathMat); crossPath.rotation.x = -Math.PI / 2; crossPath.position.y = 0.02; scene.add(crossPath);
+    // Sandy path
+    const pathMat = new THREE.MeshStandardMaterial({ color: 0x543822, roughness: 1.0 });
+    const mainPath = new THREE.Mesh(new THREE.PlaneGeometry(16, 120), pathMat); mainPath.rotation.x = -Math.PI / 2; mainPath.position.y = 0.02; scene.add(mainPath);
+    const crossPath = new THREE.Mesh(new THREE.PlaneGeometry(120, 16), pathMat); crossPath.rotation.x = -Math.PI / 2; crossPath.position.y = 0.02; scene.add(crossPath);
+
+    /* --- OVERHEAD WARM STRING LIGHTS (90s Vibe) --- */
+    function createStringLights(startX, startZ, endX, endZ) {
+      const points = [];
+      const dist = Math.hypot(endX - startX, endZ - startZ);
+      for(let i=0; i<=10; i++) {
+        const t = i/10;
+        const x = startX + (endX - startX) * t;
+        const z = startZ + (endZ - startZ) * t;
+        const y = 7 - Math.sin(t * Math.PI) * 1.5; // sagging wire
+        points.push(new THREE.Vector3(x, y, z));
+        
+        if (i > 0 && i < 10) {
+          // Add glowing bulbs
+          const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffdd44 }));
+          bulb.position.set(x, y, z);
+          scene.add(bulb);
+        }
+      }
+      const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+      const lineMat = new THREE.LineBasicMaterial({ color: 0x111111 });
+      scene.add(new THREE.Line(lineGeo, lineMat));
+    }
+    createStringLights(-20, 15, 20, 15);
+    createStringLights(-20, -5, 20, -5);
+    createStringLights(-20, 15, -20, -5);
+    createStringLights(20, 15, 20, -5);
 
     /* =========================================================================
        6. LAKSHMI-GANESHA TEMPLE
@@ -260,15 +277,18 @@
     const templeGroup = new THREE.Group();
     templeGroup.position.set(0, 0, -24);
     
-    const plinth = new THREE.Mesh(new THREE.BoxGeometry(16, 1.2, 10), new THREE.MeshStandardMaterial({ color: 0xf5f3ef, roughness: 0.2 }));
+    // Rustic Stone Plinth
+    const plinth = new THREE.Mesh(new THREE.BoxGeometry(16, 1.2, 10), new THREE.MeshStandardMaterial({ color: 0x8b7d6b, roughness: 0.8 }));
     plinth.position.y = 0.6; templeGroup.add(plinth);
 
-    const pMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.8, roughness: 0.2 });
+    const pMat = new THREE.MeshStandardMaterial({ color: 0x8b4513, roughness: 0.9 }); // Wooden Pillars
     for (let x of [-6, 6]) { for (let z of [-3.5, 3.5]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.38, 6), pMat); p.position.set(x, 3.6, z); templeGroup.add(p); } }
-    const dome = new THREE.Mesh(new THREE.ConeGeometry(6.5, 5.5, 8), new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.3 }));
+    
+    // Terracotta Dome
+    const dome = new THREE.Mesh(new THREE.ConeGeometry(6.5, 5.5, 8), new THREE.MeshStandardMaterial({ color: 0xa0522d, roughness: 0.9 }));
     dome.position.y = 9; templeGroup.add(dome);
 
-    const idolMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.85, roughness: 0.15 });
+    const idolMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, metalness: 0.5, roughness: 0.5 }); // Aged Gold
     
     // LAKSHMI IDOL
     const lakshmiGroup = new THREE.Group(); lakshmiGroup.position.set(-2, 2.2, -1);
@@ -283,11 +303,12 @@
     const haloG = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.08, 12, 32), new THREE.MeshBasicMaterial({ color: 0xffea00 })); haloG.position.set(0, 1.0, -0.2); ganeshaGroup.add(haloG);
     templeGroup.add(ganeshaGroup);
 
-    const mandirLight = new THREE.PointLight(0xffb700, 4, 25); mandirLight.position.set(0, 4, 0); templeGroup.add(mandirLight);
+    // Warm Temple Oil Lamp Glow
+    const mandirLight = new THREE.PointLight(0xff7700, 4, 30); mandirLight.position.set(0, 4, 0); templeGroup.add(mandirLight);
     scene.add(templeGroup);
 
     /* =========================================================================
-       7. SHOPS (Patakha, Mithai, Lantern, Rangoli)
+       7. WOODEN SHOPS & STRIPED TENT AWNINGS (PANDAAL)
        ========================================================================= */
     function createBanner(text, bgCol) {
       const c = document.createElement('canvas'); c.width = 512; c.height = 128; const ctx = c.getContext('2d');
@@ -296,46 +317,92 @@
       return new THREE.CanvasTexture(c);
     }
 
-    const patakhaShop = new THREE.Group(); patakhaShop.position.set(-20, 0, -5);
-    const pCanopy = new THREE.Mesh(new THREE.ConeGeometry(4.5, 2.2, 4), new THREE.MeshStandardMaterial({ color: 0xd97706 })); pCanopy.position.y = 5.2; pCanopy.rotation.y = Math.PI/4; patakhaShop.add(pCanopy);
-    const pDesk = new THREE.Mesh(new THREE.BoxGeometry(5.5, 1.4, 1.8), new THREE.MeshStandardMaterial({ color: 0x78350f })); pDesk.position.set(0, 0.7, 1.2); patakhaShop.add(pDesk);
-    const pBanner = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshBasicMaterial({ map: createBanner("🎆 Patakha Bhandar", '#991b1b'), transparent: true })); pBanner.position.set(0, 6.2, 0); patakhaShop.add(pBanner);
-    scene.add(patakhaShop);
+    // Procedural Striped Cloth Texture
+    function createStripedTent(color1, color2) {
+      const c = document.createElement('canvas'); c.width = 256; c.height = 256; const ctx = c.getContext('2d');
+      for(let i=0; i<256; i+=32) { ctx.fillStyle = (i/32)%2===0 ? color1 : color2; ctx.fillRect(i, 0, 32, 256); }
+      return new THREE.CanvasTexture(c);
+    }
 
-    const mithaiShop = new THREE.Group(); mithaiShop.position.set(20, 0, -5);
-    const mCanopy = new THREE.Mesh(new THREE.ConeGeometry(4.5, 2.2, 4), new THREE.MeshStandardMaterial({ color: 0xb91c1c })); mCanopy.position.y = 5.2; mCanopy.rotation.y = Math.PI/4; mithaiShop.add(mCanopy);
-    const mDesk = new THREE.Mesh(new THREE.BoxGeometry(5.5, 1.4, 1.8), new THREE.MeshStandardMaterial({ color: 0x78350f })); mDesk.position.set(0, 0.7, 1.2); mithaiShop.add(mDesk);
-    const mBanner = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshBasicMaterial({ map: createBanner("🍬 Bikaner Mithai", '#7c2d12'), transparent: true })); mBanner.position.set(0, 6.2, 0); mithaiShop.add(mBanner);
-    scene.add(mithaiShop);
+    function buildRusticShop(x, z, name, color1, color2) {
+      const shop = new THREE.Group(); shop.position.set(x, 0, z);
+      const woodMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 1.0 });
+      
+      // Wooden Poles
+      for (let px of [-2.5, 2.5]) { for (let pz of [-1.5, 1.5]) { const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4), woodMat); pole.position.set(px, 2, pz); shop.add(pole); } }
+      
+      // Slanted Cloth Awning
+      const tentMat = new THREE.MeshStandardMaterial({ map: createStripedTent(color1, color2), roughness: 0.9, side: THREE.DoubleSide });
+      const awning = new THREE.Mesh(new THREE.PlaneGeometry(6, 4.5), tentMat);
+      awning.position.set(0, 4.5, 0); awning.rotation.x = -Math.PI / 2.5; shop.add(awning);
 
-    const lanternStation = new THREE.Group(); lanternStation.position.set(-20, 0, 15);
-    const lDesk = new THREE.Mesh(new THREE.BoxGeometry(5.5, 1.4, 1.8), new THREE.MeshStandardMaterial({ color: 0x0f766e })); lDesk.position.set(0, 0.7, 1.2); lanternStation.add(lDesk);
-    const lBanner = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshBasicMaterial({ map: createBanner("🏮 Fly Sky Lantern", '#0f766e'), transparent: true })); lBanner.position.set(0, 6.2, 0); lanternStation.add(lBanner);
-    scene.add(lanternStation);
+      // Wooden Desk
+      const desk = new THREE.Mesh(new THREE.BoxGeometry(5.5, 1.2, 1.8), woodMat); desk.position.set(0, 0.6, 1.0); shop.add(desk);
+      
+      // Hanging Bulb
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffdd44 })); bulb.position.set(0, 3.5, 0); shop.add(bulb);
+      const light = new THREE.PointLight(0xff9900, 2, 15); light.position.set(0, 3.5, 0); shop.add(light);
 
-    const rangoliZone = new THREE.Group(); rangoliZone.position.set(20, 0, 15);
-    const rBanner = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshBasicMaterial({ map: createBanner("🎨 Rangoli Competition", '#6b21a8'), transparent: true })); rBanner.position.set(0, 4, 0); rangoliZone.add(rBanner);
-    const rFloor = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 })); rFloor.rotation.x = -Math.PI/2; rFloor.position.y = 0.05; rangoliZone.add(rFloor);
-    scene.add(rangoliZone);
+      const banner = new THREE.Mesh(new THREE.PlaneGeometry(5, 1.2), new THREE.MeshBasicMaterial({ map: createBanner(name, '#4a0000'), transparent: true }));
+      banner.position.set(0, 5.5, 1); shop.add(banner);
+
+      // Shopkeeper
+      const npc = new THREE.Group();
+      const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 0.9, 12), new THREE.MeshStandardMaterial({ color: 0x8b0000 })); torso.position.y = 0.45; npc.add(torso);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), new THREE.MeshStandardMaterial({ color: 0xdfa07a })); head.position.y = 1.1; npc.add(head);
+      npc.position.set(0, 0.2, -0.5); shop.add(npc);
+
+      scene.add(shop);
+      return shop;
+    }
+
+    buildRusticShop(-20, -5, "🎆 Patakha Bhandar", '#b91c1c', '#fef08a');
+    buildRusticShop(20, -5, "🍬 Bikaner Mithai", '#047857', '#fef08a');
+    buildRusticShop(-20, 15, "🎈 Balloon Shoot", '#1d4ed8', '#fef08a');
+    buildRusticShop(20, 15, "🏮 Sky Lanterns", '#b45309', '#fef08a');
+
+    // Add Targets for Balloon Shoot
+    const targetBalloons = [];
+    function respawnBalloons() {
+      targetBalloons.forEach(b => scene.remove(b)); targetBalloons.length = 0;
+      const bColors = [0xef4444, 0x3b82f6, 0x10b981, 0xf59e0b];
+      for(let bx = -22; bx <= -18; bx += 1) {
+        for(let by = 1.5; by <= 3.5; by += 1) {
+          const balloon = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), new THREE.MeshStandardMaterial({ color: bColors[Math.floor(Math.random()*bColors.length)], roughness: 0.2 }));
+          balloon.position.set(bx, by, 14.5); scene.add(balloon); targetBalloons.push(balloon);
+        }
+      }
+    }
+    respawnBalloons();
+
+    function popBalloon(balloonMesh) {
+      scene.remove(balloonMesh);
+      const index = targetBalloons.indexOf(balloonMesh); if (index > -1) targetBalloons.splice(index, 1);
+      spawnSparks(new THREE.Vector3().copy(balloonMesh.getWorldPosition(new THREE.Vector3())), 10, 0xffffff, 0.1);
+      LocalPlayer.coins += 5; document.getElementById('coin-count').innerText = LocalPlayer.coins;
+      if (targetBalloons.length === 0) { speakHindi("Wah bhaiya! Ye lo pachas extra coin!"); LocalPlayer.coins += 50; document.getElementById('coin-count').innerText = LocalPlayer.coins; setTimeout(respawnBalloons, 2000); }
+    }
 
     /* =========================================================================
-       8. FERRIS WHEEL (JHOOLA)
+       8. WOODEN RUSTIC FERRIS WHEEL (JHOOLA)
        ========================================================================= */
     const ferrisGroup = new THREE.Group(); ferrisGroup.position.set(26, 0, 25);
-    const supportMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8 });
-    const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.25, 16), supportMat); leg1.position.set(-2, 8, -2); leg1.rotation.z = -0.15; ferrisGroup.add(leg1);
-    const leg2 = leg1.clone(); leg2.position.x = 2; leg2.rotation.z = 0.15; ferrisGroup.add(leg2);
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x4a2e15, roughness: 1.0 }); // Rustic Wood
+    
+    // Wooden A-Frame Legs
+    const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 16), woodMat); leg1.position.set(-2.5, 8, -2.5); leg1.rotation.z = -0.2; ferrisGroup.add(leg1);
+    const leg2 = leg1.clone(); leg2.position.x = 2.5; leg2.rotation.z = 0.2; ferrisGroup.add(leg2);
 
     const wheelRotator = new THREE.Group(); wheelRotator.position.set(0, 13.5, 0);
-    const outerRing = new THREE.Mesh(new THREE.TorusGeometry(8, 0.16, 12, 32), new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xff8800 })); wheelRotator.add(outerRing);
+    const outerRing = new THREE.Mesh(new THREE.TorusGeometry(8, 0.2, 12, 32), woodMat); wheelRotator.add(outerRing);
 
     const ferrisGondolas = [];
-    const fairyColors = [0xff2200, 0xffd700, 0x00ffcc, 0xff00aa, 0x00ff44];
+    const gondolaMat = new THREE.MeshStandardMaterial({ color: 0x8b4513, roughness: 0.9 });
     for (let i = 0; i < 8; i++) {
       const rad = (i * Math.PI * 2) / 8;
-      const spoke = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 16), supportMat); spoke.rotation.z = rad; wheelRotator.add(spoke);
+      const spoke = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 16), woodMat); spoke.rotation.z = rad; wheelRotator.add(spoke);
       const podGroup = new THREE.Group(); podGroup.position.set(Math.cos(rad) * 8, Math.sin(rad) * 8, 0);
-      const podMesh = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.6), new THREE.MeshStandardMaterial({ color: fairyColors[i % fairyColors.length] }));
+      const podMesh = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.6), gondolaMat); // Wooden gondolas
       podGroup.add(podMesh); wheelRotator.add(podGroup); ferrisGondolas.push({ group: podGroup });
     }
     ferrisGroup.add(wheelRotator); scene.add(ferrisGroup);
@@ -359,13 +426,13 @@
     function buildArticulatedAvatar(name) {
       const group = new THREE.Group(); const limbs = {};
       const skinMat = new THREE.MeshStandardMaterial({ color: 0xdfa07a, roughness: 0.6 });
-      const kurtaMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.4 });
-      const pyjamaMat = new THREE.MeshStandardMaterial({ color: 0xfdfcf7, roughness: 0.6 });
+      const kurtaMat = new THREE.MeshStandardMaterial({ color: 0xca8a04, roughness: 0.8 }); // Earthy yellow Kurta
+      const pyjamaMat = new THREE.MeshStandardMaterial({ color: 0xfdfcf7, roughness: 0.8 });
 
       const torsoPivot = new THREE.Group(); torsoPivot.position.y = 1.45; group.add(torsoPivot);
       const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 1.28, 16), kurtaMat); torso.castShadow = true; torsoPivot.add(torso); limbs.torsoPivot = torsoPivot;
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.26, 16, 16), skinMat); head.position.y = 0.8; torsoPivot.add(head);
-      const pagri = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.12, 12, 24), new THREE.MeshStandardMaterial({ color: 0xdc2626 })); pagri.position.y = 1.0; pagri.rotation.x = Math.PI/2; torsoPivot.add(pagri);
+      const pagri = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.12, 12, 24), new THREE.MeshStandardMaterial({ color: 0xb91c1c })); pagri.position.y = 1.0; pagri.rotation.x = Math.PI/2; torsoPivot.add(pagri);
 
       function createArm(isLeft) { const pivot = new THREE.Group(); pivot.position.set(isLeft?-0.48:0.48, 0.45, 0); const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.08, 0.72, 12), kurtaMat); arm.position.y = -0.36; pivot.add(arm); torsoPivot.add(pivot); return pivot; }
       limbs.armL = createArm(true); limbs.armR = createArm(false);
@@ -382,9 +449,9 @@
     const HOTSPOTS = [
       { id: "patakha_shop", name: "🎆 Patakha Wala", pos: [-20, 0, -4.5], range: 6.0, action: () => showCrackerModal() },
       { id: "mithai_shop", name: "🍬 Mithai Wala", pos: [20, 0, -4.5], range: 6.0, action: () => showMithaiModal() },
-      { id: "ferris_ride", name: "🎡 Ride Jhoola (10 Coins)", pos: [26, 0, 25], range: 6.0, action: () => boardFerrisWheel() },
-      { id: "lantern_shop", name: "🏮 Fly Sky Lantern", pos: [-20, 0, 15], range: 6.0, action: () => showLanternModal() },
-      { id: "rangoli_zone", name: "🎨 Rangoli Competition", pos: [20, 0, 15], range: 6.0, action: () => showRangoliModal() },
+      { id: "ferris_ride", name: "🎡 Ride Wooden Jhoola (10 Coins)", pos: [26, 0, 25], range: 6.0, action: () => boardFerrisWheel() },
+      { id: "balloon_game", name: "🎈 Play Balloon Shooting", pos: [-20, 0, 15], range: 6.0, action: () => window.startBalloonGame() },
+      { id: "lantern_shop", name: "🏮 Fly Sky Lantern", pos: [20, 0, 15], range: 6.0, action: () => showLanternModal() },
       { id: "temple_aarti", name: "🪔 Mandir Aarti", pos: [0, 0, -24], range: 7.0, action: () => startAartiRitual() }
     ];
 
@@ -404,11 +471,7 @@
     }
     function showLanternModal() {
       speakHindi("Ek lalteen aasmaan mein chodiye, wishes puri hongi.");
-      openModal("🏮 Fly Sky Lantern", `<button onclick="launchLantern(); closeModal();">✨ Release Lantern into Sky</button>`);
-    }
-    function showRangoliModal() {
-      speakHindi("Aao bhaiya, rangoli banao aur prize jeeto.");
-      openModal("🎨 Rangoli Competition", `<p>Draw your rangoli on the canvas!</p><button onclick="alert('Drawing tool activated! (Coming Soon)'); closeModal();">✏️ Draw Rangoli</button><button onclick="alert('You voted for Design 1'); closeModal();">👍 Vote for Best</button>`);
+      openModal("🏮 Fly Sky Lantern", `<button onclick="window.launchLantern(); closeModal();">✨ Release Lantern into Sky</button>`);
     }
 
     window.launchLantern = () => {
@@ -428,9 +491,17 @@
         speakHindi("Chalo baitho aaram se."); LocalPlayer.currentRide = 'ferris'; document.getElementById('dismount-btn').style.display = 'block'; closeModal();
       } else { speakHindi("Arre bhaiya, paise toh poore do."); alert("Not enough coins!"); closeModal(); }
     };
+    window.startBalloonGame = () => {
+      speakHindi("Aao bhaiya, nishana lagao!"); LocalPlayer.currentGame = 'balloons';
+      document.getElementById('crosshair').style.display = 'block'; document.getElementById('dismount-btn').innerText = "Exit Game"; document.getElementById('dismount-btn').style.display = 'block';
+    };
     window.dismountCurrentRide = () => {
-      LocalPlayer.currentRide = null; document.getElementById('dismount-btn').style.display = 'none';
-      LocalPlayer.body.position.set(26, 1.5, 18); // Dismount safe zone
+      if (LocalPlayer.currentRide === 'ferris') {
+        LocalPlayer.meshGroup.position.set(26, 0, 18); LocalPlayer.currentRide = null; document.getElementById('ride-state').innerText = "On Foot";
+        LocalPlayer.limbs.legL.rotation.x = 0; LocalPlayer.limbs.legR.rotation.x = 0;
+      }
+      if (LocalPlayer.currentGame === 'balloons') { LocalPlayer.currentGame = null; document.getElementById('crosshair').style.display = 'none'; }
+      document.getElementById('dismount-btn').style.display = 'none'; document.getElementById('dismount-btn').innerText = "🚪 Dismount Ride (Exit Jhoola)";
     };
     window.startAartiRitual = () => {
       speakHindi("Jai Maa Lakshmi. Jai Shri Ganesh."); LocalPlayer.coins += 25; document.getElementById('coin-count').innerText = LocalPlayer.coins; alert("Aarti Performed! Blessed with 25 Coins.");
@@ -471,34 +542,7 @@
     }
 
     /* =========================================================================
-       12. MOBILE JOYSTICK (Restored)
-       ========================================================================= */
-    const joystick = { active: false, dx: 0, dy: 0, originX: 0, originY: 0 };
-    const joyContainer = document.getElementById('mobile-controls');
-    const joyKnob = document.getElementById('joystick-knob');
-
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) { joyContainer.style.display = 'block'; }
-
-    joyContainer.addEventListener('pointerdown', (e) => {
-      joystick.active = true;
-      const rect = joyContainer.getBoundingClientRect();
-      joystick.originX = rect.left + rect.width / 2; joystick.originY = rect.top + rect.height / 2;
-      joyContainer.setPointerCapture(e.pointerId);
-    });
-
-    joyContainer.addEventListener('pointermove', (e) => {
-      if (!joystick.active) return;
-      const dx = e.clientX - joystick.originX; const dy = e.clientY - joystick.originY;
-      const dist = Math.min(38, Math.hypot(dx, dy)); const angle = Math.atan2(dy, dx);
-      joystick.dx = (Math.cos(angle) * dist) / 38; joystick.dy = (Math.sin(angle) * dist) / 38;
-      joyKnob.style.transform = `translate(${joystick.dx * 35}px, ${joystick.dy * 35}px)`;
-    });
-
-    const resetJoystick = () => { joystick.active = false; joystick.dx = 0; joystick.dy = 0; joyKnob.style.transform = `translate(0px, 0px)`; };
-    joyContainer.addEventListener('pointerup', resetJoystick); joyContainer.addEventListener('pointercancel', resetJoystick);
-
-    /* =========================================================================
-       13. INPUT & INIT
+       11. INPUT & INIT
        ========================================================================= */
     const keys = {};
     window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; if(e.key.toLowerCase()==='e'){ if(activeNearSpot) activeNearSpot.action(); } });
@@ -506,9 +550,8 @@
     let activeNearSpot = null;
 
     window.joinMela = function() {
-      // 1. CLEAR FOCUS SO KEYBOARD WORKS!
       const input = document.getElementById('username-input');
-      input.blur(); 
+      input.blur(); // Fix keyboard focus bug
       LocalPlayer.name = input.value.trim() || ("Player" + Math.floor(Math.random() * 900 + 100));
       document.getElementById('display-name').innerText = LocalPlayer.name;
       
@@ -525,20 +568,13 @@
       LocalPlayer.meshGroup = av.group; LocalPlayer.limbs = av.limbs;
       scene.add(LocalPlayer.meshGroup);
 
-      // PERFECT SPHERE PHYSICS BODY (Glides smoothly, no sticking)
-      LocalPlayer.body = new CANNON.Body({
-        mass: 15,
-        shape: new CANNON.Sphere(0.6), // Radius 0.6
-        position: new CANNON.Vec3(0, 1.5, 8),
-        material: physMat,
-        fixedRotation: true
-      });
+      LocalPlayer.body = new CANNON.Body({ mass: 15, shape: new CANNON.Sphere(0.6), position: new CANNON.Vec3(0, 1.5, 8), material: physMat, fixedRotation: true });
       LocalPlayer.body.linearDamping = 0.9;
       world.addBody(LocalPlayer.body);
     };
 
     /* =========================================================================
-       14. ANIMATION LOOP
+       12. ANIMATION LOOP
        ========================================================================= */
     const clock = new THREE.Clock();
     function animate() {
@@ -552,24 +588,17 @@
           LocalPlayer.body.position.copy(wPos); LocalPlayer.body.position.y += 0.5;
           LocalPlayer.meshGroup.position.copy(wPos); LocalPlayer.meshGroup.position.y -= 0.4; LocalPlayer.meshGroup.rotation.y = 0;
         } else {
-          // Input parsing
           let inputX = 0; let inputZ = 0;
           if (keys['w'] || keys['arrowup']) inputZ -= 1; if (keys['s'] || keys['arrowdown']) inputZ += 1;
           if (keys['a'] || keys['arrowleft']) inputX -= 1; if (keys['d'] || keys['arrowright']) inputX += 1;
 
-          if (joystick.active) { inputX += joystick.dx; inputZ += joystick.dy; }
-
           if (Math.hypot(inputX, inputZ) > 0.1) {
-            LocalPlayer.body.wakeUp(); // IMPORTANT: Prevent body from sleeping
-
+            LocalPlayer.body.wakeUp(); 
             const forward = new THREE.Vector3(-Math.sin(CameraOrbit.theta), 0, -Math.cos(CameraOrbit.theta)).normalize();
             const right = new THREE.Vector3(Math.cos(CameraOrbit.theta), 0, -Math.sin(CameraOrbit.theta)).normalize();
             const moveVec = new THREE.Vector3().addScaledVector(forward, -inputZ).addScaledVector(right, inputX).normalize();
             
-            // Set velocity manually
-            LocalPlayer.body.velocity.x = moveVec.x * 7.5;
-            LocalPlayer.body.velocity.z = moveVec.z * 7.5;
-
+            LocalPlayer.body.velocity.x = moveVec.x * 7.5; LocalPlayer.body.velocity.z = moveVec.z * 7.5;
             const targetRot = Math.atan2(moveVec.x, moveVec.z);
             LocalPlayer.meshGroup.rotation.y = THREE.MathUtils.lerp(LocalPlayer.meshGroup.rotation.y, targetRot, 0.2);
 
@@ -585,17 +614,13 @@
             LocalPlayer.limbs.torsoPivot.rotation.x = THREE.MathUtils.lerp(LocalPlayer.limbs.torsoPivot.rotation.x, 0, 0.2); LocalPlayer.limbs.torsoPivot.position.y = 1.45;
           }
 
-          // Fix Mesh Offset: Sphere is radius 0.6, so lower mesh by 0.6 to plant feet on ground
-          LocalPlayer.meshGroup.position.copy(LocalPlayer.body.position);
-          LocalPlayer.meshGroup.position.y -= 0.6; 
+          LocalPlayer.meshGroup.position.copy(LocalPlayer.body.position); LocalPlayer.meshGroup.position.y -= 0.6; 
 
-          // Hotspots Check
           let near = null; HOTSPOTS.forEach(h => { if (LocalPlayer.meshGroup.position.distanceTo(new THREE.Vector3(...h.pos)) <= h.range) near = h; });
           const prompt = document.getElementById('interaction-prompt');
           if (near) { activeNearSpot = near; prompt.style.display = 'block'; prompt.innerText = `Press [E] for ${near.name}`; }
           else { activeNearSpot = null; prompt.style.display = 'none'; }
           
-          // Dynamic Aarti Audio
           const distToTemple = LocalPlayer.meshGroup.position.distanceTo(templeGroup.position);
           const aartiVol = Math.max(0, 1 - (distToTemple / 30));
           document.getElementById('audio-aarti').volume = aartiVol * 0.8;
@@ -606,7 +631,6 @@
         const camZ = LocalPlayer.meshGroup.position.z + CameraOrbit.radius * Math.sin(CameraOrbit.phi) * Math.cos(CameraOrbit.theta);
         camera.position.set(camX, camY, camZ); camera.lookAt(LocalPlayer.meshGroup.position.x, LocalPlayer.meshGroup.position.y + 1.4, LocalPlayer.meshGroup.position.z);
       }
-
       updateCrackerPhysics(); composer.render();
     }
     animate();
