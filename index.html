@@ -3,98 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🪔 Diwali Mela Carnival | Festive 3D Experience</title>
+  <title>🪔 Authentic Diwali Mela | Traditional Indian Village Fair</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { overflow: hidden; font-family: 'Segoe UI', Tahoma, sans-serif; background: #0a0518; color: #fff; }
     canvas { display: block; }
 
-    #loader {
-      position: fixed; inset: 0; background: radial-gradient(circle, #2a1040, #0a0518);
-      display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000;
-      transition: opacity 1s;
-    }
+    #loader { position: fixed; inset: 0; background: radial-gradient(circle, #2a1040, #0a0518); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; transition: opacity 1s; }
     .loader-icon { font-size: 72px; animation: flicker 1.5s infinite alternate; }
     @keyframes flicker { from { opacity: 0.6; transform: scale(1); } to { opacity: 1; transform: scale(1.1); } }
     .loader-text { font-size: 22px; color: #ffd700; margin-top: 20px; letter-spacing: 2px; }
 
-    #hud {
-      position: fixed; top: 16px; left: 16px; background: rgba(20,8,40,0.85);
-      border: 2px solid #ffd700; border-radius: 14px; padding: 14px 20px; z-index: 20;
-      box-shadow: 0 0 25px rgba(255,170,0,0.4);
-    }
+    #hud { position: fixed; top: 16px; left: 16px; background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 14px; padding: 14px 20px; z-index: 20; box-shadow: 0 0 25px rgba(255,170,0,0.4); }
     #hud h2 { color: #ffd700; font-size: 16px; margin-bottom: 6px; }
     #hud p { font-size: 13px; margin: 2px 0; }
     .hud-value { color: #ffea79; font-weight: bold; }
 
-    #quest-log {
-      position: fixed; top: 16px; right: 16px; width: 240px; background: rgba(20,8,40,0.85);
-      border: 2px solid #ffd700; border-radius: 14px; padding: 12px; z-index: 20;
-    }
+    #quest-log { position: fixed; top: 16px; right: 16px; width: 240px; background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 14px; padding: 12px; z-index: 20; }
     #quest-log h3 { color: #ffd700; font-size: 14px; margin-bottom: 8px; }
     #quest-list { list-style: none; font-size: 12px; }
     #quest-list li { padding: 4px 0; border-bottom: 1px dashed rgba(255,215,0,0.3); }
     #quest-list li.done { text-decoration: line-through; color: #86efac; }
 
-    #chat {
-      position: fixed; bottom: 16px; left: 16px; width: 300px; background: rgba(20,8,40,0.85);
-      border: 2px solid #ffd700; border-radius: 14px; padding: 10px; z-index: 20;
-    }
+    #chat { position: fixed; bottom: 16px; left: 16px; width: 300px; background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 14px; padding: 10px; z-index: 20; }
     #messages { list-style: none; height: 120px; overflow-y: auto; font-size: 12px; margin-bottom: 8px; }
     #messages li { padding: 3px 0; }
     #chat form { display: flex; gap: 6px; }
-    #chat-input {
-      flex: 1; padding: 6px 10px; border-radius: 8px; border: 1px solid #ffd700;
-      background: #0c0416; color: #fff; font-size: 12px;
-    }
-    #chat-submit {
-      padding: 6px 12px; background: #ea580c; color: #fff; border: none;
-      border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px;
-    }
+    #chat-input { flex: 1; padding: 6px 10px; border-radius: 8px; border: 1px solid #ffd700; background: #0c0416; color: #fff; font-size: 12px; }
+    #chat-submit { padding: 6px 12px; background: #ea580c; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; }
 
-    #controls-info {
-      position: fixed; bottom: 16px; right: 16px; background: rgba(20,8,40,0.85);
-      border: 2px solid #ffd700; border-radius: 14px; padding: 10px 16px; font-size: 12px; z-index: 20;
-    }
+    #controls-info { position: fixed; bottom: 16px; right: 16px; background: rgba(20,8,40,0.85); border: 2px solid #ffd700; border-radius: 14px; padding: 10px 16px; font-size: 12px; z-index: 20; }
 
-    #interaction-prompt {
-      position: fixed; bottom: 160px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(90deg, #b91c1c, #ea580c); color: #fff;
-      padding: 10px 24px; border-radius: 30px; border: 2px solid #ffea79;
-      font-weight: bold; display: none; z-index: 25;
-      animation: pulse 1.2s infinite alternate;
-    }
+    #interaction-prompt { position: fixed; bottom: 160px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, #b91c1c, #ea580c); color: #fff; padding: 10px 24px; border-radius: 30px; border: 2px solid #ffea79; font-weight: bold; display: none; z-index: 25; animation: pulse 1.2s infinite alternate; }
     @keyframes pulse { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.08); } }
 
-    #spawn-screen {
-      position: fixed; inset: 0; background: radial-gradient(circle, rgba(22,9,38,0.98), rgba(5,2,10,1));
-      display: flex; justify-content: center; align-items: center; z-index: 500;
-    }
-    .spawn-card {
-      background: linear-gradient(145deg, #2a1440, #140722); border: 2px solid #ffd700;
-      border-radius: 20px; padding: 32px; width: 360px; text-align: center;
-    }
+    #spawn-screen { position: fixed; inset: 0; background: radial-gradient(circle, rgba(22,9,38,0.98), rgba(5,2,10,1)); display: flex; justify-content: center; align-items: center; z-index: 500; }
+    .spawn-card { background: linear-gradient(145deg, #2a1440, #140722); border: 2px solid #ffd700; border-radius: 20px; padding: 32px; width: 360px; text-align: center; }
     .spawn-card h1 { color: #ffd700; margin-bottom: 10px; font-size: 26px; }
     .spawn-card p { font-size: 13px; color: #d1d5db; margin-bottom: 20px; }
-    .spawn-card input {
-      width: 100%; padding: 12px; margin-bottom: 16px; border-radius: 10px;
-      border: 1px solid #ffd700; background: #0c0416; color: #fff; font-size: 15px; text-align: center;
-    }
-    .spawn-card button {
-      width: 100%; padding: 12px; background: linear-gradient(45deg, #ea580c, #f59e0b);
-      color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;
-    }
+    .spawn-card input { width: 100%; padding: 12px; margin-bottom: 16px; border-radius: 10px; border: 1px solid #ffd700; background: #0c0416; color: #fff; font-size: 15px; text-align: center; }
+    .spawn-card button { width: 100%; padding: 12px; background: linear-gradient(45deg, #ea580c, #f59e0b); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-    .modal {
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      background: #1c0e30; border: 2px solid #ffd700; border-radius: 16px;
-      padding: 24px; min-width: 320px; text-align: center; display: none; z-index: 100;
-    }
+    .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #1c0e30; border: 2px solid #ffd700; border-radius: 16px; padding: 24px; min-width: 320px; text-align: center; display: none; z-index: 100; }
     .modal h3 { color: #ffd700; margin-bottom: 14px; }
-    .modal button {
-      background: #ea580c; color: #fff; border: none; padding: 10px 16px;
-      border-radius: 8px; margin: 4px; cursor: pointer; font-weight: bold;
-    }
+    .modal button { background: #ea580c; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; margin: 4px; cursor: pointer; font-weight: bold; }
     .modal button:hover { background: #f59e0b; color: #000; }
   </style>
 </head>
@@ -106,15 +58,15 @@
 
   <div id="spawn-screen" style="display:none;">
     <div class="spawn-card">
-      <h1>🪔 Diwali Mela Carnival</h1>
-      <p>Explore the festive mela, visit shops, light crackers, ride the Ferris wheel, and offer prayers at the temple!</p>
+      <h1>🪔 Traditional Diwali Mela</h1>
+      <p>Step into an authentic Indian village fair - wooden rides, lantern-lit stalls, bustling crowd, and the sacred temple of Lakshmi & Ganesha.</p>
       <input type="text" id="username-input" placeholder="Enter Your Name" maxlength="14" />
       <button onclick="joinMela()">Enter Mela ✨</button>
     </div>
   </div>
 
   <div id="hud" style="display:none;">
-    <h2>🪔 SHUBH DIWALI</h2>
+    <h2>🪔 SHUBH DIWALI MELA</h2>
     <p>👤 <span id="display-name" class="hud-value">-</span></p>
     <p>🪙 Coins: <span id="coin-count" class="hud-value">100</span></p>
     <p>⭐ Blessings: <span id="blessing-count" class="hud-value">0</span></p>
@@ -123,11 +75,12 @@
   <div id="quest-log" style="display:none;">
     <h3>✨ Diwali Quests</h3>
     <ul id="quest-list">
-      <li id="q1">🪔 Visit the temple</li>
+      <li id="q1">🪔 Pray at the Lakshmi-Ganesha temple</li>
       <li id="q2">🎆 Light a cracker</li>
       <li id="q3">🍬 Buy some mithai</li>
-      <li id="q4">🎡 Ride the Ferris wheel</li>
+      <li id="q4">🎡 Ride the wooden Ferris wheel</li>
       <li id="q5">🏮 Release a sky lantern</li>
+      <li id="q6">🎠 Ride the carousel</li>
     </ul>
   </div>
 
@@ -140,7 +93,7 @@
   </div>
 
   <div id="controls-info" style="display:none;">
-    <b>🎮 Controls:</b> WASD / Arrows to move • E to interact • Drag to rotate camera
+    <b>🎮 Controls:</b> WASD / Arrows • E to interact • Drag to rotate camera
   </div>
 
   <div id="interaction-prompt">Press [E] to Interact</div>
@@ -153,24 +106,14 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
-    // ================================================
-    // GLOBAL STATE
-    // ================================================
-    const Player = {
-      name: "Player", coins: 100, blessings: 0,
-      mesh: null, position: new THREE.Vector3(0, 0, 10),
-      velocity: new THREE.Vector3(), walkCycle: 0, limbs: {}
-    };
-    const quests = { q1: false, q2: false, q3: false, q4: false, q5: false };
+    const Player = { name: "Player", coins: 100, blessings: 0, mesh: null, position: new THREE.Vector3(0, 0, 15), velocity: new THREE.Vector3(), walkCycle: 0, limbs: {} };
+    const quests = { q1: false, q2: false, q3: false, q4: false, q5: false, q6: false };
     let activeNearSpot = null;
     const keys = {};
 
-    // ================================================
-    // SCENE SETUP
-    // ================================================
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x060210, 0.015);
-    scene.background = new THREE.Color(0x0a0518);
+    scene.fog = new THREE.FogExp2(0x0a1420, 0.012);
+    scene.background = new THREE.Color(0x0a1830);
 
     const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 500);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -179,83 +122,545 @@
     renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
-    // Lighting
-    scene.add(new THREE.AmbientLight(0x4a2a6a, 1.2));
-    const moon = new THREE.DirectionalLight(0x8ba8d8, 0.6);
-    moon.position.set(30, 60, 30);
+    // Night sky with moonlight
+    scene.add(new THREE.AmbientLight(0x3a4a7a, 1.0));
+    const moon = new THREE.DirectionalLight(0xaac0ff, 0.5);
+    moon.position.set(40, 80, 20);
     scene.add(moon);
 
-    // ================================================
-    // ENVIRONMENT
-    // ================================================
-    const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(200, 200),
-      new THREE.MeshStandardMaterial({ color: 0x1a0f28, roughness: 0.9 })
+    // Moon sphere in sky
+    const moonSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(4, 24, 24),
+      new THREE.MeshBasicMaterial({ color: 0xfff8dc })
     );
+    moonSphere.position.set(40, 70, -80);
+    scene.add(moonSphere);
+    const moonHalo = new THREE.Mesh(
+      new THREE.SphereGeometry(5.5, 24, 24),
+      new THREE.MeshBasicMaterial({ color: 0xffffcc, transparent: true, opacity: 0.2 })
+    );
+    moonHalo.position.copy(moonSphere.position);
+    scene.add(moonHalo);
+
+    // Stars
+    const starGeo = new THREE.BufferGeometry();
+    const starPos = [];
+    for (let i = 0; i < 400; i++) {
+      starPos.push((Math.random()-0.5)*400, Math.random()*100+30, (Math.random()-0.5)*400);
+    }
+    starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+    const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.3 }));
+    scene.add(stars);
+
+    // Ground - dirt/earth texture color (like village ground)
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x4a3020, roughness: 0.95 });
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), groundMat);
     ground.rotation.x = -Math.PI/2;
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // Main pathway
-    const pathMat = new THREE.MeshStandardMaterial({ color: 0x4a2838, roughness: 0.7 });
-    const path1 = new THREE.Mesh(new THREE.PlaneGeometry(16, 140), pathMat);
-    path1.rotation.x = -Math.PI/2; path1.position.y = 0.02; scene.add(path1);
-    const path2 = new THREE.Mesh(new THREE.PlaneGeometry(140, 16), pathMat);
-    path2.rotation.x = -Math.PI/2; path2.position.y = 0.02; scene.add(path2);
+    // Trampled central mela area (lighter dirt)
+    const melaFloor = new THREE.Mesh(
+      new THREE.CircleGeometry(50, 32),
+      new THREE.MeshStandardMaterial({ color: 0x6b4a2e, roughness: 0.9 })
+    );
+    melaFloor.rotation.x = -Math.PI/2; melaFloor.position.y = 0.02;
+    scene.add(melaFloor);
 
-    // Decorative diyas lining the path
-    for (let i = -60; i <= 60; i += 8) {
-      [-9, 9].forEach(x => {
-        const diya = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.3, 0.4, 0.3, 8),
-          new THREE.MeshStandardMaterial({ color: 0xb45309, emissive: 0xff6600, emissiveIntensity: 0.6 })
+    // ================================================
+    // STRING LIGHTS crisscrossing the mela
+    // ================================================
+    const stringLightPoints = [
+      [-30, 8, -20, 30, 8, -20],
+      [-30, 8, 0, 30, 8, 0],
+      [-30, 8, 20, 30, 8, 20],
+      [-25, 8, -25, -25, 8, 25],
+      [25, 8, -25, 25, 8, 25],
+      [0, 8, -30, 0, 8, 30]
+    ];
+    stringLightPoints.forEach(seg => {
+      const start = new THREE.Vector3(seg[0], seg[1], seg[2]);
+      const end = new THREE.Vector3(seg[3], seg[4], seg[5]);
+      const dist = start.distanceTo(end);
+      const steps = Math.floor(dist / 2);
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const pos = new THREE.Vector3().lerpVectors(start, end, t);
+        pos.y -= Math.sin(t * Math.PI) * 0.5; // sag
+        const colors = [0xff2200, 0xffd700, 0x00ff44, 0x0088ff, 0xff00aa];
+        const bulb = new THREE.Mesh(
+          new THREE.SphereGeometry(0.15, 8, 8),
+          new THREE.MeshStandardMaterial({ color: colors[i%5], emissive: colors[i%5], emissiveIntensity: 1.2 })
         );
-        diya.position.set(x, 0.15, i); scene.add(diya);
-        const flame = new THREE.PointLight(0xff8800, 1, 6);
-        flame.position.set(x, 0.5, i); scene.add(flame);
-      });
+        bulb.position.copy(pos);
+        scene.add(bulb);
+      }
+      // Wire
+      const wireGeo = new THREE.BufferGeometry().setFromPoints([start, end]);
+      scene.add(new THREE.Line(wireGeo, new THREE.LineBasicMaterial({ color: 0x333333 })));
+    });
+
+    // ================================================
+    // LAKSHMI-GANESHA TEMPLE (Based on your reference image)
+    // ================================================
+    const temple = new THREE.Group();
+    temple.position.set(0, 0, -35);
+
+    // Temple base
+    const base = new THREE.Mesh(
+      new THREE.BoxGeometry(20, 1.5, 14),
+      new THREE.MeshStandardMaterial({ color: 0xeeeae0, roughness: 0.3 })
+    );
+    base.position.y = 0.75; temple.add(base);
+
+    // Steps
+    for (let i = 0; i < 3; i++) {
+      const step = new THREE.Mesh(
+        new THREE.BoxGeometry(14 + i*2, 0.3, 2),
+        new THREE.MeshStandardMaterial({ color: 0xd0ccbe, roughness: 0.4 })
+      );
+      step.position.set(0, i*0.3 + 0.15, 7 + i*0.8); temple.add(step);
     }
 
-    // ================================================
-    // TEMPLE
-    // ================================================
-    const templeGroup = new THREE.Group();
-    templeGroup.position.set(0, 0, -30);
-    const plinth = new THREE.Mesh(
-      new THREE.BoxGeometry(18, 1.2, 12),
-      new THREE.MeshStandardMaterial({ color: 0xf5f3ef, roughness: 0.2 })
-    );
-    plinth.position.y = 0.6; templeGroup.add(plinth);
-    const pillarMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.8, roughness: 0.2 });
-    [[-7,-4.5],[7,-4.5],[-7,4.5],[7,4.5]].forEach(([x,z]) => {
-      const p = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.45, 7), pillarMat);
-      p.position.set(x, 4.0, z); templeGroup.add(p);
+    // Pillars - 4 ornate gold pillars
+    const pillarMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.85, roughness: 0.2 });
+    [[-7.5,-5.5],[7.5,-5.5],[-7.5,5.5],[7.5,5.5]].forEach(([x,z]) => {
+      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.55, 8), pillarMat);
+      pillar.position.set(x, 5, z); temple.add(pillar);
+      // Pillar top ornament
+      const cap = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 1.2), pillarMat);
+      cap.position.set(x, 9.2, z); temple.add(cap);
     });
-    const dome = new THREE.Mesh(
-      new THREE.ConeGeometry(7, 6, 8),
-      new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.3 })
-    );
-    dome.position.y = 10.5; templeGroup.add(dome);
 
-    // Idols
-    const idolMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.15, emissive: 0x442200, emissiveIntensity: 0.3 });
-    [-2.5, 2.5].forEach(x => {
-      const idol = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 1, 2, 16), idolMat);
-      idol.position.set(x, 2.4, -2); templeGroup.add(idol);
-      const halo = new THREE.Mesh(
-        new THREE.TorusGeometry(0.9, 0.1, 12, 32),
-        new THREE.MeshBasicMaterial({ color: 0xffea00 })
+    // Temple roof base
+    const roofBase = new THREE.Mesh(
+      new THREE.BoxGeometry(18, 0.8, 13),
+      new THREE.MeshStandardMaterial({ color: 0xb45309 })
+    );
+    roofBase.position.y = 9.5; temple.add(roofBase);
+
+    // Main dome (shikhara style)
+    const shikhara = new THREE.Mesh(
+      new THREE.ConeGeometry(6, 7, 8),
+      new THREE.MeshStandardMaterial({ color: 0xc07020, roughness: 0.4 })
+    );
+    shikhara.position.y = 13.4; temple.add(shikhara);
+
+    // Kalash on top
+    const kalash = new THREE.Mesh(
+      new THREE.SphereGeometry(0.5, 12, 12),
+      new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9 })
+    );
+    kalash.position.y = 17.5; temple.add(kalash);
+    const spike = new THREE.Mesh(
+      new THREE.ConeGeometry(0.2, 1.2, 8),
+      new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9 })
+    );
+    spike.position.y = 18.6; temple.add(spike);
+
+    // Side mini-domes
+    [[-7, 0, -4], [7, 0, -4], [-7, 0, 4], [7, 0, 4]].forEach(([x,,z]) => {
+      const miniDome = new THREE.Mesh(
+        new THREE.ConeGeometry(1.5, 2.5, 8),
+        new THREE.MeshStandardMaterial({ color: 0xc07020 })
       );
-      halo.position.set(x, 3.8, -2); templeGroup.add(halo);
+      miniDome.position.set(x, 11, z); temple.add(miniDome);
     });
-    const templeLight = new THREE.PointLight(0xffb700, 5, 30);
-    templeLight.position.set(0, 5, -2); templeGroup.add(templeLight);
-    scene.add(templeGroup);
+
+    // Back wall (behind idols)
+    const backWall = new THREE.Mesh(
+      new THREE.BoxGeometry(14, 7, 0.4),
+      new THREE.MeshStandardMaterial({ color: 0xeeeae0 })
+    );
+    backWall.position.set(0, 4.5, -6); temple.add(backWall);
 
     // ================================================
-    // SHOPS (Patakha, Mithai, Lantern)
+    // LAKSHMI IDOL (3D sculpted based on reference)
     // ================================================
-    function makeBannerTexture(text, bgColor) {
+    const lakshmi = new THREE.Group();
+    lakshmi.position.set(-3.5, 1.8, -4);
+
+    // Lotus throne
+    const lotusMat = new THREE.MeshStandardMaterial({ color: 0xff9966, emissive: 0x441100, emissiveIntensity: 0.3 });
+    const lotus1 = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, 0.3, 8), lotusMat);
+    lotus1.position.y = -0.1; lakshmi.add(lotus1);
+    // Lotus petals
+    for (let i = 0; i < 8; i++) {
+      const petal = new THREE.Mesh(
+        new THREE.ConeGeometry(0.4, 0.8, 6),
+        new THREE.MeshStandardMaterial({ color: 0xff7744 })
+      );
+      const angle = (i/8) * Math.PI * 2;
+      petal.position.set(Math.cos(angle)*1.3, 0.1, Math.sin(angle)*1.3);
+      petal.rotation.z = Math.PI/2;
+      petal.rotation.y = -angle;
+      lakshmi.add(petal);
+    }
+
+    // Lakshmi body - seated posture (red saree)
+    const sareeMat = new THREE.MeshStandardMaterial({ color: 0xaa3322, emissive: 0x331100, emissiveIntensity: 0.3, roughness: 0.5 });
+    const lakshmiLegs = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.9, 1.2, 0.8, 12),
+      sareeMat
+    );
+    lakshmiLegs.position.y = 0.5; lakshmi.add(lakshmiLegs);
+
+    // Lakshmi torso (ornate top)
+    const lakshmiTorsoMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.3, emissive: 0x443300, emissiveIntensity: 0.4 });
+    const lakshmiTorso = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.6, 0.75, 1.0, 12),
+      lakshmiTorsoMat
+    );
+    lakshmiTorso.position.y = 1.45; lakshmi.add(lakshmiTorso);
+
+    // Lakshmi head
+    const skinMat = new THREE.MeshStandardMaterial({ color: 0xd4a76a, roughness: 0.5, emissive: 0x221100, emissiveIntensity: 0.2 });
+    const lakshmiHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), skinMat);
+    lakshmiHead.position.y = 2.15; lakshmi.add(lakshmiHead);
+
+    // Lakshmi crown (mukut)
+    const crownMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.95, emissive: 0x553300, emissiveIntensity: 0.5 });
+    const lakshmiCrown = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.6, 8), crownMat);
+    lakshmiCrown.position.y = 2.6; lakshmi.add(lakshmiCrown);
+
+    // Lakshmi halo (prabhavali)
+    const haloRays = new THREE.Mesh(
+      new THREE.CircleGeometry(1.0, 16),
+      new THREE.MeshBasicMaterial({ color: 0xffcc33, transparent: true, opacity: 0.4 })
+    );
+    haloRays.position.set(0, 2.2, -0.4);
+    lakshmi.add(haloRays);
+    const haloRing = new THREE.Mesh(
+      new THREE.TorusGeometry(0.9, 0.07, 12, 32),
+      crownMat
+    );
+    haloRing.position.set(0, 2.2, -0.35);
+    lakshmi.add(haloRing);
+
+    // Lakshmi 4 arms (seated hands pose - 2 holding pots, 2 showing blessing)
+    [[-0.8, 1.5, 0.1, -0.6], [0.8, 1.5, 0.1, 0.6], [-0.9, 1.3, 0.3, -0.9], [0.9, 1.3, 0.3, 0.9]].forEach(([x,y,z,rz]) => {
+      const arm = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.08, 0.09, 0.6, 8),
+        skinMat
+      );
+      arm.position.set(x, y, z); arm.rotation.z = rz; lakshmi.add(arm);
+    });
+
+    // Lakshmi holding gold pot (kalash)
+    const lakshmiPot = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.2, 0.25, 0.4, 12),
+      crownMat
+    );
+    lakshmiPot.position.set(0, 1.1, 0.5);
+    lakshmi.add(lakshmiPot);
+    temple.add(lakshmi);
+
+    // ================================================
+    // GANESHA IDOL (3D sculpted based on reference)
+    // ================================================
+    const ganesha = new THREE.Group();
+    ganesha.position.set(3.5, 1.8, -4);
+
+    // Lotus throne for Ganesha
+    const gLotus = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, 0.3, 8), lotusMat);
+    gLotus.position.y = -0.1; ganesha.add(gLotus);
+    for (let i = 0; i < 8; i++) {
+      const petal = new THREE.Mesh(
+        new THREE.ConeGeometry(0.4, 0.8, 6),
+        new THREE.MeshStandardMaterial({ color: 0xff7744 })
+      );
+      const angle = (i/8) * Math.PI * 2;
+      petal.position.set(Math.cos(angle)*1.3, 0.1, Math.sin(angle)*1.3);
+      petal.rotation.z = Math.PI/2; petal.rotation.y = -angle;
+      ganesha.add(petal);
+    }
+
+    // Ganesha legs (dhoti - red/orange)
+    const dhotiMat = new THREE.MeshStandardMaterial({ color: 0xcc5522, emissive: 0x331100, emissiveIntensity: 0.3, roughness: 0.5 });
+    const ganeshaLegs = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.0, 1.3, 0.9, 12),
+      dhotiMat
+    );
+    ganeshaLegs.position.y = 0.55; ganesha.add(ganeshaLegs);
+
+    // Ganesha belly (round)
+    const ganeshaBodyMat = new THREE.MeshStandardMaterial({ color: 0xd4a76a, roughness: 0.4, emissive: 0x221100, emissiveIntensity: 0.3 });
+    const ganeshaBelly = new THREE.Mesh(
+      new THREE.SphereGeometry(0.9, 16, 16),
+      ganeshaBodyMat
+    );
+    ganeshaBelly.position.y = 1.4; ganeshaBelly.scale.y = 0.85; ganesha.add(ganeshaBelly);
+
+    // Ganesha head (elephant - large sphere)
+    const ganeshaHead = new THREE.Mesh(
+      new THREE.SphereGeometry(0.65, 16, 16),
+      ganeshaBodyMat
+    );
+    ganeshaHead.position.y = 2.5; ganesha.add(ganeshaHead);
+
+    // Ears (large flat discs)
+    [-1, 1].forEach(side => {
+      const ear = new THREE.Mesh(
+        new THREE.SphereGeometry(0.4, 12, 12),
+        ganeshaBodyMat
+      );
+      ear.position.set(side * 0.65, 2.55, -0.15);
+      ear.scale.set(0.3, 1.1, 0.8);
+      ganesha.add(ear);
+    });
+
+    // Trunk (curved)
+    const trunkSegments = 6;
+    for (let i = 0; i < trunkSegments; i++) {
+      const t = i / (trunkSegments - 1);
+      const trunkPart = new THREE.Mesh(
+        new THREE.SphereGeometry(0.18 - t*0.08, 10, 10),
+        ganeshaBodyMat
+      );
+      trunkPart.position.set(
+        Math.sin(t * 1.5) * 0.3,
+        2.2 - t * 0.5,
+        0.5 + t * 0.1
+      );
+      ganesha.add(trunkPart);
+    }
+
+    // Tusks
+    [-0.2, 0.2].forEach(x => {
+      const tusk = new THREE.Mesh(
+        new THREE.ConeGeometry(0.06, 0.3, 8),
+        new THREE.MeshStandardMaterial({ color: 0xfff5d6 })
+      );
+      tusk.position.set(x, 2.25, 0.45);
+      tusk.rotation.x = -0.3;
+      ganesha.add(tusk);
+    });
+
+    // Ganesha crown
+    const ganeshaCrown = new THREE.Mesh(
+      new THREE.ConeGeometry(0.45, 0.7, 8),
+      crownMat
+    );
+    ganeshaCrown.position.y = 3.1; ganesha.add(ganeshaCrown);
+
+    // Ganesha halo
+    const gHalo = new THREE.Mesh(
+      new THREE.CircleGeometry(1.1, 16),
+      new THREE.MeshBasicMaterial({ color: 0xffcc33, transparent: true, opacity: 0.4 })
+    );
+    gHalo.position.set(0, 2.6, -0.5); ganesha.add(gHalo);
+    const gHaloRing = new THREE.Mesh(
+      new THREE.TorusGeometry(1.0, 0.07, 12, 32),
+      crownMat
+    );
+    gHaloRing.position.set(0, 2.6, -0.45); ganesha.add(gHaloRing);
+
+    // Ganesha 4 arms
+    [[-0.9, 1.6, 0.1, -0.6], [0.9, 1.6, 0.1, 0.6], [-1.0, 1.3, 0.3, -0.9], [1.0, 1.3, 0.3, 0.9]].forEach(([x,y,z,rz]) => {
+      const arm = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.09, 0.1, 0.6, 8),
+        ganeshaBodyMat
+      );
+      arm.position.set(x, y, z); arm.rotation.z = rz; ganesha.add(arm);
+    });
+
+    // Modak in Ganesha's hand
+    const modak = new THREE.Mesh(
+      new THREE.ConeGeometry(0.15, 0.25, 8),
+      new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.5 })
+    );
+    modak.position.set(1.2, 1.2, 0.4);
+    ganesha.add(modak);
+
+    temple.add(ganesha);
+
+    // Marigold flowers scattered in front of idols
+    for (let i = 0; i < 25; i++) {
+      const flower = new THREE.Mesh(
+        new THREE.SphereGeometry(0.1, 8, 8),
+        new THREE.MeshStandardMaterial({ color: 0xff8800, emissive: 0x442200, emissiveIntensity: 0.3 })
+      );
+      flower.position.set(
+        (Math.random()-0.5) * 8,
+        1.55,
+        (Math.random()-0.5) * 3 - 2
+      );
+      temple.add(flower);
+    }
+
+    // Diyas in front of idols
+    [-2, 0, 2].forEach(x => {
+      const diya = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.15, 0.2, 0.1, 8),
+        new THREE.MeshStandardMaterial({ color: 0xb45309 })
+      );
+      diya.position.set(x, 1.6, -2.5); temple.add(diya);
+      const flame = new THREE.Mesh(
+        new THREE.ConeGeometry(0.08, 0.2, 6),
+        new THREE.MeshBasicMaterial({ color: 0xffcc00 })
+      );
+      flame.position.set(x, 1.78, -2.5); temple.add(flame);
+      const flameLight = new THREE.PointLight(0xff8800, 1.5, 8);
+      flameLight.position.set(x, 1.9, -2.5); temple.add(flameLight);
+    });
+
+    // Temple interior spot light
+    const templeInnerLight = new THREE.PointLight(0xffd080, 5, 30);
+    templeInnerLight.position.set(0, 7, -3); temple.add(templeInnerLight);
+    const templeFrontLight = new THREE.PointLight(0xffbb55, 3, 25);
+    templeFrontLight.position.set(0, 4, 2); temple.add(templeFrontLight);
+
+    scene.add(temple);
+
+    // ================================================
+    // WOODEN FERRIS WHEEL (Traditional giant wheel like reference)
+    // ================================================
+    const ferris = new THREE.Group(); ferris.position.set(-30, 0, -15);
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513, roughness: 0.7 });
+
+    // Wooden support frame (A-frame)
+    [[-4, 0], [4, 0]].forEach(([x,]) => {
+      const legA = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 16), woodMat);
+      legA.position.set(x, 8, -2); legA.rotation.x = 0.15; ferris.add(legA);
+      const legB = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 16), woodMat);
+      legB.position.set(x, 8, 2); legB.rotation.x = -0.15; ferris.add(legB);
+    });
+    // Cross support
+    const crossSupport = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 10), woodMat);
+    crossSupport.position.set(0, 13.5, 0); crossSupport.rotation.z = Math.PI/2;
+    ferris.add(crossSupport);
+
+    const wheel = new THREE.Group(); wheel.position.set(0, 13.5, 0);
+    // Outer wooden rings
+    const ring1 = new THREE.Mesh(
+      new THREE.TorusGeometry(7, 0.25, 8, 32),
+      woodMat
+    );
+    wheel.add(ring1);
+    const ring2 = ring1.clone(); ring2.position.z = -1.5; wheel.add(ring2);
+
+    const podColors = [0xcc2222, 0xffcc00, 0x22aa44, 0x2266cc, 0xdd4499, 0xff6600];
+    const pods = [];
+    for (let i = 0; i < 8; i++) {
+      const rad = (i * Math.PI * 2) / 8;
+      // Wooden spoke
+      const spoke1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 14), woodMat);
+      spoke1.rotation.z = rad; wheel.add(spoke1);
+
+      // Hanging basket seat
+      const pod = new THREE.Group();
+      pod.position.set(Math.cos(rad)*7, Math.sin(rad)*7, -0.75);
+      // Rope/chain
+      const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1), new THREE.MeshStandardMaterial({ color: 0x222222 }));
+      rope.position.y = -0.5; pod.add(rope);
+      // Basket seat
+      const seat = new THREE.Mesh(
+        new THREE.BoxGeometry(1.3, 1.0, 1.3),
+        new THREE.MeshStandardMaterial({ color: podColors[i % podColors.length], emissive: podColors[i%podColors.length], emissiveIntensity: 0.2 })
+      );
+      seat.position.y = -1.5; pod.add(seat);
+      // Small light on top
+      const podLight = new THREE.Mesh(
+        new THREE.SphereGeometry(0.1, 8, 8),
+        new THREE.MeshBasicMaterial({ color: 0xffee88 })
+      );
+      podLight.position.y = -0.9; pod.add(podLight);
+
+      wheel.add(pod); pods.push(pod);
+    }
+    // Lights all along the wheel rim
+    for (let i = 0; i < 24; i++) {
+      const angle = (i / 24) * Math.PI * 2;
+      const bulb = new THREE.Mesh(
+        new THREE.SphereGeometry(0.12, 8, 8),
+        new THREE.MeshBasicMaterial({ color: i%2===0 ? 0xffee00 : 0xff2200 })
+      );
+      bulb.position.set(Math.cos(angle)*7, Math.sin(angle)*7, 0.3);
+      wheel.add(bulb);
+    }
+    ferris.add(wheel);
+    scene.add(ferris);
+
+    // ================================================
+    // CAROUSEL (Merry-go-round)
+    // ================================================
+    const carousel = new THREE.Group(); carousel.position.set(28, 0, -10);
+    // Center pole
+    const centerPole = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.3, 0.3, 7),
+      new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.7 })
+    );
+    centerPole.position.y = 3.5; carousel.add(centerPole);
+
+    // Top canopy (striped tent)
+    const canopy = new THREE.Mesh(
+      new THREE.ConeGeometry(5, 2.5, 12),
+      new THREE.MeshStandardMaterial({ color: 0xff2222 })
+    );
+    canopy.position.y = 7.5; carousel.add(canopy);
+    // White stripes on canopy
+    for (let i = 0; i < 6; i++) {
+      const stripe = new THREE.Mesh(
+        new THREE.ConeGeometry(5.01, 2.52, 3, 1, false, i*Math.PI/3, Math.PI/6),
+        new THREE.MeshStandardMaterial({ color: 0xffffff })
+      );
+      stripe.position.y = 7.5; carousel.add(stripe);
+    }
+
+    // Floor
+    const carouselFloor = new THREE.Mesh(
+      new THREE.CylinderGeometry(5, 5, 0.3, 16),
+      new THREE.MeshStandardMaterial({ color: 0xcc8844 })
+    );
+    carouselFloor.position.y = 0.4; carousel.add(carouselFloor);
+
+    // Horses/seats on carousel
+    const carouselAnimals = new THREE.Group();
+    carouselAnimals.position.y = 0.4;
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      const animal = new THREE.Group();
+      animal.position.set(Math.cos(angle)*3.5, 1.5, Math.sin(angle)*3.5);
+      // Horse body
+      const body = new THREE.Mesh(
+        new THREE.BoxGeometry(1.2, 0.5, 0.4),
+        new THREE.MeshStandardMaterial({ color: [0xffffff, 0xff6600, 0xaa44ff][i%3] })
+      );
+      animal.add(body);
+      // Head
+      const head = new THREE.Mesh(
+        new THREE.BoxGeometry(0.3, 0.5, 0.3),
+        new THREE.MeshStandardMaterial({ color: [0xffffff, 0xff6600, 0xaa44ff][i%3] })
+      );
+      head.position.set(0.6, 0.4, 0); animal.add(head);
+      // Pole holding horse
+      const pole = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.05, 0.05, 2.5),
+        new THREE.MeshStandardMaterial({ color: 0xffd700 })
+      );
+      pole.position.y = 0.5; animal.add(pole);
+      animal.rotation.y = -angle + Math.PI/2;
+      carouselAnimals.add(animal);
+    }
+    carousel.add(carouselAnimals);
+
+    // Lights around carousel edge
+    for (let i = 0; i < 16; i++) {
+      const angle = (i / 16) * Math.PI * 2;
+      const bulb = new THREE.Mesh(
+        new THREE.SphereGeometry(0.1, 8, 8),
+        new THREE.MeshBasicMaterial({ color: i%2===0 ? 0xffff00 : 0xff00ff })
+      );
+      bulb.position.set(Math.cos(angle)*5, 5.8, Math.sin(angle)*5);
+      carousel.add(bulb);
+    }
+
+    scene.add(carousel);
+
+    // ================================================
+    // FOOD STALLS (Canopy stalls like the reference)
+    // ================================================
+    function makeBanner(text, bgColor) {
       const c = document.createElement('canvas'); c.width = 512; c.height = 128;
       const ctx = c.getContext('2d');
       ctx.fillStyle = bgColor; ctx.fillRect(0,0,512,128);
@@ -265,65 +670,169 @@
       return new THREE.CanvasTexture(c);
     }
 
-    function createShop(name, color, bgColor, pos) {
+    function createCanopyStall(name, canopyColor, bgColor, pos) {
       const g = new THREE.Group(); g.position.set(...pos);
-      const canopy = new THREE.Mesh(
-        new THREE.ConeGeometry(5, 2.5, 4),
-        new THREE.MeshStandardMaterial({ color: color })
+      // Striped canopy roof (red & white stripes typical of mela)
+      const roof = new THREE.Mesh(
+        new THREE.ConeGeometry(4, 2, 4),
+        new THREE.MeshStandardMaterial({ color: canopyColor })
       );
-      canopy.position.y = 5.5; canopy.rotation.y = Math.PI/4; g.add(canopy);
-      const desk = new THREE.Mesh(
-        new THREE.BoxGeometry(6, 1.6, 2),
-        new THREE.MeshStandardMaterial({ color: 0x78350f })
+      roof.position.y = 4.5; roof.rotation.y = Math.PI/4; g.add(roof);
+      // White stripes
+      for (let i = 0; i < 2; i++) {
+        const stripe = new THREE.Mesh(
+          new THREE.ConeGeometry(4.02, 2.02, 4, 1, false, i*Math.PI/2, Math.PI/4),
+          new THREE.MeshStandardMaterial({ color: 0xffffff })
+        );
+        stripe.position.y = 4.5; stripe.rotation.y = Math.PI/4;
+        g.add(stripe);
+      }
+
+      // Wooden posts
+      [[-2, 2], [2, 2], [-2, -2], [2, -2]].forEach(([x,z]) => {
+        const post = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.1, 0.1, 3.5),
+          new THREE.MeshStandardMaterial({ color: 0x8b4513 })
+        );
+        post.position.set(x, 1.75, z); g.add(post);
+      });
+
+      // Counter table
+      const counter = new THREE.Mesh(
+        new THREE.BoxGeometry(4.5, 1, 1.6),
+        new THREE.MeshStandardMaterial({ color: 0x6b4423 })
       );
-      desk.position.set(0, 0.8, 1.5); g.add(desk);
+      counter.position.set(0, 0.5, 1.3); g.add(counter);
+
+      // Items on counter
+      for (let i = -1; i <= 1; i++) {
+        const item = new THREE.Mesh(
+          new THREE.SphereGeometry(0.2, 8, 8),
+          new THREE.MeshStandardMaterial({ color: [0xffcc00, 0xff6600, 0xffee88][i+1] })
+        );
+        item.position.set(i*1.2, 1.1, 1.3); g.add(item);
+      }
+
+      // Banner
       const banner = new THREE.Mesh(
-        new THREE.PlaneGeometry(6.5, 1.6),
-        new THREE.MeshBasicMaterial({ map: makeBannerTexture(name, bgColor), transparent: true })
+        new THREE.PlaneGeometry(5, 1.3),
+        new THREE.MeshBasicMaterial({ map: makeBanner(name, bgColor), transparent: true })
       );
-      banner.position.set(0, 6.5, 0); g.add(banner);
-      // Hanging lantern decoration
+      banner.position.set(0, 5.8, 0); g.add(banner);
+
+      // Hanging lantern
       const lantern = new THREE.Mesh(
         new THREE.SphereGeometry(0.3, 12, 12),
-        new THREE.MeshStandardMaterial({ color: 0xff4400, emissive: 0xff2200, emissiveIntensity: 0.8 })
+        new THREE.MeshStandardMaterial({ color: 0xff4400, emissive: 0xff2200, emissiveIntensity: 0.9 })
       );
-      lantern.position.set(0, 4, 2); g.add(lantern);
+      lantern.position.set(0, 3, 2.2); g.add(lantern);
+      const lanternLight = new THREE.PointLight(0xff6600, 2, 10);
+      lanternLight.position.copy(lantern.position); g.add(lanternLight);
+
       return g;
     }
 
-    scene.add(createShop("🎆 Patakha Bhandar", 0xd97706, '#991b1b', [-25, 0, -8]));
-    scene.add(createShop("🍬 Bikaner Mithai", 0xb91c1c, '#7c2d12', [25, 0, -8]));
-    scene.add(createShop("🏮 Sky Lantern", 0x0f766e, '#0f766e', [-25, 0, 18]));
+    scene.add(createCanopyStall("🎆 Patakha Bhandar", 0xdd2222, '#991b1b', [-25, 0, 10]));
+    scene.add(createCanopyStall("🍬 Mithai Wala", 0xdd2222, '#7c2d12', [-18, 0, 20]));
+    scene.add(createCanopyStall("🏮 Sky Lantern", 0x228844, '#0f766e', [18, 0, 20]));
+    scene.add(createCanopyStall("🥘 Chaat Corner", 0xdd2222, '#8b2635', [25, 0, 10]));
+    scene.add(createCanopyStall("🧋 Jalebi Garam", 0xffaa22, '#b45309', [-12, 0, -8]));
+    scene.add(createCanopyStall("🎨 Rangoli Kala", 0x8844cc, '#6b21a8', [12, 0, -8]));
 
     // ================================================
-    // FERRIS WHEEL (JHOOLA)
+    // VILLAGE HUTS in background
     // ================================================
-    const ferris = new THREE.Group(); ferris.position.set(28, 0, 28);
-    const supportMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8 });
-    [-2.5, 2.5].forEach(x => {
-      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.3, 18), supportMat);
-      leg.position.set(x, 9, 0); leg.rotation.z = x < 0 ? -0.15 : 0.15; ferris.add(leg);
-    });
-    const wheel = new THREE.Group(); wheel.position.set(0, 15, 0);
-    wheel.add(new THREE.Mesh(
-      new THREE.TorusGeometry(8.5, 0.18, 12, 32),
-      new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xff8800, emissiveIntensity: 0.4 })
-    ));
-    const podColors = [0xff2200, 0xffd700, 0x00ffcc, 0xff00aa, 0x00ff44, 0xff7700, 0x9900ff, 0x00aaff];
-    const pods = [];
-    for (let i = 0; i < 8; i++) {
-      const rad = (i * Math.PI * 2) / 8;
-      const spoke = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 17), supportMat);
-      spoke.rotation.z = rad; wheel.add(spoke);
-      const pod = new THREE.Group();
-      pod.position.set(Math.cos(rad)*8.5, Math.sin(rad)*8.5, 0);
-      const podMesh = new THREE.Mesh(
-        new THREE.BoxGeometry(1.8, 1.8, 1.8),
-        new THREE.MeshStandardMaterial({ color: podColors[i], emissive: podColors[i], emissiveIntensity: 0.3 })
+    for (let i = 0; i < 12; i++) {
+      const angle = (i / 12) * Math.PI * 2;
+      const dist = 60 + Math.random() * 15;
+      const hut = new THREE.Group();
+      hut.position.set(Math.cos(angle)*dist, 0, Math.sin(angle)*dist);
+      // Wall
+      const wall = new THREE.Mesh(
+        new THREE.BoxGeometry(4, 3, 4),
+        new THREE.MeshStandardMaterial({ color: 0xd4a574 })
       );
-      pod.add(podMesh); wheel.add(pod); pods.push(pod);
+      wall.position.y = 1.5; hut.add(wall);
+      // Thatched roof
+      const roof = new THREE.Mesh(
+        new THREE.ConeGeometry(3.3, 2, 4),
+        new THREE.MeshStandardMaterial({ color: 0x8b5a2b })
+      );
+      roof.position.y = 4; roof.rotation.y = Math.PI/4; hut.add(roof);
+      // Window light
+      const windowLight = new THREE.PointLight(0xffaa55, 0.8, 8);
+      windowLight.position.set(0, 2, 2); hut.add(windowLight);
+      scene.add(hut);
     }
-    ferris.add(wheel); scene.add(ferris);
+
+    // ================================================
+    // TREES scattered around
+    // ================================================
+    for (let i = 0; i < 20; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 55 + Math.random() * 30;
+      const tree = new THREE.Group();
+      tree.position.set(Math.cos(angle)*dist, 0, Math.sin(angle)*dist);
+      const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.4, 0.5, 4),
+        new THREE.MeshStandardMaterial({ color: 0x5a3a20 })
+      );
+      trunk.position.y = 2; tree.add(trunk);
+      const leaves = new THREE.Mesh(
+        new THREE.SphereGeometry(2, 10, 10),
+        new THREE.MeshStandardMaterial({ color: 0x1a4a2a })
+      );
+      leaves.position.y = 5; leaves.scale.y = 1.3; tree.add(leaves);
+      scene.add(tree);
+    }
+
+    // ================================================
+    // DECORATIVE DIYAS lining pathways
+    // ================================================
+    for (let i = -40; i <= 40; i += 6) {
+      [-11, 11].forEach(x => {
+        const diya = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.3, 0.4, 0.3, 8),
+          new THREE.MeshStandardMaterial({ color: 0xb45309, emissive: 0xff6600, emissiveIntensity: 0.5 })
+        );
+        diya.position.set(x, 0.15, i); scene.add(diya);
+        const flame = new THREE.PointLight(0xff8800, 0.8, 5);
+        flame.position.set(x, 0.5, i); scene.add(flame);
+      });
+    }
+
+    // ================================================
+    // NPC CROWD (walking villagers)
+    // ================================================
+    const npcs = [];
+    const npcColors = [0xcc2222, 0x22aa44, 0x2244cc, 0xdd8800, 0xaa44dd, 0xff6688, 0x44ddcc];
+    for (let i = 0; i < 25; i++) {
+      const npc = new THREE.Group();
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 5 + Math.random() * 25;
+      npc.position.set(Math.cos(angle)*dist, 0, Math.sin(angle)*dist);
+      
+      const sareeColor = npcColors[Math.floor(Math.random()*npcColors.length)];
+      const body = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.3, 0.4, 1.2, 10),
+        new THREE.MeshStandardMaterial({ color: sareeColor })
+      );
+      body.position.y = 0.7; npc.add(body);
+      
+      const head = new THREE.Mesh(
+        new THREE.SphereGeometry(0.22, 12, 12),
+        new THREE.MeshStandardMaterial({ color: 0xd4a76a })
+      );
+      head.position.y = 1.55; npc.add(head);
+      
+      scene.add(npc);
+      npcs.push({ 
+        mesh: npc, 
+        angle: Math.random()*Math.PI*2,
+        speed: 0.01 + Math.random()*0.02,
+        changeTimer: Math.random()*100
+      });
+    }
 
     // ================================================
     // PLAYER AVATAR
@@ -376,10 +885,8 @@
       return { group, limbs };
     }
 
-    // ================================================
-    // CAMERA ORBIT
-    // ================================================
-    const cam = { theta: 0.5, phi: 0.7, radius: 14, dragging: false, lastX: 0, lastY: 0 };
+    // Camera
+    const cam = { theta: 0.5, phi: 0.7, radius: 16, dragging: false, lastX: 0, lastY: 0 };
     renderer.domElement.addEventListener('pointerdown', (e) => {
       cam.dragging = true; cam.lastX = e.clientX; cam.lastY = e.clientY;
     });
@@ -391,23 +898,22 @@
     });
     window.addEventListener('pointerup', () => { cam.dragging = false; });
     window.addEventListener('wheel', (e) => {
-      cam.radius = Math.max(7, Math.min(30, cam.radius + e.deltaY * 0.02));
+      cam.radius = Math.max(7, Math.min(35, cam.radius + e.deltaY * 0.02));
     }, { passive: true });
 
-    // ================================================
-    // HOTSPOTS
-    // ================================================
+    // Hotspots
     const hotspots = [
-      { id: "temple", name: "🪔 Temple Aarti", pos: [0, 0, -30], range: 8, action: () => doAarti() },
-      { id: "patakha", name: "🎆 Patakha Shop", pos: [-25, 0, -8], range: 6, action: () => showPatakhaModal() },
-      { id: "mithai", name: "🍬 Mithai Shop", pos: [25, 0, -8], range: 6, action: () => showMithaiModal() },
-      { id: "lantern", name: "🏮 Sky Lantern", pos: [-25, 0, 18], range: 6, action: () => flyLantern() },
-      { id: "ferris", name: "🎡 Ferris Wheel", pos: [28, 0, 28], range: 7, action: () => rideFerris() }
+      { id: "temple", name: "🪔 Lakshmi-Ganesha Mandir", pos: [0, 0, -35], range: 9, action: () => doAarti() },
+      { id: "patakha", name: "🎆 Patakha Bhandar", pos: [-25, 0, 10], range: 6, action: () => showPatakhaModal() },
+      { id: "mithai", name: "🍬 Mithai Wala", pos: [-18, 0, 20], range: 6, action: () => showMithaiModal() },
+      { id: "lantern", name: "🏮 Sky Lantern", pos: [18, 0, 20], range: 6, action: () => flyLantern() },
+      { id: "chaat", name: "🥘 Chaat Corner", pos: [25, 0, 10], range: 6, action: () => eatChaat() },
+      { id: "jalebi", name: "🧋 Jalebi Garam", pos: [-12, 0, -8], range: 6, action: () => eatJalebi() },
+      { id: "rangoli", name: "🎨 Rangoli Kala", pos: [12, 0, -8], range: 6, action: () => drawRangoli() },
+      { id: "ferris", name: "🎡 Giant Wheel", pos: [-30, 0, -15], range: 8, action: () => rideFerris() },
+      { id: "carousel", name: "🎠 Merry-Go-Round", pos: [28, 0, -10], range: 7, action: () => rideCarousel() }
     ];
 
-    // ================================================
-    // UI ACTIONS
-    // ================================================
     const modal = document.getElementById('action-modal');
     function openModal(title, html) {
       document.getElementById('modal-title').innerText = title;
@@ -445,9 +951,9 @@
       speak("Haan bhaiya, kaunsa patakha loge?");
       openModal("🎆 Patakha Bhandar", `
         <p>Bhaiya kaunsa patakha chahiye?</p>
-        <button onclick="burnCracker('rocket')">🚀 Rocket (5 coins)</button>
-        <button onclick="burnCracker('anar')">🌋 Anar (3 coins)</button>
-        <button onclick="burnCracker('chakri')">🌀 Chakri (3 coins)</button>
+        <button onclick="burnCracker('rocket')">🚀 Rocket (5)</button>
+        <button onclick="burnCracker('anar')">🌋 Anar (3)</button>
+        <button onclick="burnCracker('chakri')">🌀 Chakri (3)</button>
       `);
     };
 
@@ -457,7 +963,7 @@
         <p>Taza taza mithai!</p>
         <button onclick="buyMithai('kaju katli', 10)">💎 Kaju Katli (10)</button>
         <button onclick="buyMithai('gulab jamun', 8)">🍯 Gulab Jamun (8)</button>
-        <button onclick="buyMithai('laddu', 6)">🟡 Besan Laddu (6)</button>
+        <button onclick="buyMithai('laddu', 6)">🟡 Laddu (6)</button>
       `);
     };
 
@@ -465,12 +971,10 @@
       if (Player.coins >= cost) {
         Player.coins -= cost; updateHUD();
         speak("Ye lijiye garam garam " + name);
-        addChatMessage("Shopkeeper", `Here is your ${name}! Enjoy!`);
+        addChatMessage("Shopkeeper", `Here is your ${name}!`);
         completeQuest('q3', 15);
         closeModal();
-      } else {
-        alert("Not enough coins!");
-      }
+      } else alert("Not enough coins!");
     };
 
     window.burnCracker = function(type) {
@@ -494,8 +998,7 @@
       );
       lan.position.copy(Player.position); lan.position.y = 2;
       scene.add(lan);
-      const light = new THREE.PointLight(0xff8800, 2, 10);
-      lan.add(light);
+      const light = new THREE.PointLight(0xff8800, 2, 10); lan.add(light);
       const anim = () => {
         lan.position.y += 0.08;
         lan.position.x += Math.sin(lan.position.y * 0.3) * 0.02;
@@ -506,9 +1009,33 @@
       completeQuest('q5', 20);
     };
 
+    window.eatChaat = function() {
+      speak("Garma garam chaat bhaiya");
+      openModal("🥘 Chaat Corner", `
+        <p>Pani puri, bhel, dahi puri!</p>
+        <button onclick="Player.coins -= 5; updateHUD(); addChatMessage('You', 'Enjoyed Pani Puri!'); closeModal();">💧 Pani Puri (5)</button>
+        <button onclick="Player.coins -= 7; updateHUD(); addChatMessage('You', 'Enjoyed Bhel!'); closeModal();">🥗 Bhel (7)</button>
+      `);
+    };
+
+    window.eatJalebi = function() {
+      speak("Garam garam jalebi");
+      Player.coins -= 5; updateHUD();
+      addChatMessage("Shopkeeper", "Yahan hai aapki jalebi!");
+      closeModal();
+    };
+
+    window.drawRangoli = function() {
+      speak("Rangoli banayenge aap?");
+      openModal("🎨 Rangoli Design", `
+        <p>Make a beautiful rangoli pattern!</p>
+        <button onclick="Player.coins += 15; Player.blessings += 1; updateHUD(); addChatMessage('System', 'Beautiful Rangoli! +15 coins'); closeModal();">✨ Make Rangoli</button>
+      `);
+    };
+
     window.rideFerris = function() {
       speak("Jhoole ka maza lijiye");
-      openModal("🎡 Ferris Wheel", `
+      openModal("🎡 Giant Wheel", `
         <p>Enjoy the view from the top!</p>
         <button onclick="payFerris()">🎫 Pay 10 Coins</button>
       `);
@@ -518,7 +1045,24 @@
       if (Player.coins >= 10) {
         Player.coins -= 10; updateHUD();
         completeQuest('q4', 25);
-        addChatMessage("System", "You rode the Ferris wheel! 🎡");
+        addChatMessage("System", "You rode the Giant Wheel! 🎡");
+        closeModal();
+      } else alert("Not enough coins!");
+    };
+
+    window.rideCarousel = function() {
+      speak("Ghoda ghoda ride lijiye");
+      openModal("🎠 Carousel", `
+        <p>Hop on the merry-go-round!</p>
+        <button onclick="payCarousel()">🎫 Pay 8 Coins</button>
+      `);
+    };
+
+    window.payCarousel = function() {
+      if (Player.coins >= 8) {
+        Player.coins -= 8; updateHUD();
+        completeQuest('q6', 20);
+        addChatMessage("System", "You rode the Carousel! 🎠");
         closeModal();
       } else alert("Not enough coins!");
     };
@@ -526,9 +1070,9 @@
     window.doAarti = function() {
       speak("Jai Maa Lakshmi. Jai Shri Ganesh.");
       openModal("🪔 Temple Aarti", `
-        <p>Om Jai Lakshmi Mata...</p>
-        <p>You offered prayers and received blessings!</p>
-        <button onclick="finishAarti()">🙏 Receive Blessing</button>
+        <p>Om Jai Lakshmi Mata...<br>Jai Ganesh Deva...</p>
+        <p>Offer your prayers to Lakshmi & Ganesha</p>
+        <button onclick="finishAarti()">🙏 Perform Aarti</button>
       `);
     };
 
@@ -539,11 +1083,8 @@
       closeModal();
     };
 
-    // ================================================
-    // CRACKER PHYSICS
-    // ================================================
+    // Cracker effects
     const activeFx = [];
-
     function sparks(pos, count, color, speed) {
       for (let i = 0; i < count; i++) {
         const s = new THREE.Mesh(
@@ -558,36 +1099,25 @@
         });
       }
     }
-
     function launchRocket(x, z) {
       const r = new THREE.Mesh(
         new THREE.CylinderGeometry(0.1, 0.1, 0.8, 8),
         new THREE.MeshStandardMaterial({ color: 0xdc2626 })
       );
       r.position.set(x, 0.5, z); scene.add(r);
-      const light = new THREE.PointLight(0xff7700, 2, 10);
-      scene.add(light);
+      const light = new THREE.PointLight(0xff7700, 2, 10); scene.add(light);
       activeFx.push({ type: 'rocket', mesh: r, light, vy: 0.6, life: 60 });
     }
-
     function launchAnar(x, z) {
-      const a = new THREE.Mesh(
-        new THREE.ConeGeometry(0.3, 0.6, 12),
-        new THREE.MeshStandardMaterial({ color: 0xb45309 })
-      );
+      const a = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.6, 12), new THREE.MeshStandardMaterial({ color: 0xb45309 }));
       a.position.set(x, 0.3, z); scene.add(a);
       activeFx.push({ type: 'anar', mesh: a, life: 120 });
     }
-
     function launchChakri(x, z) {
-      const c = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.35, 0.35, 0.1, 16),
-        new THREE.MeshStandardMaterial({ color: 0x10b981 })
-      );
+      const c = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.1, 16), new THREE.MeshStandardMaterial({ color: 0x10b981 }));
       c.position.set(x, 0.05, z); scene.add(c);
       activeFx.push({ type: 'chakri', mesh: c, angle: 0, life: 140 });
     }
-
     function updateFx() {
       for (let i = activeFx.length - 1; i >= 0; i--) {
         const f = activeFx[i];
@@ -607,26 +1137,20 @@
           if (f.life <= 0) { scene.remove(f.mesh); activeFx.splice(i, 1); }
         } else if (f.type === 'chakri') {
           f.angle += 0.4; f.mesh.rotation.y = f.angle;
-          sparks(new THREE.Vector3(
-            f.mesh.position.x + Math.cos(f.angle)*0.35, 0.1,
-            f.mesh.position.z + Math.sin(f.angle)*0.35
-          ), 5, 0x10b981, 0.3);
+          sparks(new THREE.Vector3(f.mesh.position.x + Math.cos(f.angle)*0.35, 0.1, f.mesh.position.z + Math.sin(f.angle)*0.35), 5, 0x10b981, 0.3);
           f.life--;
           if (f.life <= 0) { scene.remove(f.mesh); activeFx.splice(i, 1); }
         }
       }
     }
 
-    // ================================================
-    // CHAT
-    // ================================================
+    // Chat
     function addChatMessage(user, msg) {
       const li = document.createElement('li');
       li.innerHTML = `<b style="color:#ffd700">${user}:</b> ${msg}`;
       document.getElementById('messages').appendChild(li);
       document.getElementById('messages').scrollTop = 999999;
     }
-
     window.sendChat = function(e) {
       e.preventDefault();
       const input = document.getElementById('chat-input');
@@ -639,9 +1163,7 @@
       }, 800);
     };
 
-    // ================================================
-    // INPUT
-    // ================================================
+    // Input
     window.addEventListener('keydown', e => {
       if (document.activeElement.tagName === 'INPUT') return;
       keys[e.key.toLowerCase()] = true;
@@ -649,15 +1171,11 @@
     });
     window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
-    // ================================================
-    // JOIN GAME
-    // ================================================
     window.joinMela = function() {
       Player.name = document.getElementById('username-input').value.trim() || "Player";
       document.getElementById('display-name').innerText = Player.name;
       document.getElementById('spawn-screen').style.display = 'none';
       ['hud','quest-log','chat','controls-info'].forEach(id => document.getElementById(id).style.display = 'block');
-
       const av = buildAvatar(Player.name);
       Player.mesh = av.group; Player.limbs = av.limbs;
       Player.mesh.position.copy(Player.position);
@@ -666,7 +1184,6 @@
       addChatMessage("System", `Welcome to the Mela, ${Player.name}! 🪔`);
     };
 
-    // Show spawn after loader
     window.addEventListener('load', () => {
       setTimeout(() => {
         document.getElementById('loader').style.opacity = 0;
@@ -677,13 +1194,28 @@
       }, 1500);
     });
 
-    // ================================================
-    // ANIMATION LOOP
-    // ================================================
     function animate() {
       requestAnimationFrame(animate);
-      wheel.rotation.z += 0.006;
+      wheel.rotation.z += 0.005;
       pods.forEach(p => { p.rotation.z = -wheel.rotation.z; });
+      carouselAnimals.rotation.y += 0.008;
+
+      // NPC movement
+      npcs.forEach(npc => {
+        npc.changeTimer--;
+        if (npc.changeTimer <= 0) {
+          npc.angle = Math.random() * Math.PI * 2;
+          npc.changeTimer = 100 + Math.random()*200;
+        }
+        npc.mesh.position.x += Math.cos(npc.angle) * npc.speed;
+        npc.mesh.position.z += Math.sin(npc.angle) * npc.speed;
+        npc.mesh.rotation.y = -npc.angle + Math.PI/2;
+        // Keep NPCs in bounds
+        const d = Math.hypot(npc.mesh.position.x, npc.mesh.position.z);
+        if (d > 35) {
+          npc.angle = Math.atan2(-npc.mesh.position.z, -npc.mesh.position.x);
+        }
+      });
 
       if (Player.mesh) {
         let ix = 0, iz = 0;
@@ -696,10 +1228,9 @@
           const forward = new THREE.Vector3(-Math.sin(cam.theta), 0, -Math.cos(cam.theta));
           const right = new THREE.Vector3(Math.cos(cam.theta), 0, -Math.sin(cam.theta));
           const move = new THREE.Vector3().addScaledVector(forward, -iz).addScaledVector(right, ix).normalize();
-          Player.position.addScaledVector(move, 0.15);
+          Player.position.addScaledVector(move, 0.18);
           Player.mesh.position.copy(Player.position);
           Player.mesh.rotation.y = Math.atan2(move.x, move.z);
-
           Player.walkCycle += 0.35;
           const swing = Math.sin(Player.walkCycle) * 0.7;
           Player.limbs.legL.rotation.x = swing;
@@ -712,7 +1243,6 @@
           });
         }
 
-        // Hotspot detection
         let near = null;
         hotspots.forEach(h => {
           if (Player.position.distanceTo(new THREE.Vector3(...h.pos)) <= h.range) near = h;
@@ -727,7 +1257,6 @@
           prompt.style.display = 'none';
         }
 
-        // Camera follow
         const cx = Player.position.x + cam.radius * Math.sin(cam.phi) * Math.sin(cam.theta);
         const cy = Player.position.y + cam.radius * Math.cos(cam.phi);
         const cz = Player.position.z + cam.radius * Math.sin(cam.phi) * Math.cos(cam.theta);
